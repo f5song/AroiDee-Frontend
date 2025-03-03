@@ -23,7 +23,6 @@ interface TabsNavigationProps {
 }
 
 const TabsNavigation: React.FC<TabsNavigationProps> = ({
-  activeTab,
   searchQuery,
   sort,
   onSearchChange,

@@ -1,15 +1,11 @@
 // MyRecipesPage.tsx
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { 
   Recipe, 
   RecipeSource,
-  RECIPES_PER_PAGE, 
-  TAB_VALUES,
   fetchRecipesBySource, 
   toggleFavoriteRecipe 
 } from "@/lib/recipes";
-import Footer from "@/components/footer";
-import Navbar from "@/components/navigation";
 import RecipeCollection from "@/components/myRecipe/RecipeCollection";
 import PageHeader from "@/components/myRecipe/PageHeader";
 

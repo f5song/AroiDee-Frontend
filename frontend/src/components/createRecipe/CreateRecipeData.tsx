@@ -76,22 +76,22 @@ export const difficultyLevels = [
   { value: "hard", label: "Hard" }
 ];
 
-// Mock function to save recipe data
-export const saveRecipe = async (recipe: RecipeInput): Promise<{ success: boolean; id?: number; error?: string }> => {
-  // In a real app, this would be an API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Simulate successful save
-      resolve({
-        success: true,
-        id: Math.floor(Math.random() * 1000) + 100 // Generate a fake ID
-      });
+// // Mock function to save recipe data
+// export const saveRecipe = async (recipe: RecipeInput): Promise<{ success: boolean; id?: number; error?: string }> => {
+//   // In a real app, this would be an API call
+//   return new Promise((resolve) => {
+//     setTimeout(() => {
+//       // Simulate successful save
+//       resolve({
+//         success: true,
+//         id: Math.floor(Math.random() * 1000) + 100 // Generate a fake ID
+//       });
       
-      // To simulate an error instead:
-      // resolve({
-      //   success: false,
-      //   error: "Failed to save recipe"
-      // });
-    }, 1500); // Simulate network delay
-  });
-};
+//       // To simulate an error instead:
+//       // resolve({
+//       //   success: false,
+//       //   error: "Failed to save recipe"
+//       // });
+//     }, 1500); // Simulate network delay
+//   });
+// };

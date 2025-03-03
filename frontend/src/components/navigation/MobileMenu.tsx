@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { X } from 'lucide-react';
 import NavItem from './NavItem';
 import ProfileMenu from './ProfileMenu';
 import { RECIPE_MENU_ITEMS, MEAL_PLANNING_ITEMS } from './constants';
@@ -89,7 +88,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
       </div>
 
       {/* Add keyframe animation for menu items */}
-      <style jsx>{`
+      <style>{`
         @keyframes fadeSlideIn {
           from {
             opacity: 0;

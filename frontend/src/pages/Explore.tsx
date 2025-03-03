@@ -11,8 +11,7 @@ import {
   fetchRecipesBySource,
   toggleFavoriteRecipe,
 } from "@/lib/recipes";
-import Navbar from "@/components/navigation";
-import Footer from "@/components/footer";
+
 
 /**
  * Main component for the Explore page

@@ -1,8 +1,6 @@
 // UPDATED Profile.tsx - Using only ResponsiveSidebar
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import Navbar from "@/components/navigation";
-import Footer from "@/components/footer";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileStats from "@/components/profile/ProfileStats"; // Using original ProfileStats
 import ProfileActions from "@/components/profile/ProfileActions";

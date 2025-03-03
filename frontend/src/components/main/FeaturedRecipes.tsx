@@ -1,4 +1,4 @@
-import React from "react";
+
 import { Star } from "lucide-react";
 
 // Sample data for featured recipes

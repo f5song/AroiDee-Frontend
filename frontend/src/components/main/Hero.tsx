@@ -1,6 +1,6 @@
-import React from "react";
+
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+
 
 const Hero = () => {
   // Animation variants

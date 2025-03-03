@@ -1,6 +1,4 @@
 import React from "react";
-import Navbar from "@/components/navigation";
-import Footer from "@/components/footer";
 import TeamMemberCard from "@/components/aboutUs/TeamMemberCard"; // Import the updated card
 
 const teamMembers = [

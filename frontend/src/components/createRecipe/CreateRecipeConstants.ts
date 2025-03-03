@@ -1,6 +1,6 @@
 // lib/recipes/create-recipe-constants.ts
 import { IngredientInput, InstructionInput, RecipeInput } from "@/lib/recipes/form/types";
-import { DIFFICULTY_OPTIONS } from "@/lib/recipes/constants";
+
 
 /**
  * Default values for ingredient form

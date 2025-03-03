@@ -1,4 +1,4 @@
-import React from "react";
+
 import { motion } from "framer-motion";
 
 // Updated categories with food images
@@ -38,7 +38,7 @@ const categories = [
 // Motion variants
 const categoryVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i) => ({ 
+  visible: (i:number) => ({ 
     opacity: 1, 
     y: 0, 
     transition: { 

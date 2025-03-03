@@ -31,7 +31,6 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Tabs,
@@ -46,8 +45,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Slider } from "@/components/ui/slider";
-import Navbar from "@/components/navigation";
-import Footer from "@/components/footer";
 
 // Import from refactored files
 import { 
@@ -418,7 +415,7 @@ export default function CreateRecipePage() {
                       )}
                       
                       <div className="space-y-3">
-                        {recipe.ingredients.map((ingredient, index) => (
+                        {recipe.ingredients.map((ingredient) => (
                           <div key={ingredient.id} className="grid grid-cols-12 gap-2 items-center">
                             <div className="col-span-6 md:col-span-5">
                               <Input

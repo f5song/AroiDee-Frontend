@@ -36,5 +36,4 @@ export {
   createRecipe,
   updateRecipe,
   uploadRecipeImage,
-  fetchRecipeForEdit
 } from "./api";

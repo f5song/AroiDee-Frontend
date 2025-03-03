@@ -1,7 +1,7 @@
 // lib/recipes/form/api.ts
 import { RecipeInput, CreateRecipeResponse } from "./types";
 import { recipeInputToRecipe } from "./types";
-import { Recipe } from "../types";
+
 
 /**
  * สร้างสูตรอาหารใหม่
@@ -81,19 +81,19 @@ export const uploadRecipeImage = async (imageFile: File): Promise<{url: string} 
   }
 };
 
-/**
- * ดึงสูตรอาหารสำหรับแก้ไข
- */
-export const fetchRecipeForEdit = async (id: number): Promise<RecipeInput | null> => {
-  try {
-    // ในแอปจริง นี่จะเป็นการเรียก API ของคุณ
-    await new Promise(resolve => setTimeout(resolve, 800)); // จำลองความล่าช้าของเครือข่าย
+// /**
+//  * ดึงสูตรอาหารสำหรับแก้ไข
+//  */
+// export const fetchRecipeForEdit = async (id: number): Promise<RecipeInput | null> => {
+//   try {
+//     // ในแอปจริง นี่จะเป็นการเรียก API ของคุณ
+//     await new Promise(resolve => setTimeout(resolve, 800)); // จำลองความล่าช้าของเครือข่าย
     
-    // ดึงสูตรอาหารจาก ID ที่กำหนด (จำลอง)
-    // คุณจะแปลงการตอบสนองของ API เป็นรูปแบบ RecipeInput ที่นี่
-    return null;
-  } catch (error) {
-    console.error("เกิดข้อผิดพลาดในการดึงสูตรอาหาร:", error);
-    return null;
-  }
-};
+//     // ดึงสูตรอาหารจาก ID ที่กำหนด (จำลอง)
+//     // คุณจะแปลงการตอบสนองของ API เป็นรูปแบบ RecipeInput ที่นี่
+//     return null;
+//   } catch (error) {
+//     console.error("เกิดข้อผิดพลาดในการดึงสูตรอาหาร:", error);
+//     return null;
+//   }
+// };

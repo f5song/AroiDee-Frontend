@@ -1,6 +1,6 @@
 // lib/recipes/form/hooks.ts
 import { useState } from "react";
-import { RecipeInput, IngredientInput, InstructionInput, ValidationErrors } from "./types";
+import { RecipeInput, IngredientInput, ValidationErrors } from "./types";
 import { DEFAULT_RECIPE_FORM } from "./constants";
 import { validateRecipe, findErrorTab } from "./validation";
 

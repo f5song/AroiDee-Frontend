@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ChefHat, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 
 import {
   Tabs,
@@ -10,7 +10,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
-import { ExploreSidebarProps, AdvancedFilters as AdvancedFiltersType } from "@/components/explore/sidebar/types";
+import { ExploreSidebarProps  } from "@/components/explore/sidebar/types";
 import { categories } from "@/components/explore/sidebar/constants";
 import SearchBar from "@/components/explore/sidebar/SearchBar";
 import CategoryList from "@/components/explore/sidebar/CategoryList";
@@ -30,7 +30,7 @@ export function ExploreSidebar({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sidebarHeight, setSidebarHeight] = useState("auto");
+  const [sidebarHeight] = useState("auto");
   const [activeTab, setActiveTab] = useState("categories");
   
   // Advanced filters state

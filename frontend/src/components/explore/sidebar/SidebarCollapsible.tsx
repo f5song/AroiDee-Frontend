@@ -6,13 +6,11 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { SidebarCollapsibleProps } from "@/components/explore/sidebar/types";
-import Tooltip from "@/components/explore/sidebar/Tooltip";
 
 export function SidebarCollapsible({
   isOpen,
   setIsOpen,
   isMobile,
-  sidebarHeight,
   selectedCategory,
   activeFiltersCount,
   searchQuery,

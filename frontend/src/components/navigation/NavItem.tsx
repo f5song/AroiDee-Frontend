@@ -121,7 +121,7 @@ const NavItem: React.FC<NavItemProps> = ({
       )}
 
       {/* Add keyframe animation for the link items */}
-      <style jsx>{`
+      <style>{`
         @keyframes slideIn {
           from {
             opacity: 0;

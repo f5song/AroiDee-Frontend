@@ -1,7 +1,7 @@
 // components/myRecipe/RecipeCollection.tsx
 import React, { useState, useEffect } from "react";
 import { Recipe, RecipeSource, FilterOptions } from "@/lib/recipes/types";
-import { RECIPES_PER_PAGE, TAB_VALUES, SORT_OPTIONS } from "@/lib/recipes/constants";
+import { TAB_VALUES, SORT_OPTIONS } from "@/lib/recipes/constants";
 import { fetchRecipesBySource } from "@/lib/recipes/api";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PaginationControls from "@/components/explore/PaginationControls";
@@ -139,9 +139,9 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   );
 
   // Select which initial data to use for each tab
-  const initialRecipes = activeTab === TAB_VALUES.MY_RECIPES 
-    ? initialMyRecipes 
-    : initialFavoriteRecipes;
+  // const initialRecipes = activeTab === TAB_VALUES.MY_RECIPES 
+  //   ? initialMyRecipes 
+  //   : initialFavoriteRecipes;
 
   return (
     <>

@@ -1,6 +1,6 @@
 // lib/recipes/recipe-form-api.ts
 import { RecipeInput, CreateRecipeResponse, recipeInputToRecipe } from "@/lib/recipes/form/types";
-import { Recipe } from "@/lib/recipes/types";
+
 
 /**
  * Saves a new recipe
@@ -80,19 +80,19 @@ export const uploadRecipeImage = async (imageFile: File): Promise<{url: string} 
   }
 };
 
-/**
- * Fetches a recipe for editing
- */
-export const fetchRecipeForEdit = async (id: number): Promise<RecipeInput | null> => {
-  try {
-    // In a real app, this would be a call to your API
-    await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
+// /**
+//  * Fetches a recipe for editing
+//  */
+// export const fetchRecipeForEdit = async (id: number): Promise<RecipeInput | null> => {
+//   try {
+//     // In a real app, this would be a call to your API
+//     await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
     
-    // Simulate recipe fetch
-    // You would convert the API response to RecipeInput format here
-    return null;
-  } catch (error) {
-    console.error("Error fetching recipe:", error);
-    return null;
-  }
-};
+//     // Simulate recipe fetch
+//     // You would convert the API response to RecipeInput format here
+//     return null;
+//   } catch (error) {
+//     console.error("Error fetching recipe:", error);
+//     return null;
+//   }
+// };

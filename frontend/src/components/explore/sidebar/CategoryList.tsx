@@ -17,7 +17,6 @@ export function CategoryList({
   return (
     <Accordion 
       type="multiple" 
-      collapsible 
       className="w-full" 
       value={expandedCategories} 
       onValueChange={setExpandedCategories}
