@@ -55,7 +55,7 @@ const Categories = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        Popular Categories
+        Categories
       </motion.h3>
 
       {/* Category Grid */}

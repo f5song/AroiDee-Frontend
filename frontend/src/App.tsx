@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { AuthProvider } from "@/components/auth/AuthContext";
 import SmartNavbar from "./components/navigation/SmartNavbar";
 import LandingPage from "@/pages/Homepage";
@@ -15,21 +13,6 @@ import LoginPage from "@/pages/LoginPage";
 import Footer from "./components/footer";
 
 const App = () => {
-  const API_URL = import.meta.env.VITE_API_URL; // ✅ ใช้ค่าจาก .env
-  const [backendMessage, setBackendMessage] = useState<string>("");
-
-
-  useEffect(() => {
-    axios
-      .get<{ message: string }>(`${API_URL}/api/test`)
-      .then((response) => {
-        setBackendMessage(response.data.message);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setBackendMessage("❌ Cannot connect to backend");
-      });
-  }, []);
   
 
   return (
@@ -39,12 +22,6 @@ const App = () => {
           <SmartNavbar />
 
           <main className="flex-grow">
-            {/* แสดงข้อความจาก Backend (เช็คว่าเชื่อมต่อสำเร็จหรือไม่) */}
-            {backendMessage && (
-              <div className="bg-green-100 text-green-700 p-2 text-center">
-                {backendMessage}
-              </div>
-            )}
 
             <Routes>
               <Route path="/" element={<LandingPage />} />
