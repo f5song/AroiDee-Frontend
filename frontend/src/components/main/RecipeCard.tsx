@@ -4,15 +4,17 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, BarChart, Star, Heart } from "lucide-react";
 
 interface Recipe {
+  id: number;
   title: string;
   author: string;
   image: string;
-  cookTime: string;
+  cookTime: number; // 🔹 ให้ cookTime เป็น number
   calories: number;
-  rating: number;
+  rating?: number | null;
   ingredients: string[];
   isFavorite: boolean;
 }
+
 
 interface RecipeCardProps {
   recipe: Recipe;
