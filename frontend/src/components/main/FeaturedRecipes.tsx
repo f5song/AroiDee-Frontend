@@ -13,6 +13,7 @@ const FeaturedRecipes = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    
     axios
       .get(`${API_URL}/api/recipes`)
       .then((response) => {
@@ -23,6 +24,7 @@ const FeaturedRecipes = () => {
           setLoading(false);
           return;
         }
+        console.log("API Response:", response.data);
 
         // สุ่ม 6 รายการจาก recipes
         const shuffledRecipes = allRecipes.sort(() => 0.5 - Math.random()).slice(0, 6);
