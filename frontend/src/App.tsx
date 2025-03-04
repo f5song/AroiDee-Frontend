@@ -15,18 +15,22 @@ import LoginPage from "@/pages/LoginPage";
 import Footer from "./components/footer";
 
 const App = () => {
+  const API_URL = import.meta.env.VITE_API_URL; // ✅ ใช้ค่าจาก .env
   const [backendMessage, setBackendMessage] = useState<string>("");
+
 
   useEffect(() => {
     axios
-      .get<{ message: string }>("https://aroi-dee-backend.vercel.app/api/test") // Backend URL
+      .get<{ message: string }>(`${API_URL}/api/test`)
       .then((response) => {
         setBackendMessage(response.data.message);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
+        setBackendMessage("❌ Cannot connect to backend");
       });
   }, []);
+  
 
   return (
     <AuthProvider>
