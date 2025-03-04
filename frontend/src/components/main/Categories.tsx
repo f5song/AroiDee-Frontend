@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://aroi-dee-backend.vercel.app";
+const API_URL = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+  ? import.meta.env.VITE_API_URL
+  : "https://aroi-dee-backend.vercel.app";
 
 // Motion variants
 const categoryVariants = {
@@ -31,7 +33,7 @@ const Categories = () => {
     axios
       .get(`${API_URL}/api/categories`)
       .then((response) => {
-        setCategories(response.data.categories);
+        setCategories(response.data.data); // ✅ ตรวจสอบให้แน่ใจว่า API คืนค่าเป็น data
         setLoading(false);
       })
       .catch((error) => {
@@ -71,7 +73,7 @@ const Categories = () => {
             {/* Circular Image */}
             <div className="w-24 h-24 rounded-full overflow-hidden mb-2 shadow-md">
               <img
-                src={category.image_url || "/api/placeholder/120/120"}
+                src={category.image_url || "/default-category.png"} // ✅ ใช้ภาพ fallback
                 alt={category.name}
                 className="w-full h-full object-cover"
               />
