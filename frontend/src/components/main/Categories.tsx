@@ -1,59 +1,49 @@
-
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 
-// Updated categories with food images
-const categories = [
-  { 
-    name: "Pasta", 
-    image: "/api/placeholder/120/120",
-    alt: "Pasta dish with noodles"
-  },
-  { 
-    name: "Pizza", 
-    image: "/api/placeholder/120/120",
-    alt: "Pizza with vegetables"
-  },
-  { 
-    name: "Vegan", 
-    image: "/api/placeholder/120/120",
-    alt: "Vegan salad bowl"
-  },
-  { 
-    name: "Desserts", 
-    image: "/api/placeholder/120/120",
-    alt: "Sweet desserts"
-  },
-  { 
-    name: "Smoothies", 
-    image: "/api/placeholder/120/120",
-    alt: "Fruit smoothie"
-  },
-  { 
-    name: "Breakfast", 
-    image: "/api/placeholder/120/120",
-    alt: "Breakfast bowl"
-  },
-];
+const API_URL = import.meta.env.VITE_API_URL || "https://aroi-dee-backend.vercel.app";
 
 // Motion variants
 const categoryVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i:number) => ({ 
-    opacity: 1, 
-    y: 0, 
-    transition: { 
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
       delay: i * 0.1,
-      duration: 0.4, 
-      ease: "easeOut" 
-    } 
+      duration: 0.4,
+      ease: "easeOut",
+    },
   }),
-  hover: { 
+  hover: {
     y: -5,
-    transition: { duration: 0.2 } 
+    transition: { duration: 0.2 },
   },
 };
 
 const Categories = () => {
+  const [categories, setCategories] = useState<{ id: number; name: string; image_url?: string }[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/api/categories`)
+      .then((response) => {
+        setCategories(response.data.categories);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching categories:", error);
+        setError("Failed to load categories.");
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <p className="text-center text-gray-500">Loading categories...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+
   return (
     <section className="container mx-auto py-8 px-4">
       {/* Section Title */}
@@ -70,7 +60,7 @@ const Categories = () => {
       <div className="grid grid-cols-3 md:grid-cols-6 gap-4 justify-items-center">
         {categories.map((category, i) => (
           <motion.div
-            key={category.name}
+            key={category.id}
             className="flex flex-col items-center cursor-pointer"
             variants={categoryVariants}
             custom={i}
@@ -80,13 +70,13 @@ const Categories = () => {
           >
             {/* Circular Image */}
             <div className="w-24 h-24 rounded-full overflow-hidden mb-2 shadow-md">
-              <img 
-                src={category.image} 
-                alt={category.alt} 
+              <img
+                src={category.image_url || "/api/placeholder/120/120"}
+                alt={category.name}
                 className="w-full h-full object-cover"
               />
             </div>
-            
+
             {/* Category Name */}
             <span className="text-sm font-medium text-center">{category.name}</span>
           </motion.div>
