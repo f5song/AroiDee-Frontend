@@ -19,7 +19,7 @@ const App = () => {
 
   useEffect(() => {
     axios
-      .get<{ message: string }>("http://localhost:5000/api/test") // Backend URL
+      .get<{ message: string }>("https://aroi-dee-backend.vercel.app/api/test") // Backend URL
       .then((response) => {
         setBackendMessage(response.data.message);
       })
