@@ -2,7 +2,7 @@ export interface Recipe {
     id: number;
     title: string;
     calories: number;
-    time: number;
+    cook_time: number;
     image: string;
     rating: number;
     difficulty: string;
