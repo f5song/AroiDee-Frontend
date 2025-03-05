@@ -1,14 +1,15 @@
 export interface Recipe {
-    id: number;
-    title: string;
-    calories: number;
-    cook_time: number;
-    image: string;
-    rating: number;
-    difficulty: string;
-    tags: string[];
-  }
-  
+  id: number;
+  title: string;
+  calories: number;
+  cook_time?: number; 
+  image: string;
+  rating: number;
+  difficulty: string;
+  tags: string[];
+}
+
+
   export interface PaginationInfo {
     currentPage: number;
     totalPages: number;
