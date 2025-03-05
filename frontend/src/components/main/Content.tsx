@@ -21,7 +21,11 @@ interface ContentProps {
   toggleFavorite: (index: number) => void;
 }
 
-const Content: React.FC<ContentProps> = ({ topic, recipes, toggleFavorite }) => {
+const Content: React.FC<ContentProps> = ({
+  topic,
+  recipes,
+  toggleFavorite,
+}) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const handlePrev = () => {
@@ -41,14 +45,20 @@ const Content: React.FC<ContentProps> = ({ topic, recipes, toggleFavorite }) => 
       {topic && <h3 className="text-3xl font-bold mb-4">{topic}</h3>}
 
       <div className="relative">
-        <div ref={scrollRef} className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar">
+        <div
+          ref={scrollRef}
+          className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar"
+        >
           {recipes.map((recipe, index) => (
-            <motion.div key={recipe.id} className="snap-center flex-shrink-0 w-[320px]">
+            <motion.div
+              key={recipe.id}
+              className="snap-center flex-shrink-0 w-[320px]"
+            >
               <RecipeCard
                 recipe={{
                   ...recipe,
-                  cook_time: recipe.cook_time ?? 0, // ✅ ถ้า cook_time ไม่มีค่า ให้ใช้ 0
-                  calories: recipe.calories ?? 0, // ✅ ถ้า calories ไม่มีค่า ให้ใช้ 0
+                  cook_time: recipe.cook_time ?? 0,
+                  calories: recipe.calories ?? 0,
                 }}
                 onToggleFavorite={() => toggleFavorite(index)}
               />
@@ -58,10 +68,16 @@ const Content: React.FC<ContentProps> = ({ topic, recipes, toggleFavorite }) => 
 
         {recipes.length > 3 && (
           <>
-            <button onClick={handlePrev} className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow-md hover:bg-gray-300 transition">
+            <button
+              onClick={handlePrev}
+              className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow-md hover:bg-gray-300 transition"
+            >
               <ArrowLeft className="h-6 w-6" />
             </button>
-            <button onClick={handleNext} className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow-md hover:bg-gray-300 transition">
+            <button
+              onClick={handleNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-200 p-2 rounded-full shadow-md hover:bg-gray-300 transition"
+            >
               <ArrowRight className="h-6 w-6" />
             </button>
           </>

@@ -34,21 +34,21 @@ const Homepage: React.FC = () => {
   useEffect(() => {
     axios.get(`${API_URL}/api/recipes`)
       .then((response) => {
+        console.log("Fetched Recipes:", response.data); // ✅ ตรวจสอบค่าที่ frontend ได้รับ
+  
         if (response.data.success) {
           const fetchedRecipes = response.data.data.map((recipe: any) => ({
             id: recipe.id,
             title: recipe.title,
-            author: recipe.users?.username || "Unknown",
+            author: recipe.author || "Unknown", // ✅ ใช้ `author` แทน users.username
             image_url: recipe.image_url || "/default-recipe.jpg",
-            cook_time: recipe.cook_time || 0,
-            calories: recipe.nutrition_facts?.[0]?.calories 
-              ? Number(recipe.nutrition_facts[0].calories) 
-              : 0, // ✅ แก้ให้ไม่ error
+            cook_time: recipe.cook_time ?? 0, // ✅ ถ้าไม่มีค่าให้ใช้ 0
+            calories: recipe.calories ?? 0, // ✅ calories มาจาก API ตรงๆ
             rating: recipe.rating ?? null, // ✅ ตรวจสอบค่า rating
-            ingredients: recipe.recipe_ingredients?.map((ing: any) => ing.ingredients?.name || "Unknown") || [],
+            ingredients: recipe.ingredients || [],
             isFavorite: false,
           }));
-
+  
           setRecipes(fetchedRecipes);
         } else {
           setError("Failed to load recipes.");
@@ -61,6 +61,7 @@ const Homepage: React.FC = () => {
         setLoading(false);
       });
   }, []);
+  
 
   // 📌 ฟังก์ชัน Toggle Favorite
   const toggleFavorite = (index: number) => {
