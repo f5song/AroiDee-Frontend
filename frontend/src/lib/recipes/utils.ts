@@ -20,7 +20,7 @@ export const sortRecipes = (recipes: Recipe[], sortOption: string): Recipe[] => 
     case "rating":
       return recipesCopy.sort((a, b) => b.rating - a.rating);
     case "cooking-time":
-      return recipesCopy.sort((a, b) => a.time - b.time);
+      return recipesCopy.sort((a, b) => a.cook_time - b.cook_time);
     case "calories-low":
       return recipesCopy.sort((a, b) => a.calories - b.calories);
     case "calories-high":
@@ -47,7 +47,7 @@ export const filterRecipes = (
   // กรองตามหมวดหมู่
   if (categories.length > 0) {
     filtered = filtered.filter(recipe => 
-      categories.some(category => recipe.tags.includes(category))
+      categories.some(category => recipe.categories.includes(category))  // เปลี่ยนจาก recipe.tags เป็น recipe.categories
     );
   }
   
@@ -56,13 +56,13 @@ export const filterRecipes = (
     const searchLower = search.toLowerCase();
     filtered = filtered.filter(recipe => 
       recipe.title.toLowerCase().includes(searchLower) ||
-      recipe.tags.some(tag => TAG_DISPLAY[tag]?.toLowerCase().includes(searchLower) || tag.toLowerCase().includes(searchLower))
+      recipe.categories.some(tag => tag.toLowerCase().includes(searchLower)) // กรองคำค้นหาจาก categories
     );
   }
   
   // กรองตามเวลาทำอาหาร
   if (cookingTime) {
-    filtered = filtered.filter(recipe => recipe.time <= cookingTime);
+    filtered = filtered.filter(recipe => recipe.cook_time <= cookingTime);  // เปลี่ยนจาก recipe.time เป็น recipe.cook_time
   }
   
   // กรองตามความยาก
@@ -128,7 +128,7 @@ export const getDifficultyDisplay = (difficulty: string): string => {
  * ดึงแท็กที่ไม่ซ้ำกันจากสูตรอาหาร
  */
 export const extractUniqueTags = (recipes: Recipe[]): string[] => {
-  const allTags = recipes.flatMap(recipe => recipe.tags);
+  const allTags = recipes.flatMap(recipe => recipe.categories);
   return [...new Set(allTags)];
 };
 

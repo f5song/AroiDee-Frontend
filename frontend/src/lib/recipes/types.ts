@@ -4,16 +4,17 @@
  * สูตรอาหาร
  */
 export interface Recipe {
-    id: number;
-    description: string;
-    title: string;
-    calories: number;
-    time: number;
-    image: string;
-    rating: number;
-    difficulty: string;
-    tags: string[];
-  }
+  id: number;
+  description: string;
+  title: string;
+  calories: number;
+  cook_time: number;
+  image: string;
+  rating: number;
+  difficulty: string;
+  categories: string[];  // แทนที่ tags ด้วย categories
+}
+
   
   /**
    * ข้อมูลการแบ่งหน้า

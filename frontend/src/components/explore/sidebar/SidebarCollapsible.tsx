@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Filter, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Filter, ChevronRight, X } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -7,10 +7,12 @@ import {
 } from "@/components/ui/collapsible";
 import { SidebarCollapsibleProps } from "@/components/explore/sidebar/types";
 
+
 export function SidebarCollapsible({
   isOpen,
   setIsOpen,
   isMobile,
+
   selectedCategory,
   activeFiltersCount,
   searchQuery,
@@ -24,12 +26,12 @@ export function SidebarCollapsible({
   
   return (
     <>
-      {/* Mobile toggle button when sidebar is closed */}
+      {/* Mobile toggle button when sidebar is closed - แสดงเฉพาะเมื่อเป็นมือถือและ sidebar ปิดอยู่ */}
       {isMobile && !isOpen && (
         <Button 
           variant="outline" 
           size="sm" 
-          className="fixed left-4 top-20 z-50 rounded-full shadow-md p-3"
+          className="fixed left-4 top-20 z-50 rounded-full shadow-md p-3 transition-all duration-300 hover:bg-primary hover:text-white"
           onClick={() => setIsOpen(true)}
         >
           <Filter className="h-4 w-4" />
@@ -44,19 +46,25 @@ export function SidebarCollapsible({
       <Collapsible
         open={isOpen}
         onOpenChange={setIsOpen}
-        className={`bg-background ${isMobile ? 'fixed inset-0 z-40' : 'border-r sticky top-[var(--navbar-height,0px)] z-10'}`}
+        className={`bg-background ${isMobile ? 'fixed left-0 top-0 bottom-0 z-40' : 'border-r sticky top-[var(--navbar-height,0px)] z-10'}`}
         style={{ 
           height: isMobile ? '100%' : 'auto',
-          minHeight: isMobile ? '100%' : 'calc(100vh - var(--navbar-height, 0px))'
+          minHeight: isMobile ? '100%' : 'calc(100vh - var(--navbar-height, 0px))',
+          width: isMobile && isOpen ? '100%' : 'auto',
+          transform: isMobile ? (isOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
+          transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+          display: isMobile ? 'block' : 'block', // แสดงตลอดแต่ใช้ transform เลื่อนแทน
+          boxShadow: isMobile && isOpen ? '0 4px 24px rgba(0, 0, 0, 0.2)' : 'none' // เพิ่มเงาเมื่อเปิด sidebar บนมือถือ
         }}
       >
         <div
           className={`transition-all duration-300 ${
-            isOpen ? (isMobile ? "w-full" : "w-72") : "w-12"
+            isOpen ? (isMobile ? "w-full" : "w-ๅ/") : (isMobile ? "w-full" : "w-12")
           } flex flex-col h-full bg-white shadow-sm`}
         >
           <div className="flex items-center justify-between p-4 border-b">
             <h2 className={`font-semibold ${!isOpen && "sr-only"}`}>Recipe Explorer</h2>
+            {/* ถ้าเป็นมือถือ ซ่อนปุ่มเลื่อน sidebar ทางด้านข้าง แสดงเฉพาะปุ่มปิด */}
             <CollapsibleTrigger asChild>
               <Button
                 variant="ghost"
@@ -64,9 +72,9 @@ export function SidebarCollapsible({
                 className="rounded-full w-8 h-8 p-0"
               >
                 {isOpen ? (
-                  isMobile ? <X className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />
+                  <X className="h-4 w-4" />
                 ) : (
-                  <ChevronRight className="h-4 w-4" />
+                  !isMobile && <ChevronRight className="h-4 w-4" />
                 )}
               </Button>
             </CollapsibleTrigger>

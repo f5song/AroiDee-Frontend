@@ -10,7 +10,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
-import { ExploreSidebarProps  } from "@/components/explore/sidebar/types";
+import { ExploreSidebarProps} from "@/components/explore/sidebar/types";
 import { categories } from "@/components/explore/sidebar/constants";
 import SearchBar from "@/components/explore/sidebar/SearchBar";
 import CategoryList from "@/components/explore/sidebar/CategoryList";
@@ -23,7 +23,8 @@ export function ExploreSidebar({
   onCategoryChange,
   onSearch,
   onAdvancedFiltersChange,
-}: ExploreSidebarProps) {
+  onSidebarToggle, // เพิ่ม prop ใหม่สำหรับแจ้งสถานะ sidebar
+}: ExploreSidebarProps & { onSidebarToggle?: (isOpen: boolean) => void }) {
   // State
   const [isOpen, setIsOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -35,7 +36,7 @@ export function ExploreSidebar({
   
   // Advanced filters state
   const [cookingTime, setCookingTime] = useState(30);
-  const [calorieRange, setCalorieRange] = useState(500); // Default calorie range
+  const [calorieRange, setCalorieRange] = useState(500);
   const [difficulty, setDifficulty] = useState("all");
   const [ingredients, setIngredients] = useState<string>("");
   const [ingredientsList, setIngredientsList] = useState<string[]>([]);
@@ -44,11 +45,15 @@ export function ExploreSidebar({
   // Check if mobile on initial render and when window resizes
   useEffect(() => {
     function handleResize() {
-      setIsMobile(window.innerWidth < 768);
+      const isMobileView = window.innerWidth < 768;
+      setIsMobile(isMobileView);
+      
+      // ในโหมดมือถือให้ปิด sidebar โดยค่าเริ่มต้น
+      // ในโหมดเดสก์ท็อปให้เปิด sidebar โดยค่าเริ่มต้น
       if (window.innerWidth < 768) {
-        setIsOpen(false);
-      } else {
-        setIsOpen(true);
+        setIsOpen(false); // มือถือปิด sidebar เสมอเมื่อเริ่มต้นหรือ resize
+      } else if (window.innerWidth >= 768) {
+        setIsOpen(true); // เดสก์ท็อปเปิด sidebar เสมอ
       }
     }
     
@@ -61,6 +66,13 @@ export function ExploreSidebar({
     // Clean up
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // แจ้งสถานะ sidebar ไปยัง parent component
+  useEffect(() => {
+    if (onSidebarToggle) {
+      onSidebarToggle(isOpen);
+    }
+  }, [isOpen, onSidebarToggle]);
 
   // Find parent category
   const findParentCategory = (slug: string): string | null => {
@@ -75,7 +87,7 @@ export function ExploreSidebar({
   useEffect(() => {
     let count = 0;
     if (cookingTime !== 30) count++;
-    if (calorieRange !== 500) count++; // Count calorie filter if not default
+    if (calorieRange !== 500) count++;
     if (difficulty !== "all") count++;
     if (ingredientsList.length > 0) count++;
     setActiveFiltersCount(count);
@@ -133,7 +145,7 @@ export function ExploreSidebar({
         cookingTime,
         difficulty,
         ingredients: ingredientsList,
-        calorieRange // Include calorie range in advanced filters
+        calorieRange
       });
     }
     
@@ -149,7 +161,7 @@ export function ExploreSidebar({
     setSearchQuery("");
     onSearch("");
     setCookingTime(30);
-    setCalorieRange(500); // Reset calorie range to default
+    setCalorieRange(500);
     setDifficulty("all");
     setIngredientsList([]);
     if (onAdvancedFiltersChange) {
@@ -157,7 +169,7 @@ export function ExploreSidebar({
         cookingTime: 30,
         difficulty: "all",
         ingredients: [],
-        calorieRange: 500 // Include default calorie range in reset
+        calorieRange: 500
       });
     }
   };
