@@ -23,12 +23,14 @@ interface RecipeCardProps {
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onToggleFavorite }) => {
   return (
     <div className="bg-white border rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden flex flex-col min-h-[420px]">
-      <img src={recipe.image_url} alt={recipe.title} className="w-full h-48 object-cover" />
+      {/* ✅ ป้องกัน null หรือ undefined */}
+      <img src={recipe.image_url || "/default-recipe.jpg"} alt={recipe.title} className="w-full h-48 object-cover" />
 
       <div className="p-4 flex flex-col flex-grow justify-between">
         <div>
           <h4 className="font-semibold text-lg mb-1 line-clamp-1">{recipe.title}</h4>
-          <p className="text-sm text-gray-500 mb-2 line-clamp-1">by {recipe.author}</p>
+          {/* ✅ ป้องกัน Unknown แสดงผลหาก author เป็น null หรือ undefined */}
+          <p className="text-sm text-gray-500 mb-2 line-clamp-1">by {recipe.author || "Anonymous"}</p>
 
           <div className="flex flex-wrap gap-2 my-2 max-h-[40px] overflow-hidden">
             {recipe.ingredients.slice(0, 3).map((ing, i) => (
@@ -41,8 +43,12 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onToggleFavorite }) => 
         </div>
 
         <div className="flex justify-between items-center text-sm text-gray-600">
-          <div className="flex items-center gap-1"><Clock className="h-4 w-4" /> {recipe.cook_time} mins</div>
-          <div className="flex items-center gap-1"><BarChart className="h-4 w-4" /> {recipe.calories} kcal</div>
+          <div className="flex items-center gap-1">
+            <Clock className="h-4 w-4" /> {recipe.cook_time ? `${recipe.cook_time} mins` : "N/A"}
+          </div>
+          <div className="flex items-center gap-1">
+            <BarChart className="h-4 w-4" /> {recipe.calories && recipe.calories > 0 ? `${recipe.calories} kcal` : "N/A"}
+          </div>
         </div>
 
         <div className="flex justify-between items-center mt-3">
