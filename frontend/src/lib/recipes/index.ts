@@ -22,16 +22,17 @@ export {
 } from './constants';
 
 // API functions
-export {
-  fetchRecipes,
-  fetchUserRecipes,
-  fetchFavoriteRecipes,
-  fetchRecipeById,
-  fetchRecipesBySource,
-  toggleFavoriteRecipe,
-  isFavoriteRecipe,
-  fetchCategories
+// lib/recipes/api.ts
+export { 
+  fetchRecipes, 
+  fetchUserRecipes, 
+  fetchFavoriteRecipes, 
+  fetchRecipeById, 
+  fetchRecipesBySource, 
+  toggleFavoriteRecipe, 
+  fetchCategories 
 } from './api';
+
 
 // Utils
 export {
