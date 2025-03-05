@@ -14,7 +14,7 @@ interface RecipeCardProps {
     id: number;
     title: string;
     calories: number;
-    cook_time: number;
+    cook_time?: number;
     image: string;
     rating: number;
     difficulty: string;
