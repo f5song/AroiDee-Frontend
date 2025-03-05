@@ -6,14 +6,15 @@ import RecipeCard from "./RecipeCard";
 interface Recipe {
     id: number;
     title: string;
-    author: string;
-    image: string;
-    cookTime: number; // 🔹 ต้องเป็น number
-    calories: number;
+    author: string; // ✅ ดึง username จาก users
+    image_url?: string;
+    cook_time?: number;
+    calories?: number;
     rating?: number | null;
     ingredients: string[];
     isFavorite: boolean;
-}
+  }
+  
 
 interface ContentProps {
     topic?: string;

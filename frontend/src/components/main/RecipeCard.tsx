@@ -6,10 +6,10 @@ import { Clock, BarChart, Star, Heart } from "lucide-react";
 interface Recipe {
   id: number;
   title: string;
-  author: string;
-  image: string;
-  cookTime: number; // 🔹 ให้ cookTime เป็น number
-  calories: number;
+  author: string; // ✅ ดึง username จาก users
+  image_url?: string;
+  cook_time?: number;
+  calories?: number;
   rating?: number | null;
   ingredients: string[];
   isFavorite: boolean;
@@ -25,7 +25,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onToggleFavorite }) => 
   return (
     <div className="bg-white border rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden flex flex-col min-h-[420px]">
       {/* Recipe Image */}
-      <img src={recipe.image} alt={recipe.title} className="w-full h-48 object-cover" />
+      <img src={recipe.image_url} alt={recipe.title} className="w-full h-48 object-cover" />
 
       {/* Recipe Details */}
       <div className="p-4 flex flex-col flex-grow justify-between">
@@ -46,7 +46,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onToggleFavorite }) => 
 
         {/* Cook Time & Calories */}
         <div className="flex justify-between items-center text-sm text-gray-600">
-          <div className="flex items-center gap-1"><Clock className="h-4 w-4" /> {recipe.cookTime}</div>
+          <div className="flex items-center gap-1"><Clock className="h-4 w-4" /> {recipe.cook_time}</div>
           <div className="flex items-center gap-1"><BarChart className="h-4 w-4" /> {recipe.calories} kcal</div>
         </div>
 
