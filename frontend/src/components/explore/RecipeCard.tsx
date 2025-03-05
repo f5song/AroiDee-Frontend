@@ -14,7 +14,7 @@ interface RecipeCardProps {
     id: number;
     title: string;
     calories: number;
-    time: number;
+    cook_time: number;
     image: string;
     rating: number;
     difficulty: string;
@@ -28,7 +28,7 @@ interface RecipeCardProps {
  * Recipe card component displaying a single recipe
  */
 export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardProps) {
-  const { id, title, calories, time, image, rating, difficulty, tags } = recipe;
+  const { id, title, calories, cook_time, image, rating, difficulty, tags } = recipe;
 
   // Show no more than 2 tags
   const displayTags = tags?.slice(0, 2) || [];
@@ -68,7 +68,7 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="flex items-center">
-                  <Clock className="w-4 h-4 mr-1" /> {time} min
+                  <Clock className="w-4 h-4 mr-1" /> {cook_time} min
                 </span>
               </TooltipTrigger>
               <TooltipContent>
