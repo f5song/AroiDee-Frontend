@@ -1,100 +1,64 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { useAuth } from "@/components/auth/AuthContext";
-import AuthDemoComponent from "@/components/auth/AuthDemoComponent";
 import Hero from "@/components/main/Hero";
 import Categories from "@/components/main/Categories";
 import Content from "@/components/main/Content";
-import ShareRecipe from "@/components/main/ShareRecipe"; 
+import ShareRecipe from "@/components/main/ShareRecipe";
 import FeaturedRecipes from "@/components/main/FeaturedRecipes";
 import LatestRecipes from "@/components/main/LatestRecipesGrid";
 
-const recipesData = [
-  {
-    title: "Oatmeal Pancakes",
-    author: "Sarah Johnson",
-    image: "/placeholder.svg",
-    cookTime: "20 mins",
-    calories: 320,
-    rating: 4.8,
-    ingredients: ["Oats", "Milk", "Egg", "Honey"],
-    isFavorite: true
-  },
-  {
-    title: "Herb Roasted Chicken",
-    author: "Jane Doe",
-    image: "/placeholder.svg",
-    cookTime: "60 mins",
-    calories: 450,
-    rating: 4.5,
-    ingredients: ["Chicken", "Basil", "Garlic", "Pepper", "Olive Oil"],
-    isFavorite: false
-  },
-  {
-    title: "Mixed Vegetable Salad",
-    author: "Mike Wilson",
-    image: "/placeholder.svg",
-    cookTime: "15 mins",
-    calories: 180,
-    rating: 4.2,
-    ingredients: ["Salad Greens", "Tomato", "Cucumber", "Avocado"],
-    isFavorite: false
-  },
-  {
-    title: "Berry Smoothie",
-    author: "Emily Clark",
-    image: "/placeholder.svg",
-    cookTime: "10 mins",
-    calories: 150,
-    rating: 4.7,
-    ingredients: ["Strawberries", "Blueberries", "Yogurt"],
-    isFavorite: true
-  },
-  {
-    title: "Berry Smoothie",
-    author: "Emily Clark",
-    image: "/placeholder.svg",
-    cookTime: "10 mins",
-    calories: 150,
-    rating: 4.7,
-    ingredients: ["Strawberries", "Blueberries", "Yogurt"],
-    isFavorite: true
-  },
-  {
-    title: "Berry Smoothie",
-    author: "Emily Clark",
-    image: "/placeholder.svg",
-    cookTime: "10 mins",
-    calories: 150,
-    rating: 4.7,
-    ingredients: ["Strawberries", "Blueberries", "Yogurt"],
-    isFavorite: true
-  },
-  {
-    title: "Berry Smoothie",
-    author: "Emily Clark",
-    image: "/placeholder.svg",
-    cookTime: "10 mins",
-    calories: 150,
-    rating: 4.7,
-    ingredients: ["Strawberries", "Blueberries", "Yogurt"],
-    isFavorite: true
-  },
-  {
-    title: "Berry Smoothie",
-    author: "Emily Clark",
-    image: "/placeholder.svg",
-    cookTime: "10 mins",
-    calories: 150,
-    rating: 4.7,
-    ingredients: ["Strawberries", "Blueberries", "Yogurt"],
-    isFavorite: true
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://aroi-dee-backend.vercel.app";
+  interface Recipe {
+    id: number;
+    title: string;
+    author: string;
+    image: string;
+    cookTime: number;  // ✅ ควรเป็น number ตาม Backend
+    calories: number;
+    rating?: number | null;
+    ingredients: string[];
+    isFavorite: boolean;
   }
-];
-
-const Landing: React.FC = () => {
-  const [recipes, setRecipes] = useState(recipesData);
+  
+const Homepage: React.FC = () => {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
 
+  // 📌 ดึงข้อมูลจาก Backend
+  useEffect(() => {
+    axios
+      .get(`${API_URL}/api/recipes`)
+      .then((response) => {
+        const fetchedRecipes = response.data.data.map((recipe: any) => ({
+          id: recipe.id,
+          title: recipe.title,
+          author: recipe.author || "Unknown",
+          image: recipe.image_url || "/default-recipe.jpg",
+          cookTime: recipe.cook_time || 0, // ✅ cookTime เป็น number
+          calories: recipe.nutrition_facts?.calories || 0,
+          rating: recipe.rating || null, // ✅ ถ้า API มี rating
+          ingredients:
+            recipe.recipe_ingredients?.map(
+              (ing: any) => ing.ingredients.name
+            ) || [],
+          isFavorite: false,
+        }));
+
+        setRecipes(fetchedRecipes);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching recipes:", error);
+        setError("Failed to load recipes.");
+        setLoading(false);
+      });
+  }, []);
+
+  // 📌 ฟังก์ชัน Toggle Favorite
   const toggleFavorite = (index: number) => {
     setRecipes((prev) =>
       prev.map((recipe, i) =>
@@ -103,44 +67,37 @@ const Landing: React.FC = () => {
     );
   };
 
+  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar removed here as it's now in the App.tsx wrapper */}
       {/* Hero Section */}
       <Hero />
       <main className="container mx-auto py-6 px-4">
-        {/* Dev Authentication Demo */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
-            <h2 className="text-xl font-semibold mb-2 text-gray-800">ทดสอบการเข้าสู่ระบบ</h2>
-            <p className="text-gray-600 mb-4">
-              ใช้ปุ่มด้านล่างเพื่อสลับระหว่างการเข้าสู่ระบบและออกจากระบบ เพื่อทดสอบการแสดงผล Navbar
-            </p>
-            <AuthDemoComponent />
-          </div>
-        )}
-        
         {/* Popular Categories */}
         <Categories />
-        
-        {/* Featured Recipes (Super Delicious Section) */}
+        {/* Featured Recipes */}
         <FeaturedRecipes />
-        
         {/* Recommended Recipes */}
-        <Content topic="Recommended" recipes={recipes} toggleFavorite={toggleFavorite} />
-        
+        <Content
+          topic="Recommended"
+          recipes={recipes}
+          toggleFavorite={toggleFavorite}
+        />
         {/* Most Popular Recipes */}
-        <Content topic="Most Popular Recipes" recipes={recipes} toggleFavorite={toggleFavorite} />
-        
+        <Content
+          topic="Most Popular Recipes"
+          recipes={recipes}
+          toggleFavorite={toggleFavorite}
+        />
         {/* Latest Recipes Grid */}
         <LatestRecipes />
-
         {/* Share Recipe - only shown to authenticated users */}
         {isAuthenticated && <ShareRecipe />}
       </main>
-      {/* Footer removed here as it's now in the App.tsx wrapper */}
     </div>
   );
 };
 
-export default Landing;
+export default Homepage;
