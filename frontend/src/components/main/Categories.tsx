@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
-  ? import.meta.env.VITE_API_URL
-  : "https://aroi-dee-backend.vercel.app";
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
 
 // Motion variants
 const categoryVariants = {
@@ -33,7 +34,11 @@ const Categories = () => {
     axios
       .get(`${API_URL}/api/categories`)
       .then((response) => {
-        setCategories(response.data.data); // ✅ ตรวจสอบให้แน่ใจว่า API คืนค่าเป็น data
+        if (response.data.success) {
+          setCategories(response.data.data); // ✅ ตรวจสอบว่า API คืนค่า success=true
+        } else {
+          setError("Failed to load categories.");
+        }
         setLoading(false);
       })
       .catch((error) => {
