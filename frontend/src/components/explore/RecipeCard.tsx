@@ -7,18 +7,19 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Recipe } from "@/lib/recipes/types";
-import { getTagColor } from "@/lib/recipes/utils";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface RecipeCardProps {
-  recipe: Recipe;
+  recipe: {
+    id: number;
+    title: string;
+    calories: number;
+    time: number;
+    image: string;
+    rating: number;
+    difficulty: string;
+    tags: string[];
+  };
   isFavorite: boolean;
   onFavoriteToggle: () => void;
 }
@@ -28,7 +29,7 @@ interface RecipeCardProps {
  */
 export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardProps) {
   const { id, title, calories, time, image, rating, difficulty, tags } = recipe;
-  
+
   // Show no more than 2 tags
   const displayTags = tags?.slice(0, 2) || [];
 
@@ -56,7 +57,7 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
               <Badge
                 key={tag}
                 variant="secondary"
-                className={`${getTagColor(tag)} text-xs`}
+                className="text-xs bg-green-50"
               >
                 {tag}
               </Badge>
@@ -107,9 +108,7 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
                 }}
               >
                 <Heart
-                  className={`w-4 h-4 mr-2 ${
-                    isFavorite ? "fill-red-500 text-red-500" : "text-red-500"
-                  }`}
+                  className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : "text-red-500"}`}
                 />
                 {isFavorite ? "Saved" : "Save"}
               </Button>

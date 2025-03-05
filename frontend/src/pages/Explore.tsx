@@ -8,10 +8,9 @@ import {
   FilterOptions,
   Recipe,
   RecipeSource,
-  fetchRecipesBySource,
+  fetchRecipesBySource,  // This should be the updated function that fetches from API
   toggleFavoriteRecipe,
 } from "@/lib/recipes";
-
 
 /**
  * Main component for the Explore page
@@ -50,10 +49,13 @@ export default function ExplorePage() {
     const loadRecipes = async () => {
       setLoading(true);
       try {
+        // Fetch the data from backend using the filterOptions
         const result = await fetchRecipesBySource(
-          RecipeSource.ALL,
+          RecipeSource.ALL,  // Make sure that your backend endpoint supports this
           filterOptions
         );
+
+        // Update the recipes and pagination states based on the fetched data
         setRecipes(result.recipes);
         setPagination(result.pagination);
       } catch (error) {
@@ -97,7 +99,6 @@ export default function ExplorePage() {
 
   const handleFavorite = async (id: number) => {
     try {
-      // Use updated API
       const result = await toggleFavoriteRecipe(id);
 
       if (result.success) {
@@ -129,8 +130,6 @@ export default function ExplorePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      
-
       <div className="flex flex-1">
         <ExploreSidebar
           onCategoryChange={handleCategoryChange}
