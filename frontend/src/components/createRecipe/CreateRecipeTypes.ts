@@ -24,12 +24,12 @@ export interface InstructionInput {
 export interface RecipeInput {
   title: string;
   description: string;
-  time: number;
+  cook_time: number;
   calories: number;
   difficulty: string;
   servings: number;
   image: string | null;
-  tags: string[];
+  categories: string[];
   ingredients: IngredientInput[];
   instructions: InstructionInput[];
 }
@@ -65,11 +65,11 @@ export const recipeInputToRecipe = (input: RecipeInput): Partial<Recipe> => {
   return {
     title: input.title,
     description: input.description,
-    time: input.time,
+    cook_time: input.cook_time,
     calories: input.calories,
     difficulty: input.difficulty,
     image: input.image || "/placeholder.svg",
-    tags: input.tags,
+    categories: input.categories,
     rating: 0, // New recipe starts with 0 rating
     // Add any other necessary conversions here
   };

@@ -7,18 +7,25 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface RecipeCardProps {
   recipe: {
     id: number;
+    description: string;
     title: string;
     calories: number;
-    cook_time?: number;
+    cook_time: number;
     image: string;
     rating: number;
     difficulty: string;
-    tags: string[];
+    categories: string[]; // แทนที่ tags ด้วย categories
   };
   isFavorite: boolean;
   onFavoriteToggle: () => void;
@@ -27,11 +34,16 @@ interface RecipeCardProps {
 /**
  * Recipe card component displaying a single recipe
  */
-export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardProps) {
-  const { id, title, calories, cook_time, image, rating, difficulty, tags } = recipe;
+export function RecipeCard({
+  recipe,
+  isFavorite,
+  onFavoriteToggle,
+}: RecipeCardProps) {
+  const { id, title, calories, cook_time, image, rating, difficulty, categories } =
+    recipe;
 
   // Show no more than 2 tags
-  const displayTags = tags?.slice(0, 2) || [];
+  const displayTags = categories?.slice(0, 2) || [];
 
   return (
     <TooltipProvider>
@@ -53,13 +65,13 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
           </CardTitle>
 
           <div className="flex flex-wrap gap-1 mb-2">
-            {displayTags.map((tag) => (
+            {displayTags.map((categories) => (
               <Badge
-                key={tag}
+                key={categories}
                 variant="secondary"
                 className="text-xs bg-green-50"
               >
-                {tag}
+                {categories}
               </Badge>
             ))}
           </div>
@@ -108,7 +120,9 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
                 }}
               >
                 <Heart
-                  className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : "text-red-500"}`}
+                  className={`w-4 h-4 mr-2 ${
+                    isFavorite ? "fill-red-500 text-red-500" : "text-red-500"
+                  }`}
                 />
                 {isFavorite ? "Saved" : "Save"}
               </Button>
