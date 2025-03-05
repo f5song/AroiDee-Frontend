@@ -75,11 +75,11 @@ export const recipeInputToRecipe = (input: RecipeInput): Partial<Recipe> => {
   return {
     title: input.title,
     description: input.description,
-    time: input.time,
+    cook_time: input.time,
     calories: input.calories,
     difficulty: input.difficulty,
     image: input.image || "/placeholder.svg",
-    tags: input.tags,
+    categories: input.tags,
     rating: 0 // New recipe starts with 0 rating
   };
 };
