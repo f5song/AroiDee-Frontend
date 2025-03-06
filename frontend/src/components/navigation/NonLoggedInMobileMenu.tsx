@@ -30,17 +30,7 @@ const NonLoggedInMobileMenu: React.FC<NonLoggedInMobileMenuProps> = ({ isOpen, o
       hasDropdown: true,
       dropdownItems: MEAL_PLANNING_ITEMS,
       isActive: location.pathname.startsWith('/meal-planning'),
-    },
-    {
-      title: 'Categories',
-      path: '/categories',
-      isActive: location.pathname.startsWith('/categories'),
-    },
-    {
-      title: 'Community',
-      path: '/community',
-      isActive: location.pathname.startsWith('/community'),
-    },
+    }
   ];
 
   // Add the animation styles using a regular style tag
