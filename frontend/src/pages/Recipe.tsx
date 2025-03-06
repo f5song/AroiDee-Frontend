@@ -73,12 +73,6 @@ interface RecipeHeaderProps {
   setSaved: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-interface RecipeMetaProps {
-  prepTime: string;
-  cookTime: string;
-  difficulty: string;
-}
-
 interface ControlBarProps {
   toggleUnit: () => void;
   selectedUnit: string;
