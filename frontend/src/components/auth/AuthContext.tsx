@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
+import axios from "axios";
 
 type User = {
   id: number;
@@ -8,19 +9,14 @@ type User = {
 
 interface AuthContextType {
   user: User;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
-  login: async () => {},
-  logout: () => {}
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -28,63 +24,66 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // ตรวจสอบว่ามี token และ user ที่บันทึกไว้หรือไม่
-    const savedUser = localStorage.getItem('user');
-    const savedToken = localStorage.getItem('authToken');
+    // ✅ ดึง token และ user จาก localStorage เมื่อโหลดหน้า
+    const savedToken = localStorage.getItem("authToken");
+    const savedUser = localStorage.getItem("user");
 
-    if (savedUser && savedToken) {
+    if (savedToken && savedUser) {
+      setToken(savedToken);
       setUser(JSON.parse(savedUser));
     }
     setIsLoading(false);
   }, []);
 
-  // ✅ ใช้ API /api/users/login เพื่อเข้าสู่ระบบ
+  // ✅ ใช้ API /api/login เพื่อเข้าสู่ระบบ
   const login = async (email: string, password: string) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-
-      const response = await fetch('https://aroi-dee-backend.vercel.app/api/users/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+      const response = await axios.post("https://aroi-dee-backend.vercel.app/api/login", {
+        email,
+        password,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'เข้าสู่ระบบล้มเหลว');
-      }
+      const { token, user } = response.data;
 
       // ✅ บันทึก Token & User ลงใน LocalStorage
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("user", JSON.stringify(user));
 
-      setUser(data.user);
+      setToken(token);
+      setUser(user);
     } catch (error: any) {
-      console.error('Login failed:', error.message);
-      throw error;
+      console.error("Login failed:", error.response?.data?.message || error.message);
+      throw new Error(error.response?.data?.message || "เข้าสู่ระบบล้มเหลว");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ✅ ลบ Token และข้อมูลผู้ใช้ออกเมื่อล็อกเอาต์
+  // ✅ ลบ Token และข้อมูลผู้ใช้เมื่อ Logout
   const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, isAuthenticated: !!user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// ✅ Hook สำหรับใช้งาน Context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
+  return context;
+};
 
 export default AuthContext;

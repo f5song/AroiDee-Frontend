@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileStats from "@/components/profile/ProfileStats";
 import ProfileActions from "@/components/profile/ProfileActions";
@@ -7,6 +9,7 @@ import ResponsiveSidebar from "@/components/profile/ResponsiveSidebar";
 import { Profile } from "@/components/profile/ProfileTypes";
 import ProfileCalorieGoals from "@/components/profile/ProfileCalorieGoals";
 import { toast } from "sonner";
+import { useAuth } from "@/components/auth/AuthContext";
 
 // Import all tab content components
 import {
@@ -20,129 +23,86 @@ import {
 } from "@/components/profile/TabContents";
 
 const ProfilePage: React.FC = () => {
-  // Improved initial state with placeholders
-  const [profile, setProfile] = useState<Profile>({
-    fullName: "Loading...",
-    username: "Loading...",
-    email: "Loading...",
-    dateOfBirth: "",
-    gender: "Other",
-    notifications: true,
-    preferences: {
-      language: "th",
-      units: "metric",
-      darkMode: false,
-      emailNotifications: true,
-      pushNotifications: true,
-      newsletterSubscribed: false
-    }
-  });
-
+  const { token, isAuthenticated } = useAuth(); // ✅ ดึงข้อมูลจาก useAuth()
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulate loading profile data
+  // ✅ ถ้าไม่ได้ล็อกอิน ให้ redirect ไปหน้า login
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login"); // เปลี่ยน path ไปที่หน้า login
+    }
+  }, [isAuthenticated, navigate]);
+
+  // ✅ ดึงข้อมูลโปรไฟล์จาก Backend
   useEffect(() => {
     const fetchProfile = async () => {
+      if (!token) return;
+
       setIsLoading(true);
       try {
-        // Mock API call - replace with actual API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock data
-        const userData: Profile = {
-          fullName: "John Doe",
-          username: "johndoe",
-          email: "john.doe@example.com",
-          dateOfBirth: "1990-01-01T00:00:00",
-          gender: "Male",
-          notifications: true,
-          avatar: "/api/placeholder/150/150",
-          preferences: {
-            language: "en",
-            units: "metric",
-            darkMode: false,
-            emailNotifications: true,
-            pushNotifications: true,
-            newsletterSubscribed: false
-          }
-        };
-        
-        setProfile(userData);
+        const response = await axios.get("https://aroi-dee-backend.vercel.app/api/users/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setProfile(response.data.user); // ✅ ตั้งค่าข้อมูลผู้ใช้จาก Backend
       } catch (error) {
         console.error("Failed to load profile data", error);
         toast.error("Failed to load profile", {
-          description: "There was an error loading your profile data. Please try again later."
+          description: "There was an error loading your profile data. Please try again later.",
         });
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     fetchProfile();
-  }, []);
+  }, [token]);
 
   const handleProfileChange = (updatedProfile: Profile) => {
     setProfile(updatedProfile);
   };
 
+  // ✅ แก้ไขให้ `handleSave()` อัปเดตโปรไฟล์แล้ว setProfile()
   const handleSave = async () => {
-    // Validate required fields
-    if (!profile.fullName.trim()) {
+    if (!profile) return;
 
+    if (!profile.username.trim() || !profile.email.trim()) {
       toast.error("Validation Error", {
-        description: "Full name is required"
+        description: "Username and Email are required",
       });
-      
       return;
     }
-    
-    if (!profile.email.trim()) {
 
-      toast.error("Validation Error", {
-        description: "Email is required"
-      });
-      
-      return;
-    }
-    
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(profile.email)) {
-
-      toast.error("Validation Error", {
-        description: "Please enter a valid email address"
-      });
-      
-      return;
-    }
-    
     setIsSaving(true);
-    
+
     try {
-      // Simulate API call - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      const response = await axios.put(
+        "https://aroi-dee-backend.vercel.app/api/users/profile",
+        { username: profile.username, email: profile.email },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setProfile(response.data.user); // ✅ อัปเดตโปรไฟล์ที่แสดงใน UI
       toast.success("Profile Updated", {
-        description: "Your profile information has been successfully updated."
+        description: "Your profile information has been successfully updated.",
       });
-      
-      
+
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to save profile", error);
       toast.error("Update Failed", {
-        description: "There was an error updating your profile. Please try again."
+        description: "There was an error updating your profile. Please try again.",
       });
-      
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Map of tab IDs to their content components
   const tabComponents = {
     profile: (
       <motion.div
@@ -156,7 +116,7 @@ const ProfilePage: React.FC = () => {
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             <p className="mt-4 text-gray-500">Loading profile...</p>
           </div>
-        ) : (
+        ) : profile ? (
           <>
             <ProfileForm
               profile={profile}
@@ -175,6 +135,8 @@ const ProfilePage: React.FC = () => {
               isSaving={isSaving}
             />
           </>
+        ) : (
+          <p className="text-center text-red-500">Failed to load profile.</p>
         )}
       </motion.div>
     ),
@@ -185,22 +147,24 @@ const ProfilePage: React.FC = () => {
     recipes: <MyRecipesContent />,
     notifications: <NotificationsContent />,
     "calorie-goals": <ProfileCalorieGoals />,
-    settings: <SettingsWrapper profile={profile} setProfile={setProfile} isEditable={isEditing} setIsEditable={setIsEditing} />,
+    settings: profile ? (
+      <SettingsWrapper
+        profile={profile}
+        setProfile={setProfile}
+        isEditable={isEditing}
+        setIsEditable={setIsEditing}
+      />
+    ) : null,
   };
 
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Use only ResponsiveSidebar */}
           <div className="w-full md:w-64 flex-shrink-0">
-            <ResponsiveSidebar
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-            />
+            <ResponsiveSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           </div>
 
-          {/* Main Content */}
           <div className="flex-grow">
             {tabComponents[activeTab as keyof typeof tabComponents] || null}
           </div>
