@@ -13,16 +13,13 @@ import LoginPage from "@/pages/LoginPage";
 import Footer from "./components/footer";
 
 const App = () => {
-  
-
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <div className="flex flex-col min-h-screen">
           <SmartNavbar />
 
           <main className="flex-grow">
-
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/recipes/explore" element={<Explore />} />
@@ -38,8 +35,8 @@ const App = () => {
 
           <Footer />
         </div>
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 };
 
