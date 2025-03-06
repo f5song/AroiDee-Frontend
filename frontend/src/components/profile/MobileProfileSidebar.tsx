@@ -1,4 +1,3 @@
-// UPDATED MobileProfileSidebar.tsx - Remove desktop sidebar
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -11,7 +10,8 @@ import {
   PenTool,
   Bell,
   Menu,
-  X
+  X,
+  Flame
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -48,14 +48,16 @@ const MobileProfileSidebar: React.FC<ProfileSidebarProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Define the tabs - ensure these match exactly with the ones in ProfileSidebar
   const tabs = [
     { id: "profile", label: "Profile", icon: <User size={18} /> },
     { id: "saved", label: "Saved Recipes", icon: <Heart size={18} /> },
-    { id: "shopping", label: "Shopping List", icon: <ShoppingCart size={18} /> },
-    { id: "nutrition", label: "Nutrition", icon: <BarChart2 size={18} /> },
-    { id: "meal-plans", label: "Meal Plans", icon: <Calendar size={18} /> },
+    // { id: "shopping", label: "Shopping List", icon: <ShoppingCart size={18} /> },
+    { id: "nutrition", label: "Nutrition Tracker", icon: <BarChart2 size={18} /> },
+    // { id: "meal-plans", label: "Meal Plans", icon: <Calendar size={18} /> },
     { id: "recipes", label: "My Recipes", icon: <PenTool size={18} /> },
     { id: "notifications", label: "Notifications", icon: <Bell size={18} /> },
+    { id: "calorie-goals", label: "Calorie Goals", icon: <Flame size={18} /> },
     { id: "settings", label: "Settings", icon: <Settings size={18} /> },
   ];
 

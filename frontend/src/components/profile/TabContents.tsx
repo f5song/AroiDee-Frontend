@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Notifications from "./Notifications";
+import SettingsContent from "./SettingsContent";
+import { Profile } from "./ProfileTypes";
 
 // Common component for empty state tab content
 interface TabContentProps {
@@ -100,9 +102,25 @@ export const NotificationsContent: React.FC = () => {
   );
 };
 
-export const SettingsContent: React.FC = () => (
-  <TabContent 
-    title="Account Settings" 
-    message="Manage your account settings here." 
+// เปลี่ยนชื่อ component เพื่อไม่ให้ซ้ำกับการนำเข้า
+interface SettingsProps {
+  profile: Profile;
+  setProfile: (profile: Profile) => void;
+  isEditable: boolean;
+  setIsEditable: (isEditable: boolean) => void;
+}
+
+// เปลี่ยนชื่อจาก SettingsContent เป็น SettingsWrapper เพื่อไม่ให้ซ้ำกับการ import
+export const SettingsWrapper: React.FC<SettingsProps> = ({ 
+  profile, 
+  setProfile, 
+  isEditable, 
+  setIsEditable 
+}) => (
+  <SettingsContent 
+    profile={profile} 
+    setProfile={setProfile} 
+    isEditable={isEditable} 
+    setIsEditable={setIsEditable} 
   />
 );

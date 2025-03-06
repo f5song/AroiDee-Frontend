@@ -8,7 +8,8 @@ import {
   Settings, 
   Calendar, 
   PenTool,
-  Bell
+  Bell,
+  Flame
 } from "lucide-react";
 
 interface TabProps {
@@ -43,14 +44,16 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   activeTab, 
   setActiveTab 
 }) => {
+  // Define tabs - ensure these match exactly with the ones in MobileProfileSidebar
   const tabs = [
     { id: "profile", label: "Profile", icon: <User size={20} /> },
     { id: "saved", label: "Saved Recipes", icon: <Heart size={20} /> },
-    { id: "shopping", label: "Shopping List", icon: <ShoppingCart size={20} /> },
+    // { id: "shopping", label: "Shopping List", icon: <ShoppingCart size={20} /> },
     { id: "nutrition", label: "Nutrition Tracker", icon: <BarChart2 size={20} /> },
-    { id: "meal-plans", label: "Meal Plans", icon: <Calendar size={20} /> },
+    // { id: "meal-plans", label: "Meal Plans", icon: <Calendar size={20} /> },
     { id: "recipes", label: "My Recipes", icon: <PenTool size={20} /> },
     { id: "notifications", label: "Notifications", icon: <Bell size={20} /> },
+    { id: "calorie-goals", label: "Calorie Goals", icon: <Flame size={20} /> },
     { id: "settings", label: "Settings", icon: <Settings size={20} /> },
   ];
 

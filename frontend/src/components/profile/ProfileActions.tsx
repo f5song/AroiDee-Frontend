@@ -1,58 +1,55 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
+import { Save, X } from "lucide-react";
 import { Profile } from "./ProfileTypes";
-import DeleteAccountDialog from "./DeleteAccountDialog";
 
 interface ProfileActionsProps {
   profile: Profile;
   handleSave: () => void;
-  isEditable: boolean;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
+  isSaving?: boolean;
 }
 
-const ProfileActions: React.FC<ProfileActionsProps> = ({ profile, handleSave, isEditable }) => {
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+const ProfileActions: React.FC<ProfileActionsProps> = ({
+  handleSave,
+  isEditing,
+  setIsEditing,
+  isSaving = false
+}) => {
+  if (!isEditing) {
+    return null; // Don't render actions if not in edit mode
+  }
   
-  const openDeleteDialog = () => {
-    setIsDeleteDialogOpen(true);
-  };
-  
-  const closeDeleteDialog = () => {
-    setIsDeleteDialogOpen(false);
-  };
-  
-  const handleDeleteAccount = () => {
-    console.log("Account deletion confirmed");
-    // Here you would make an API call to delete the account
-    closeDeleteDialog();
-  };
-
   return (
-    <div>
+    <div className="border-t pt-4 mt-4">
       <div className="flex flex-col sm:flex-row justify-end gap-4">
-        {isEditable && (
-          <Button 
-            className="w-full sm:w-60 bg-green-500 hover:bg-green-600 text-white" 
-            onClick={handleSave}
-          >
-            Save Changes
-          </Button>
-        )}
         <Button 
-          className="w-full sm:w-60 bg-red-500 hover:bg-red-600 text-white" 
-          variant="destructive"
-          onClick={openDeleteDialog}
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={() => setIsEditing(false)}
+          disabled={isSaving}
         >
-          Delete Account
+          <X className="h-4 w-4 mr-2" /> Cancel
+        </Button>
+        
+        <Button 
+          className="w-full sm:w-60 bg-green-500 hover:bg-green-600 text-white" 
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" /> Save Changes
+            </>
+          )}
         </Button>
       </div>
-      
-      {/* Delete Account Confirmation Dialog */}
-      <DeleteAccountDialog 
-        isOpen={isDeleteDialogOpen}
-        onClose={closeDeleteDialog}
-        onConfirm={handleDeleteAccount}
-        username={profile.username}
-      />
     </div>
   );
 };

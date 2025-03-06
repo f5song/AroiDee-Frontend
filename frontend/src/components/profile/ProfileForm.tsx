@@ -1,6 +1,5 @@
-import React, { ChangeEvent, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,75 +8,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Edit, User, Mail, Calendar, VenetianMask, AlertCircle } from "lucide-react";
+import { User, Mail, Calendar, VenetianMask, Edit } from "lucide-react";
 import { Profile } from "./ProfileTypes";
 import AvatarUpload from "./AvatarUpload";
+import { Button } from "@/components/ui/button";
 
 interface ProfileFormProps {
   profile: Profile;
-  setProfile: (profile: Profile) => void;
-  isEditable: boolean;
-  setIsEditable: (editable: boolean) => void;
-}
-
-// Extended form errors interface
-interface FormErrors {
-  fullName?: string;
-  email?: string;
-  dateOfBirth?: string;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
+  onProfileChange: (updatedProfile: Profile) => void;
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({
   profile,
-  setProfile,
-  isEditable,
-  setIsEditable,
+  isEditing,
+  setIsEditing,
+  onProfileChange
 }) => {
-  const [formErrors, setFormErrors] = useState<FormErrors>({});
-  
-  const handleInputChange = (field: keyof Profile, value: string) => {
-    setProfile({ ...profile, [field]: value });
-    
-    // Clear error when field is edited
-    if (formErrors[field as keyof FormErrors]) {
-      setFormErrors({
-        ...formErrors,
-        [field]: undefined,
-      });
-    }
-  };
-  
   const handleAvatarChange = (file: File) => {
     console.log("Avatar file:", file);
     // Here you would typically upload the file to your server
     // and update the profile with the new avatar URL
   };
-  
-  const validateForm = (): boolean => {
-    const errors: FormErrors = {};
-    
-    // Validate name
-    if (!profile.fullName || profile.fullName.trim().length < 2) {
-      errors.fullName = "Name must be at least 2 characters";
-    }
-    
-    // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!profile.email || !emailRegex.test(profile.email)) {
-      errors.email = "Please enter a valid email address";
-    }
-    
-    // Validate date of birth (optional)
-    if (profile.dateOfBirth) {
-      const dob = new Date(profile.dateOfBirth);
-      const now = new Date();
-      if (dob > now) {
-        errors.dateOfBirth = "Date of birth cannot be in the future";
-      }
-    }
-    
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+
+  const handleInputChange = (field: keyof Profile, value: string) => {
+    onProfileChange({
+      ...profile,
+      [field]: value
+    });
   };
 
   return (
@@ -89,16 +48,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     >
       <AvatarUpload 
         username={profile.username} 
-        currentAvatar={undefined} 
+        currentAvatar={profile.avatar} 
         onAvatarChange={handleAvatarChange} 
       />
       <ProfileFormFields 
         profile={profile} 
-        handleInputChange={handleInputChange}
-        isEditable={isEditable}
-        setIsEditable={setIsEditable}
-        formErrors={formErrors}
-        validateForm={validateForm}
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+        onInputChange={handleInputChange}
       />
     </motion.div>
   );
@@ -110,9 +67,8 @@ interface FormFieldProps {
   type: string;
   placeholder: string;
   value: string;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (value: string) => void;
   readOnly: boolean;
-  error?: string;
 }
 
 // Individual form field component
@@ -123,47 +79,35 @@ const FormField: React.FC<FormFieldProps> = ({
   value,
   onChange,
   readOnly,
-  error,
 }) => (
   <div className="space-y-1">
-    <div className={`flex items-center gap-2 bg-gray-50 p-3 rounded-md shadow-sm ${
-      error ? "border border-red-300" : ""
-    }`}>
+    <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-md shadow-sm">
       {icon}
       <Input
         type={type}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         readOnly={readOnly}
-        className="h-8 text-sm border-0 focus-visible:ring-0 p-0 pl-1"
+        className={`h-8 text-sm p-0 pl-1 ${readOnly ? 'border-0 focus-visible:ring-0' : 'border-gray-300'}`}
       />
     </div>
-    {error && (
-      <div className="flex items-center gap-1 text-xs text-red-500 pl-2">
-        <AlertCircle size={12} />
-        <span>{error}</span>
-      </div>
-    )}
   </div>
 );
 
 // Form fields container
 interface ProfileFormFieldsProps {
   profile: Profile;
-  handleInputChange: (field: keyof Profile, value: string) => void;
-  isEditable: boolean;
-  setIsEditable: (editable: boolean) => void;
-  formErrors: FormErrors;
-  validateForm: () => boolean;
+  isEditing: boolean;
+  setIsEditing: (isEditing: boolean) => void;
+  onInputChange: (field: keyof Profile, value: string) => void;
 }
 
 const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   profile,
-  handleInputChange,
-  isEditable,
-  setIsEditable,
-  formErrors,
+  isEditing,
+  setIsEditing,
+  onInputChange
 }) => {
   return (
     <div className="flex-grow space-y-4">
@@ -171,14 +115,15 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
           User Profile
         </h1>
-        {!isEditable && (
+        
+        {!isEditing && (
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            onClick={() => setIsEditable(true)}
-            className="p-2"
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-1"
           >
-            <Edit className="w-4 h-4 text-gray-600" />
+            <Edit className="h-4 w-4" /> Edit Profile
           </Button>
         )}
       </div>
@@ -190,11 +135,8 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           type="text"
           placeholder="Full Name"
           value={profile.fullName}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            handleInputChange("fullName", e.target.value)
-          }
-          readOnly={!isEditable}
-          error={formErrors.fullName}
+          onChange={isEditing ? (value) => onInputChange('fullName', value) : undefined}
+          readOnly={!isEditing}
         />
 
         {/* Email */}
@@ -203,11 +145,8 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           type="email"
           placeholder="Email"
           value={profile.email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            handleInputChange("email", e.target.value)
-          }
-          readOnly={!isEditable}
-          error={formErrors.email}
+          onChange={isEditing ? (value) => onInputChange('email', value) : undefined}
+          readOnly={!isEditing}
         />
 
         {/* Birth Date */}
@@ -216,11 +155,8 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           type="date"
           placeholder="Date of Birth"
           value={profile.dateOfBirth ? profile.dateOfBirth.split('T')[0] : ''}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            handleInputChange("dateOfBirth", e.target.value)
-          }
-          readOnly={!isEditable}
-          error={formErrors.dateOfBirth}
+          onChange={isEditing ? (value) => onInputChange('dateOfBirth', value) : undefined}
+          readOnly={!isEditing}
         />
 
         {/* Gender Selection */}
@@ -228,12 +164,10 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           <VenetianMask className="text-gray-500 w-4 h-4 flex-shrink-0" />
           <Select
             value={profile.gender}
-            onValueChange={(value) =>
-              handleInputChange("gender", value as "Male" | "Female" | "Other")
-            }
-            disabled={!isEditable}
+            disabled={!isEditing}
+            onValueChange={isEditing ? (value) => onInputChange('gender', value) : undefined}
           >
-            <SelectTrigger className="w-full h-8 text-sm border-gray-300">
+            <SelectTrigger className={`w-full h-8 text-sm ${!isEditing ? 'border-0' : 'border-gray-300'}`}>
               <SelectValue>{profile.gender || "Select Gender"}</SelectValue>
             </SelectTrigger>
             <SelectContent>
