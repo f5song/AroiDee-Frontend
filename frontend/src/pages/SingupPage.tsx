@@ -19,17 +19,17 @@ const SignupPageContent: React.FC = () => {
     e.preventDefault();
 
     if (!name || !email || !password) {
-      setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      setError("Please fill in all fields");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("รหัสผ่านไม่ตรงกัน");
+      setError("Passwords do not match");
       return;
     }
 
     if (password.length < 8) {
-      setError("รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร");
+      setError("Password must be at least 8 characters long");
       return;
     }
 
@@ -46,22 +46,22 @@ const SignupPageContent: React.FC = () => {
         }
       );
 
-      // ตรวจสอบว่าค่า Response มีเนื้อหาหรือไม่
+      // Check if the response has content
       if (!response.ok) {
-        const errorText = await response.text(); // อ่านข้อความจาก response
-        throw new Error(errorText || "สมัครสมาชิกล้มเหลว");
+        const errorText = await response.text(); // Read message from response
+        throw new Error(errorText || "Registration failed");
       }
 
-      const data = await response.json(); // แปลง response เป็น JSON
+      const data = await response.json(); // Convert response to JSON
 
       if (!data.success) {
-        throw new Error(data.message || "สมัครสมาชิกล้มเหลว");
+        throw new Error(data.message || "Registration failed");
       }
 
-      alert("สมัครสมาชิกสำเร็จ 🎉 กรุณาเข้าสู่ระบบ");
-      navigate("/login"); // นำผู้ใช้ไปที่หน้า Login
+      alert("Registration successful! 🎉 Please log in");
+      navigate("/login"); // Navigate user to Login page
     } catch (err: any) {
-      setError(err.message || "เกิดข้อผิดพลาด");
+      setError(err.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -72,17 +72,17 @@ const SignupPageContent: React.FC = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            สมัครสมาชิกใหม่
+            Sign Up
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            หรือ{" "}
+            Or{" "}
             <Link
               to="/login"
               className="font-medium text-orange-500 hover:text-orange-600"
             >
-              เข้าสู่ระบบ
+              log in
             </Link>{" "}
-            หากมีบัญชีอยู่แล้ว
+            if you already have an account
           </p>
         </div>
 
@@ -99,7 +99,7 @@ const SignupPageContent: React.FC = () => {
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                ชื่อ
+                Name
               </label>
               <input
                 id="name"
@@ -110,7 +110,7 @@ const SignupPageContent: React.FC = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                placeholder="ชื่อของคุณ"
+                placeholder="Your name"
               />
             </div>
 
@@ -119,7 +119,7 @@ const SignupPageContent: React.FC = () => {
                 htmlFor="email-address"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                อีเมล
+                Email
               </label>
               <input
                 id="email-address"
@@ -139,7 +139,7 @@ const SignupPageContent: React.FC = () => {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                รหัสผ่าน
+                Password
               </label>
               <input
                 id="password"
@@ -159,7 +159,7 @@ const SignupPageContent: React.FC = () => {
                 htmlFor="confirm-password"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                ยืนยันรหัสผ่าน
+                Confirm Password
               </label>
               <input
                 id="confirm-password"
@@ -184,21 +184,21 @@ const SignupPageContent: React.FC = () => {
               className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
             />
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-              ฉันยอมรับ{" "}
+              I accept the{" "}
               <button
                 type="button"
                 onClick={openTerms}
                 className="text-orange-500 hover:text-orange-600 hover:underline focus:outline-none"
               >
-                ข้อกำหนดการใช้งาน
+                Terms of Service
               </button>{" "}
-              และ{" "}
+              and{" "}
               <button
                 type="button"
                 onClick={openPrivacy}
                 className="text-orange-500 hover:text-orange-600 hover:underline focus:outline-none"
               >
-                นโยบายความเป็นส่วนตัว
+                Privacy Policy
               </button>
             </label>
           </div>
@@ -211,7 +211,7 @@ const SignupPageContent: React.FC = () => {
                 isLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
-              {isLoading ? "กำลังดำเนินการ..." : "สมัครสมาชิก"}
+              {isLoading ? "Processing..." : "Sign Up"}
             </button>
           </div>
         </form>
@@ -220,7 +220,7 @@ const SignupPageContent: React.FC = () => {
   );
 };
 
-// คอมโพเนนต์หลักที่ครอบด้วย TermsPrivacyProvider
+// Main component wrapped with TermsPrivacyProvider
 const SignupPage: React.FC = () => {
   return (
     <TermsPrivacyProvider>
