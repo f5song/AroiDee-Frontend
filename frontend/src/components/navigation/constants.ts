@@ -12,11 +12,15 @@ import {
   Bookmark
 } from 'lucide-react';
 
-export type DropdownItem = {
+import { ReactNode } from "react";
+
+export interface DropdownItem {
   name: string;
-  path: string;
-  icon?: React.ReactNode;
-};
+  path?: string;
+  icon?: ReactNode;
+  onClick?: () => void;
+}
+
 
 export const RECIPE_MENU_ITEMS: DropdownItem[] = [
   { 
