@@ -98,8 +98,8 @@ const NavItem: React.FC<NavItemProps> = ({
                   {item.onClick ? (
                     <button
                       onClick={() => {
-                        item.onClick?.(); // เรียกฟังก์ชัน Logout ถ้ามี
-                        setIsOpen(false); // ปิดเมนูหลังคลิก
+                        item.onClick?.(); // ✅ เรียกฟังก์ชัน (Logout)
+                        setIsOpen(false); // ✅ ปิด Dropdown หลังจากคลิก
                       }}
                       className="flex items-center gap-3 w-full px-4 py-3 rounded-md text-left text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors duration-200"
                     >

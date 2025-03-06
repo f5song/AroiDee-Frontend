@@ -1,28 +1,21 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, User, Settings, LogOut } from "lucide-react";
+import {  User, Settings, LogOut } from "lucide-react";
 import NavItem from "./NavItem";
 
-interface ProfileMenuProps {
-  isMobile?: boolean;
-}
-
-const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
+const ProfileMenu: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      // ลบ Token จาก LocalStorage หรือ SessionStorage
-      localStorage.removeItem("authToken");
+      localStorage.removeItem("authToken"); // ลบ Token
 
-      // ถ้ามี API Logout สามารถเรียกใช้งานได้ที่นี่
       await fetch("/api/users/logout", {
         method: "POST",
-        credentials: "include", // ใช้ถ้าคุณมี session-based auth
+        credentials: "include", // ถ้ามี session-based auth
       });
 
-      // นำผู้ใช้ไปหน้า Login
-      navigate("/login");
+      navigate("/login"); // นำไปหน้า Login
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -31,19 +24,16 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
   const PROFILE_MENU_ITEMS = [
     { name: "My Profile", path: "/profile", icon: <User className="w-5 h-5" /> },
     { name: "Account Settings", path: "/settings", icon: <Settings className="w-5 h-5" /> },
-    { name: "Logout", path: "#", icon: <LogOut className="w-5 h-5" />, onClick: handleLogout },
+    { name: "Logout", onClick: handleLogout, icon: <LogOut className="w-5 h-5" /> }, // ✅ ใช้ onClick แทน path
   ];
 
   return (
-    <NavItem title={isMobile ? "Profile" : ""} hasDropdown dropdownItems={PROFILE_MENU_ITEMS} isMobile={isMobile}>
-      {!isMobile && (
-        <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full overflow-hidden">
-            <img src="/api/placeholder/40/40" alt="Profile" className="w-full h-full object-cover" />
-          </div>
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+    <NavItem title="" hasDropdown dropdownItems={PROFILE_MENU_ITEMS}>
+      <div className="flex items-center gap-2">
+        <div className="w-10 h-10 rounded-full overflow-hidden">
+          <img src="/api/placeholder/40/40" alt="Profile" className="w-full h-full object-cover" />
         </div>
-      )}
+      </div>
     </NavItem>
   );
 };
