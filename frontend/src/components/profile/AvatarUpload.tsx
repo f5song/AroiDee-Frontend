@@ -25,19 +25,19 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error({
-        title: "Invalid file type",
+      toast.error("Invalid file type", {
         description: "Please select an image file"
       });
+      
       return;
     }
     
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error({
-        title: "File too large",
-        description: "Image size should be less than 5MB"
+      toast.error("File too large", {
+        description: "file large more than 5mb"
       });
+      
       return;
     }
     
@@ -67,18 +67,19 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       onAvatarChange(fileInputRef.current.files[0]);
       
       // Show success message
-      toast.success({
-        title: "Avatar updated",
-        description: "Your profile picture has been updated successfully"
-      });
+
+        toast.success("Avatar updated", {
+          description: "Your profile picture has been updated successfully"
+        });
+        
       
       // Clear the file input but keep the preview
       if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (error) {
-      toast.error({
-        title: "Update failed",
+      toast.error("Update failed", {
         description: "Failed to update profile picture. Please try again."
       });
+      
     } finally {
       setIsUploading(false);
     }

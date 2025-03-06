@@ -3,10 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, 
   Heart, 
-  ShoppingCart, 
   BarChart2, 
   Settings, 
-  Calendar, 
   PenTool,
   Bell,
   Menu,

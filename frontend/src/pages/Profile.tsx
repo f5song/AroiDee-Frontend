@@ -73,8 +73,7 @@ const ProfilePage: React.FC = () => {
         setProfile(userData);
       } catch (error) {
         console.error("Failed to load profile data", error);
-        toast.error({
-          title: "Failed to load profile",
+        toast.error("Failed to load profile", {
           description: "There was an error loading your profile data. Please try again later."
         });
       } finally {
@@ -92,28 +91,31 @@ const ProfilePage: React.FC = () => {
   const handleSave = async () => {
     // Validate required fields
     if (!profile.fullName.trim()) {
-      toast.error({
-        title: "Validation Error",
+
+      toast.error("Validation Error", {
         description: "Full name is required"
       });
+      
       return;
     }
     
     if (!profile.email.trim()) {
-      toast.error({
-        title: "Validation Error",
+
+      toast.error("Validation Error", {
         description: "Email is required"
       });
+      
       return;
     }
     
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(profile.email)) {
-      toast.error({
-        title: "Validation Error",
+
+      toast.error("Validation Error", {
         description: "Please enter a valid email address"
       });
+      
       return;
     }
     
@@ -123,18 +125,18 @@ const ProfilePage: React.FC = () => {
       // Simulate API call - replace with actual API call
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      toast.success({
-        title: "Profile Updated",
+      toast.success("Profile Updated", {
         description: "Your profile information has been successfully updated."
       });
+      
       
       setIsEditing(false);
     } catch (error) {
       console.error("Failed to save profile", error);
-      toast.error({
-        title: "Update Failed",
+      toast.error("Update Failed", {
         description: "There was an error updating your profile. Please try again."
       });
+      
     } finally {
       setIsSaving(false);
     }

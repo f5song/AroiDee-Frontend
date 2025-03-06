@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Flame, Calculator, ChevronRight, Save, Edit, Info, ArrowDown, ArrowRight, ChevronDown } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Flame, Calculator, ChevronRight, Save, Edit, Info, ArrowDown, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   Select,
   SelectContent,
@@ -117,10 +115,10 @@ const ProfileCalorieGoals = () => {
       calorieGoal: calculatedCalories
     }));
     setActiveTab("manual");
-    toast({
-      title: "Calorie Target Updated",
-      description: `Calorie goal set to ${calculatedCalories} kcal per day`,
+    toast.success("Calorie Target Updated", {
+      description: `Calorie goal set to ${calculatedCalories} kcal per day`
     });
+    
   };
   
   // Save data
@@ -145,8 +143,7 @@ const ProfileCalorieGoals = () => {
     }
   };
   
-  // Update macro nutrient ratios
-  const updateMacro = (type, value) => {
+  const updateMacro = (type: "carbs" | "protein" | "fat", value: number) => {
     if (!isEditing) return;
     
     const newMacros = { ...userData.macros };
@@ -159,8 +156,7 @@ const ProfileCalorieGoals = () => {
       const totalOther = newMacros.protein + newMacros.fat;
       if (totalOther > 0) {
         const proteinRatio = newMacros.protein / totalOther;
-        const fatRatio = newMacros.fat / totalOther;
-        
+  
         newMacros.protein = Math.round(newMacros.protein - (diff * proteinRatio));
         newMacros.fat = 100 - newMacros.carbs - newMacros.protein;
       }
@@ -172,8 +168,7 @@ const ProfileCalorieGoals = () => {
       const totalOther = newMacros.carbs + newMacros.fat;
       if (totalOther > 0) {
         const carbsRatio = newMacros.carbs / totalOther;
-        const fatRatio = newMacros.fat / totalOther;
-        
+  
         newMacros.carbs = Math.round(newMacros.carbs - (diff * carbsRatio));
         newMacros.fat = 100 - newMacros.carbs - newMacros.protein;
       }
@@ -185,8 +180,7 @@ const ProfileCalorieGoals = () => {
       const totalOther = newMacros.carbs + newMacros.protein;
       if (totalOther > 0) {
         const carbsRatio = newMacros.carbs / totalOther;
-        const proteinRatio = newMacros.protein / totalOther;
-        
+  
         newMacros.carbs = Math.round(newMacros.carbs - (diff * carbsRatio));
         newMacros.protein = 100 - newMacros.carbs - newMacros.fat;
       }
@@ -197,6 +191,7 @@ const ProfileCalorieGoals = () => {
       macros: newMacros
     });
   };
+  
   
   // Render calorie summary section
   const renderCalorieSummary = () => {

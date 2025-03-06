@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, ChevronLeft, ChevronRight, Calendar, Flame, Clock, X, Edit, Heart, Search, Filter, PlusCircle, Info } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, ChevronLeft, ChevronRight, Flame, Clock, X, Search, PlusCircle, Info } from 'lucide-react';
+import { Card, CardContent, CardFooter} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Tooltip,
@@ -107,7 +106,7 @@ const CalendarMealPlanner: React.FC = () => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   // Get calorie goal from user profile
-  const [calorieGoal, setCalorieGoal] = useState<number>(USER_PROFILE.calorieGoal);
+  const [calorieGoal] = useState<number>(USER_PROFILE.calorieGoal);
   const [view, setView] = useState<'calendar' | 'day'>('calendar'); // 'calendar' or 'day'
   const [meals, setMeals] = useState<MealsByDate>({});
   const [showRecipeDialog, setShowRecipeDialog] = useState<boolean>(false);

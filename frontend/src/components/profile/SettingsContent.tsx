@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import { 
   Bell, 
   Globe, 
   Sun, 
   Moon, 
-  Lock, 
-  Mail, 
   Save, 
   Shield, 
   Download, 
@@ -35,12 +32,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Profile } from "./ProfileTypes";
 import { toast } from "sonner";
 
@@ -82,17 +73,17 @@ const SettingsContent: React.FC<SettingsContentProps> = ({
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success({
-        title: "Settings Saved",
-        description: "Your settings have been successfully updated",
+      toast.success("Settings Saved", {
+        description: "Your settings have been successfully updated"
       });
+      
       
       setIsEditable(false);
     } catch (error) {
-      toast.error({
-        title: "Error",
-        description: "Unable to save settings. Please try again.",
+      toast.error("Error", {
+        description: "Unable to save settings. Please try again."
       });
+      
     } finally {
       setIsSaving(false);
     }
@@ -100,18 +91,18 @@ const SettingsContent: React.FC<SettingsContentProps> = ({
 
   const handleChangePassword = async () => {
     if (newPassword !== confirmPassword) {
-      toast.error({
-        title: "Passwords Don't Match",
-        description: "New password and confirmation do not match",
+      toast.error("Passwords Don't Match", {
+        description: "New password and confirmation do not match"
       });
+      
       return;
     }
     
     if (newPassword.length < 8) {
-      toast.error({
-        title: "Password Too Short",
-        description: "Password should be at least 8 characters long",
+      toast.error("Password Too Short", {
+        description: "Password should be at least 8 characters long"
       });
+
       return;
     }
     
@@ -121,20 +112,21 @@ const SettingsContent: React.FC<SettingsContentProps> = ({
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success({
-        title: "Password Changed",
-        description: "Your password has been successfully updated",
+      toast.success("Password Changed", {
+        description: "Your password has been successfully updated"
       });
+      
       
       // Clear form
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      toast.error({
-        title: "Error",
-        description: "Unable to change password. Please try again.",
+
+      toast.error("Error", {
+        description: "Unable to change password. Please try again."
       });
+      
     } finally {
       setIsSaving(false);
     }
@@ -194,10 +186,10 @@ const SettingsContent: React.FC<SettingsContentProps> = ({
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
 
-    toast.success({
-      title: "Data Export Successful",
-      description: "Your profile data has been downloaded",
+    toast.success("Data Export Successful", {
+      description: "Your profile data has been downloaded"
     });
+    
   };
 
   // Account settings content

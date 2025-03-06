@@ -73,10 +73,11 @@ const PasswordForm: React.FC<PasswordFormProps> = ({ onPasswordChange, isEditing
     const allValid = Object.values(validations).every(Boolean);
     
     if (!allValid) {
-      toast.error({
-        title: "Invalid Password",
+
+      toast.error("Invalid Password", {
         description: "Please make sure your password meets all requirements"
       });
+      
       return;
     }
     
@@ -89,15 +90,14 @@ const PasswordForm: React.FC<PasswordFormProps> = ({ onPasswordChange, isEditing
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      
-      toast.success({
-        title: "Password Updated",
+
+      toast.success("Password Updated", {
         description: "Your password has been successfully changed"
       });
+      
     } catch (error) {
       console.error("Failed to change password", error);
-      toast.error({
-        title: "Update Failed",
+      toast.error("Update Failed", {
         description: "There was an error changing your password. Please try again."
       });
     } finally {
