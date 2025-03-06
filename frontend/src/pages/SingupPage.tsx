@@ -17,42 +17,47 @@ const SignupPageContent: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!name || !email || !password) {
       setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
-  
+
     if (password !== confirmPassword) {
       setError("รหัสผ่านไม่ตรงกัน");
       return;
     }
-  
+
     if (password.length < 8) {
       setError("รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร");
       return;
     }
-  
+
     try {
       setIsLoading(true);
       setError("");
-  
-      const response = await fetch("/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: name,
-          email,
-          password,
-        }),
-      });
-  
-      const data = await response.json();
-  
+
+      const response = await fetch(
+        "https://aroi-dee-backend.vercel.app/api/users/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: name, email, password }),
+        }
+      );
+
+      // ตรวจสอบว่าค่า Response มีเนื้อหาหรือไม่
+      if (!response.ok) {
+        const errorText = await response.text(); // อ่านข้อความจาก response
+        throw new Error(errorText || "สมัครสมาชิกล้มเหลว");
+      }
+
+      const data = await response.json(); // แปลง response เป็น JSON
+
       if (!data.success) {
         throw new Error(data.message || "สมัครสมาชิกล้มเหลว");
       }
-  
+
       alert("สมัครสมาชิกสำเร็จ 🎉 กรุณาเข้าสู่ระบบ");
       navigate("/login"); // นำผู้ใช้ไปที่หน้า Login
     } catch (err: any) {
