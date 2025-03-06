@@ -15,7 +15,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     
     if (!email || !password) {
-      setError('กรุณากรอกอีเมลและรหัสผ่าน');
+      setError('Please enter email and password');
       return;
     }
     
@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
       await login(email, password);
       navigate('/'); // Redirect to home page after login
     } catch (err) {
-      setError('เข้าสู่ระบบล้มเหลว กรุณาลองอีกครั้ง');
+      setError('Login failed. Please try again');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -38,12 +38,12 @@ const LoginPage: React.FC = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            เข้าสู่ระบบ
+            Log In
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            หรือ{' '}
+            Or{' '}
             <Link to="/signup" className="font-medium text-orange-500 hover:text-orange-600">
-              สมัครสมาชิกใหม่
+              sign up
             </Link>
           </p>
         </div>
@@ -58,7 +58,7 @@ const LoginPage: React.FC = () => {
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1">
-                อีเมล
+                Email
               </label>
               <input
                 id="email-address"
@@ -75,10 +75,10 @@ const LoginPage: React.FC = () => {
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  รหัสผ่าน
+                  Password
                 </label>
                 <Link to="/forgot-password" className="text-sm text-orange-500 hover:text-orange-600">
-                  ลืมรหัสผ่าน?
+                  Forgot password?
                 </Link>
               </div>
               <input
@@ -103,7 +103,7 @@ const LoginPage: React.FC = () => {
                 isLoading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
-              {isLoading ? 'กำลังดำเนินการ...' : 'เข้าสู่ระบบ'}
+              {isLoading ? 'Processing...' : 'Log In'}
             </button>
           </div>
         </form>
