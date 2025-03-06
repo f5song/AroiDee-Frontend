@@ -35,7 +35,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (savedToken && savedUser) {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
+
+      // ✅ ตั้งค่า axios ให้ใช้ token อัตโนมัติ
+      axios.defaults.headers.common.Authorization = `Bearer ${savedToken}`;
     }
+
     setIsLoading(false);
   }, []);
 
@@ -56,6 +60,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       setToken(token);
       setUser(user);
+
+      // ✅ ตั้งค่า axios ให้ใช้ token อัตโนมัติ
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
     } catch (error: any) {
       console.error("Login failed:", error.response?.data?.message || error.message);
       throw new Error(error.response?.data?.message || "เข้าสู่ระบบล้มเหลว");
@@ -70,6 +77,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
+
+    // ✅ รีเฟรชแอปเพื่อเคลียร์ข้อมูลทั้งหมด
+    window.location.reload();
   };
 
   return (
