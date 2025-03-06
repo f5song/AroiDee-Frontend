@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 
 type User = {
   id: string;
@@ -22,7 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   login: async () => {},
   logout: async () => {},
-  signup: async () => {}
+  signup: async () => {},
 });
 
 interface AuthProviderProps {
@@ -32,19 +33,19 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is already logged in
     const checkAuthStatus = async () => {
       try {
-        // In a real app, you would check with your backend or local storage
-        const savedUser = localStorage.getItem('user');
-        
-        if (savedUser) {
+        const savedUser = localStorage.getItem("user");
+        const token = localStorage.getItem("authToken");
+
+        if (savedUser && token) {
           setUser(JSON.parse(savedUser));
         }
       } catch (error) {
-        console.error('Authentication check failed:', error);
+        console.error("Authentication check failed:", error);
       } finally {
         setIsLoading(false);
       }
@@ -53,25 +54,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuthStatus();
   }, []);
 
-  const login = async (email: string) => {
+  const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
       
-      // Mock login - in a real app, you would call your API
-      // This is just for demonstration purposes
-      const mockUser = {
-        id: '123',
-        name: 'Test User',
-        email,
-        profileImage: '/api/placeholder/40/40'
-      };
-      
-      // Save to localStorage for persistence
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      setUser(mockUser);
+      const response = await fetch("/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Login failed");
+
+      const { user, token } = data;
+
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("authToken", token);
+
+      setUser(user);
+      navigate("/"); // นำไปหน้า Home หลัง Login สำเร็จ
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -81,37 +85,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       setIsLoading(true);
-      
-      // Clear from localStorage
-      localStorage.removeItem('user');
-      
+
+      await fetch("/api/users/logout", { method: "POST", credentials: "include" });
+
+      localStorage.removeItem("user");
+      localStorage.removeItem("authToken");
+
       setUser(null);
+      navigate("/login"); // นำไปหน้า Login หลัง Logout
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const signup = async (name: string, email: string) => {
+  const signup = async (name: string, email: string, password: string) => {
     try {
       setIsLoading(true);
       
-      // Mock signup - in a real app, you would call your API
-      const mockUser = {
-        id: '123',
-        name,
-        email,
-        profileImage: '/api/placeholder/40/40'
-      };
-      
-      // Save to localStorage for persistence
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      setUser(mockUser);
+      const response = await fetch("/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Signup failed");
+
+      const { user, token } = data;
+
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("authToken", token);
+
+      setUser(user);
+      navigate("/"); // นำไปหน้า Home หลัง Signup สำเร็จ
     } catch (error) {
-      console.error('Signup failed:', error);
+      console.error("Signup failed:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -119,16 +130,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated: !!user,
-        isLoading,
-        login,
-        logout,
-        signup
-      }}
-    >
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, signup }}>
       {children}
     </AuthContext.Provider>
   );

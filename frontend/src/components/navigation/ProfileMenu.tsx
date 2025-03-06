@@ -1,25 +1,21 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext"; // ✅ ใช้ Context
 import { ChevronDown, User, Settings, LogOut } from "lucide-react";
 import NavItem from "./NavItem";
 
 interface ProfileMenuProps {
-  isMobile?: boolean; // ✅ เพิ่ม isMobile เป็น prop
+  isMobile?: boolean;
 }
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth(); // ✅ ใช้ Context แทน LocalStorage
 
   const handleLogout = async () => {
     try {
-      localStorage.removeItem("authToken"); // ลบ Token ออกจาก LocalStorage
-
-      await fetch("/api/users/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      navigate("/login"); // พาผู้ใช้ไปที่หน้า Login
+      logout(); // ✅ ใช้ฟังก์ชัน logout จาก Context
+      navigate("/login"); // ✅ พาผู้ใช้ไปหน้า Login
     } catch (error) {
       console.error("Logout failed:", error);
     }

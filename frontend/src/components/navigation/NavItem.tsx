@@ -53,6 +53,13 @@ const NavItem: React.FC<NavItemProps> = ({
     }
   };
 
+  const handleItemClick = async (item: DropdownItem) => {
+    if (item.onClick) {
+      await item.onClick(); // ✅ เรียกฟังก์ชัน Logout หรือเมนูอื่น ๆ
+    }
+    setIsOpen(false); // ✅ ปิด Dropdown หลังจากคลิก
+  };
+
   const activeClass = isActive
     ? "text-orange-500 bg-orange-50 font-medium"
     : "text-gray-700 hover:text-orange-500 hover:bg-orange-50";
@@ -68,7 +75,9 @@ const NavItem: React.FC<NavItemProps> = ({
       {path && (!hasDropdown || !isMobile) ? (
         <Link
           to={path}
-          className={`flex items-center px-4 py-3 rounded-md transition-all duration-200 ${activeClass} ${isMobile ? "w-full text-lg" : ""}`}
+          className={`flex items-center px-4 py-3 rounded-md transition-all duration-200 ${activeClass} ${
+            isMobile ? "w-full text-lg" : ""
+          }`}
           onClick={handleClick}
         >
           {title}
@@ -79,7 +88,9 @@ const NavItem: React.FC<NavItemProps> = ({
       ) : (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex items-center px-4 py-3 rounded-md transition-all duration-200 ${activeClass} ${isMobile ? "w-full justify-between text-lg" : ""}`}
+          className={`flex items-center px-4 py-3 rounded-md transition-all duration-200 ${activeClass} ${
+            isMobile ? "w-full justify-between text-lg" : ""
+          }`}
         >
           {children || title}
           {hasDropdown && !children && (
@@ -97,10 +108,7 @@ const NavItem: React.FC<NavItemProps> = ({
                 <React.Fragment key={index}>
                   {item.onClick ? (
                     <button
-                      onClick={() => {
-                        item.onClick?.(); // ✅ เรียกฟังก์ชัน (Logout)
-                        setIsOpen(false); // ✅ ปิด Dropdown หลังจากคลิก
-                      }}
+                      onClick={() => handleItemClick(item)}
                       className="flex items-center gap-3 w-full px-4 py-3 rounded-md text-left text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors duration-200"
                     >
                       {item.icon && <span className="text-orange-500 flex-shrink-0">{item.icon}</span>}
