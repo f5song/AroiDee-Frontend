@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext"; // ✅ ใช้ Context
+import { useAuth } from "../auth/AuthContext"; // ✅ ใช้ Context ที่ถูกต้อง
 import { ChevronDown, User, Settings, LogOut } from "lucide-react";
 import NavItem from "./NavItem";
 
@@ -10,12 +10,19 @@ interface ProfileMenuProps {
 
 const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
   const navigate = useNavigate();
-  const { logout } = useAuth(); // ✅ ใช้ Context แทน LocalStorage
+  const auth = useAuth(); // ✅ ตรวจสอบว่ามีค่า auth จริง ๆ
+
+  if (!auth) {
+    console.error("Auth Context is not available");
+    return null; // ❌ ถ้า `auth` ไม่มีค่าก็ไม่ render อะไรเลย (ป้องกัน React Crash)
+  }
+
+  const { logout } = auth;
 
   const handleLogout = async () => {
     try {
-      logout(); // ✅ ใช้ฟังก์ชัน logout จาก Context
-      navigate("/login"); // ✅ พาผู้ใช้ไปหน้า Login
+      await logout();
+      navigate("/login"); // ✅ นำผู้ใช้ไปหน้า Login
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -24,7 +31,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
   const PROFILE_MENU_ITEMS = [
     { name: "My Profile", path: "/profile", icon: <User className="w-5 h-5" /> },
     { name: "Account Settings", path: "/settings", icon: <Settings className="w-5 h-5" /> },
-    { name: "Logout", onClick: handleLogout, icon: <LogOut className="w-5 h-5" /> },
+    { name: "Logout", onClick: handleLogout, icon: <LogOut className="w-5 h-5" /> }, // ✅ ใช้ onClick
   ];
 
   return (
