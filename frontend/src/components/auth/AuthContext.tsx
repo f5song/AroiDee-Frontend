@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await axios.post("https://aroi-dee-backend.vercel.app/api/login", {
+      const response = await axios.post("https://aroi-dee-backend.vercel.app/api/users/login", {
         email,
         password,
       });
