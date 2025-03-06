@@ -1,11 +1,9 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
 type User = {
-  id: string;
-  name: string;
+  id: number;
+  username: string;
   email: string;
-  profileImage?: string;
 } | null;
 
 interface AuthContextType {
@@ -13,17 +11,15 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isAuthenticated: false,
-  isLoading: true,
+  isLoading: false,
   login: async () => {},
-  logout: async () => {},
-  signup: async () => {},
+  logout: () => {}
 });
 
 interface AuthProviderProps {
@@ -33,104 +29,57 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const savedUser = localStorage.getItem("user");
-        const token = localStorage.getItem("authToken");
+    // ตรวจสอบว่ามี token และ user ที่บันทึกไว้หรือไม่
+    const savedUser = localStorage.getItem('user');
+    const savedToken = localStorage.getItem('authToken');
 
-        if (savedUser && token) {
-          setUser(JSON.parse(savedUser));
-        }
-      } catch (error) {
-        console.error("Authentication check failed:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuthStatus();
+    if (savedUser && savedToken) {
+      setUser(JSON.parse(savedUser));
+    }
+    setIsLoading(false);
   }, []);
 
+  // ✅ ใช้ API /api/users/login เพื่อเข้าสู่ระบบ
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      
-      const response = await fetch("/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+
+      const response = await fetch('https://aroi-dee-backend.vercel.app/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Login failed");
 
-      const { user, token } = data;
+      if (!response.ok) {
+        throw new Error(data.message || 'เข้าสู่ระบบล้มเหลว');
+      }
 
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("authToken", token);
+      // ✅ บันทึก Token & User ลงใน LocalStorage
+      localStorage.setItem('authToken', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
 
-      setUser(user);
-      navigate("/"); // นำไปหน้า Home หลัง Login สำเร็จ
-    } catch (error) {
-      console.error("Login failed:", error);
+      setUser(data.user);
+    } catch (error: any) {
+      console.error('Login failed:', error.message);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = async () => {
-    try {
-      setIsLoading(true);
-
-      await fetch("/api/users/logout", { method: "POST", credentials: "include" });
-
-      localStorage.removeItem("user");
-      localStorage.removeItem("authToken");
-
-      setUser(null);
-      navigate("/login"); // นำไปหน้า Login หลัง Logout
-    } catch (error) {
-      console.error("Logout failed:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signup = async (name: string, email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      
-      const response = await fetch("/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Signup failed");
-
-      const { user, token } = data;
-
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("authToken", token);
-
-      setUser(user);
-      navigate("/"); // นำไปหน้า Home หลัง Signup สำเร็จ
-    } catch (error) {
-      console.error("Signup failed:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+  // ✅ ลบ Token และข้อมูลผู้ใช้ออกเมื่อล็อกเอาต์
+  const logout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout, signup }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
