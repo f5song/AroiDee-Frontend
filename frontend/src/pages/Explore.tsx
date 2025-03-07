@@ -21,7 +21,6 @@ export default function ExplorePage() {
   const [favorites, setFavorites] = useState<number[]>([]);
 
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    category: "all",
     search: "",
     sort: "rating",
     page: 1,
@@ -55,9 +54,9 @@ export default function ExplorePage() {
     setLoading(true);
     const loadRecipes = async () => {
       try {
-        console.log("🔍 Fetching recipes with filters:", filterOptions); // ✅ Debugging
+        console.log("🔍 Fetching recipes with filters:", filterOptions);
         const result = await fetchRecipes(filterOptions);
-        console.log("✅ API Response:", result); // ✅ ดูว่าข้อมูลมาหรือไม่
+        console.log("✅ API Response:", result); // ตรวจสอบข้อมูลที่ได้จาก API
         setRecipes(result.recipes);
         setPagination(result.pagination);
       } catch (error) {
@@ -124,7 +123,6 @@ export default function ExplorePage() {
               <NoResultsMessage
                 onReset={() =>
                   setFilterOptions({
-                    category: "all",
                     search: "",
                     sort: "rating",
                     page: 1,

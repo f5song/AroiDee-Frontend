@@ -1,7 +1,7 @@
 import axios from "axios";
 import { Recipe, FilterOptions, PaginationInfo, CategoryOption } from "./types";
 import { RECIPES_PER_PAGE, CATEGORIES } from "./constants";
-import { sortRecipes, filterRecipes, paginateData } from "./utils";
+// import { sortRecipes, filterRecipes, paginateData } from "./utils";
 
 const API_URL = "https://aroi-dee-backend.vercel.app/api";
 
@@ -17,7 +17,7 @@ export const fetchRecipes = async (
   const { category, search, sort, page, cookingTime, difficulty, calorieRange } = options;
 
   try {
-    await delay(500);
+    await delay(500); // หน่วงเวลาจำลอง API
     const response = await axios.get(`${API_URL}/recipes`, {
       params: {
         category: category ?? "all",
@@ -31,30 +31,14 @@ export const fetchRecipes = async (
       },
     });
 
-    const fetchedRecipes: Recipe[] = response.data?.recipes ?? [];
-
-    // ✅ กรองข้อมูลที่ frontend
-    const filteredRecipes = filterRecipes(fetchedRecipes, category ? [category] : [], search, cookingTime, difficulty, calorieRange);
-
-    // ✅ เรียงลำดับข้อมูล
-    const sortedRecipes = sortRecipes(filteredRecipes, sort ?? "rating");
-
-    // ✅ แบ่งหน้าข้อมูล
-    const { items, total, totalPages } = paginateData(sortedRecipes, page ?? 1, RECIPES_PER_PAGE);
-
-    return {
-      recipes: items,
-      pagination: {
-        currentPage: page ?? 1,
-        totalPages,
-        totalItems: total,
-      },
-    };
+    console.log("✅ API Response:", response.data); // Debugging API Response
+    return response.data; // ✅ ส่งข้อมูลกลับโดยไม่กรอง
   } catch (error) {
-    console.error("Error fetching recipes:", error);
+    console.error("❌ Error fetching recipes:", error);
     return { recipes: [], pagination: { currentPage: page ?? 1, totalPages: 0, totalItems: 0 } };
   }
 };
+
 
 // ✅ ดึงสูตรอาหารที่ผู้ใช้บันทึก
 export const getSavedRecipes = async (userId: number): Promise<number[]> => {
