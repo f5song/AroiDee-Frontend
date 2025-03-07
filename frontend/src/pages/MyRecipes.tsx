@@ -1,8 +1,7 @@
-// MyRecipesPage.tsx
 import { useState, useEffect } from "react";
+import { useAuth } from "@/components/auth/AuthContext"; // ✅ เพิ่ม useAuth
 import { 
   Recipe, 
-  RecipeSource,
   fetchRecipesBySource, 
   toggleFavoriteRecipe 
 } from "@/lib/recipes";
@@ -13,33 +12,25 @@ import PageHeader from "@/components/myRecipe/PageHeader";
  * My Recipes page component
  */
 export default function MyRecipesPage() {
-  // State for recipes
+  const { user } = useAuth(); // ✅ ดึง user จาก Context
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<number[]>([]);
 
-  // Load user's recipes and favorites
+  // ✅ โหลดสูตรอาหารของผู้ใช้และที่บันทึกไว้
   useEffect(() => {
+    if (!user) return; // ✅ ป้องกัน error ถ้า user ยังไม่ได้ล็อกอิน
+
     const fetchRecipes = async () => {
       setLoading(true);
       try {
-        // Use the updated API
-        const userRecipesResponse = await fetchRecipesBySource(RecipeSource.USER);
-        const favoritesResponse = await fetchRecipesBySource(RecipeSource.FAVORITE);
+        const userRecipesResponse = await fetchRecipesBySource("USER", user.id);
+        const favoritesResponse = await fetchRecipesBySource("FAVORITE", user.id);
 
         setMyRecipes(userRecipesResponse.recipes);
         setFavoriteRecipes(favoritesResponse.recipes);
-
-        // Get favorite recipe IDs from localStorage
-        try {
-          const savedFavorites = localStorage.getItem("favoriteRecipes");
-          if (savedFavorites) {
-            setFavorites(JSON.parse(savedFavorites));
-          }
-        } catch (error) {
-          console.error("Error reading favorites from localStorage:", error);
-        }
+        setFavorites(favoritesResponse.recipes.map((r) => r.id));
       } catch (error) {
         console.error("Error fetching recipes:", error);
       } finally {
@@ -48,25 +39,28 @@ export default function MyRecipesPage() {
     };
 
     fetchRecipes();
-  }, []);
+  }, [user]);
 
-  // Handle favorite toggle
-  const handleFavoriteToggle = async (id: number) => {
+  // ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร
+  const handleFavoriteToggle = async (recipeId: number) => {
+    if (!user) {
+      console.error("User not logged in");
+      return;
+    }
+
     try {
-      // Use toggleFavoriteRecipe from the updated API
-      const result = await toggleFavoriteRecipe(id);
-      
-      if (result.success) {
+      const success = await toggleFavoriteRecipe(user.id, recipeId); // ✅ ต้องส่ง `user.id` ไปด้วย
+
+      if (success) {
         setFavorites((prev) => {
-          const isFavorite = prev.includes(id);
+          const isFavorite = prev.includes(recipeId);
           return isFavorite
-            ? prev.filter((recipeId) => recipeId !== id)
-            : [...prev, id];
+            ? prev.filter((id) => id !== recipeId)
+            : [...prev, recipeId];
         });
 
-        // If we're removing a favorite, update the favorites list
-        if (favorites.includes(id)) {
-          setFavoriteRecipes((prev) => prev.filter((recipe) => recipe.id !== id));
+        if (favorites.includes(recipeId)) {
+          setFavoriteRecipes((prev) => prev.filter((recipe) => recipe.id !== recipeId));
         }
       }
     } catch (error) {
@@ -75,20 +69,16 @@ export default function MyRecipesPage() {
   };
 
   return (
-    <div>
-      
-      <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
-        <div className="max-w-7xl mx-auto">
-          <PageHeader />
-          
-          <RecipeCollection 
-            myRecipes={myRecipes}
-            favoriteRecipes={favoriteRecipes}
-            loading={loading}
-            favorites={favorites}
-            onFavoriteToggle={handleFavoriteToggle}
-          />
-        </div>
+    <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
+      <div className="max-w-7xl mx-auto">
+        <PageHeader />
+        <RecipeCollection 
+          myRecipes={myRecipes}
+          favoriteRecipes={favoriteRecipes}
+          loading={loading}
+          favorites={favorites}
+          onFavoriteToggle={handleFavoriteToggle}
+        />
       </div>
     </div>
   );

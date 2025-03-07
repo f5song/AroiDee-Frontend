@@ -5,13 +5,10 @@ import { sortRecipes, filterRecipes, paginateData } from "./utils";
 
 const API_URL = "https://aroi-dee-backend.vercel.app/api";
 
-// ✅ จำลองการหน่วงเวลา (แก้ไข error)
-const delay = (ms: number): Promise<void> => 
-  new Promise(resolve => setTimeout(resolve, ms));
+// ✅ ฟังก์ชันจำลอง delay
+const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 export type { FilterOptions, Recipe };
-
-
 
 // ✅ ดึงสูตรอาหารจาก Backend
 export const fetchRecipes = async (
@@ -21,37 +18,29 @@ export const fetchRecipes = async (
 
   try {
     await delay(500);
-
     const response = await axios.get(`${API_URL}/recipes`, {
       params: {
-        category: category ?? "all", // ✅ ถ้า `undefined` ให้เป็น "all"
-        search: search ?? "", // ✅ ถ้า `undefined` ให้เป็น string ว่าง
+        category: category ?? "all",
+        search: search ?? "",
         cookingTime,
         difficulty,
         calorieRange,
-        page: page ?? 1, // ✅ ถ้า `undefined` ให้เป็นหน้าแรก
+        page: page ?? 1,
         limit: RECIPES_PER_PAGE,
-        sort: sort ?? "rating", // ✅ ถ้า `undefined` ให้เรียงตาม rating
+        sort: sort ?? "rating",
       },
     });
 
-    let filteredRecipes: Recipe[] = response.data?.recipes ?? [];
+    const fetchedRecipes: Recipe[] = response.data?.recipes ?? [];
 
-    // ✅ กรองข้อมูลที่ frontend อีกรอบ (ถ้าจำเป็น)
-    filteredRecipes = filterRecipes(
-      filteredRecipes, 
-      category ? [category] : [], // ✅ ถ้า `category` เป็น `undefined` ให้เป็น `[]`
-      search ?? "", 
-      cookingTime, 
-      difficulty, 
-      calorieRange
-    );
+    // ✅ กรองข้อมูลที่ frontend
+    const filteredRecipes = filterRecipes(fetchedRecipes, category ? [category] : [], search, cookingTime, difficulty, calorieRange);
 
     // ✅ เรียงลำดับข้อมูล
-    filteredRecipes = sortRecipes(filteredRecipes, sort ?? "rating");
+    const sortedRecipes = sortRecipes(filteredRecipes, sort ?? "rating");
 
     // ✅ แบ่งหน้าข้อมูล
-    const { items, total, totalPages } = paginateData(filteredRecipes, page ?? 1, RECIPES_PER_PAGE);
+    const { items, total, totalPages } = paginateData(sortedRecipes, page ?? 1, RECIPES_PER_PAGE);
 
     return {
       recipes: items,
@@ -68,7 +57,7 @@ export const fetchRecipes = async (
 };
 
 // ✅ ดึงสูตรอาหารที่ผู้ใช้บันทึก
-export const getSavedRecipes = async (userId: number): Promise<Recipe[]> => {
+export const getSavedRecipes = async (userId: number): Promise<{ recipe_id: number }[]> => {
   try {
     const response = await axios.get(`${API_URL}/users/${userId}/saved-recipes`);
     return response.data?.savedRecipes ?? [];
@@ -108,5 +97,43 @@ export const fetchCategories = async (): Promise<CategoryOption[]> => {
   } catch (error) {
     console.error("Error fetching categories:", error);
     return CATEGORIES;
+  }
+};
+
+// ✅ ฟังก์ชันดึงข้อมูลจากแหล่งที่กำหนด (User หรือ Favorite)
+export const fetchRecipesBySource = async (
+  source: "USER" | "FAVORITE",
+  userId?: number
+): Promise<{ recipes: Recipe[]; pagination: PaginationInfo }> => {
+  if (!userId) {
+    return { recipes: [], pagination: { currentPage: 1, totalPages: 0, totalItems: 0 } };
+  }
+
+  try {
+    const response = await axios.get(`${API_URL}/users/${userId}/${source.toLowerCase()}-recipes`);
+    return {
+      recipes: response.data?.recipes ?? [],
+      pagination: response.data?.pagination ?? { currentPage: 1, totalPages: 0, totalItems: 0 },
+    };
+  } catch (error) {
+    console.error(`Error fetching ${source.toLowerCase()} recipes:`, error);
+    return { recipes: [], pagination: { currentPage: 1, totalPages: 0, totalItems: 0 } };
+  }
+};
+
+// ✅ สลับสถานะบันทึก/เลิกบันทึกสูตรอาหาร
+export const toggleFavoriteRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+  try {
+    const savedRecipes = await getSavedRecipes(userId);
+    const isSaved = savedRecipes.some((r) => r.recipe_id === recipeId);
+
+    if (isSaved) {
+      return await unsaveRecipe(userId, recipeId);
+    } else {
+      return await saveRecipe(userId, recipeId);
+    }
+  } catch (error) {
+    console.error("Error toggling favorite recipe:", error);
+    return false;
   }
 };
