@@ -57,10 +57,10 @@ export const fetchRecipes = async (
 };
 
 // ✅ ดึงสูตรอาหารที่ผู้ใช้บันทึก
-export const getSavedRecipes = async (userId: number): Promise<{ recipe_id: number }[]> => {
+export const getSavedRecipes = async (userId: number): Promise<number[]> => {
   try {
     const response = await axios.get(`${API_URL}/users/${userId}/saved-recipes`);
-    return response.data?.savedRecipes ?? [];
+    return response.data?.savedRecipes.map((r: { recipe_id: number }) => r.recipe_id) ?? [];
   } catch (error) {
     console.error("Error fetching saved recipes:", error);
     return [];
@@ -68,24 +68,24 @@ export const getSavedRecipes = async (userId: number): Promise<{ recipe_id: numb
 };
 
 // ✅ บันทึกสูตรอาหารลงฐานข้อมูล
-export const saveRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+export const saveRecipe = async (userId: number, recipeId: number): Promise<{ success: boolean }> => {
   try {
     await axios.post(`${API_URL}/users/save-recipe`, { user_id: userId, recipe_id: recipeId });
-    return true;
+    return { success: true };
   } catch (error) {
     console.error("Error saving recipe:", error);
-    return false;
+    return { success: false };
   }
 };
 
 // ✅ ยกเลิกการบันทึกสูตรอาหาร
-export const unsaveRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+export const unsaveRecipe = async (userId: number, recipeId: number): Promise<{ success: boolean }> => {
   try {
     await axios.post(`${API_URL}/users/unsave-recipe`, { user_id: userId, recipe_id: recipeId });
-    return true;
+    return { success: true };
   } catch (error) {
     console.error("Error unsaving recipe:", error);
-    return false;
+    return { success: false };
   }
 };
 
@@ -103,29 +103,29 @@ export const fetchCategories = async (): Promise<CategoryOption[]> => {
 // ✅ ฟังก์ชันดึงข้อมูลจากแหล่งที่กำหนด (User หรือ Favorite)
 export const fetchRecipesBySource = async (
   source: "USER" | "FAVORITE",
-  userId?: number
+  userId: number,
+  options: FilterOptions = {} // ✅ รองรับตัวกรอง
 ): Promise<{ recipes: Recipe[]; pagination: PaginationInfo }> => {
-  if (!userId) {
-    return { recipes: [], pagination: { currentPage: 1, totalPages: 0, totalItems: 0 } };
-  }
-
   try {
-    const response = await axios.get(`${API_URL}/users/${userId}/${source.toLowerCase()}-recipes`);
+    const response = await axios.get(`${API_URL}/users/${userId}/${source.toLowerCase()}-recipes`, {
+      params: options, // ✅ ใช้ options เป็นพารามิเตอร์
+    });
+
     return {
       recipes: response.data?.recipes ?? [],
-      pagination: response.data?.pagination ?? { currentPage: 1, totalPages: 0, totalItems: 0 },
+      pagination: response.data?.pagination ?? { currentPage: options.page ?? 1, totalPages: 0, totalItems: 0 },
     };
   } catch (error) {
     console.error(`Error fetching ${source.toLowerCase()} recipes:`, error);
-    return { recipes: [], pagination: { currentPage: 1, totalPages: 0, totalItems: 0 } };
+    return { recipes: [], pagination: { currentPage: options.page ?? 1, totalPages: 0, totalItems: 0 } };
   }
 };
 
 // ✅ สลับสถานะบันทึก/เลิกบันทึกสูตรอาหาร
-export const toggleFavoriteRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+export const toggleFavoriteRecipe = async (userId: number, recipeId: number): Promise<{ success: boolean }> => {
   try {
     const savedRecipes = await getSavedRecipes(userId);
-    const isSaved = savedRecipes.some((r) => r.recipe_id === recipeId);
+    const isSaved = savedRecipes.includes(recipeId);
 
     if (isSaved) {
       return await unsaveRecipe(userId, recipeId);
@@ -134,6 +134,6 @@ export const toggleFavoriteRecipe = async (userId: number, recipeId: number): Pr
     }
   } catch (error) {
     console.error("Error toggling favorite recipe:", error);
-    return false;
+    return { success: false };
   }
 };
