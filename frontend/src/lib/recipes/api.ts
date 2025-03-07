@@ -11,7 +11,7 @@ export type { FilterOptions, Recipe };
 export const fetchRecipes = async (
   options: FilterOptions = {}
 ): Promise<{ recipes: Recipe[]; pagination: PaginationInfo }> => {
-  const { search, sort, page } = options;
+  const { search, sort, page, category } = options; // ✅ เพิ่ม category
 
   try {
     const response = await axios.get(`${API_URL}/recipes`, {
@@ -19,6 +19,7 @@ export const fetchRecipes = async (
         search: search ?? "",
         sort: sort ?? "rating", // ✅ เพิ่ม sort parameter
         page: page ?? 1,
+        category: category !== "all" ? category : undefined, // ✅ ถ้าเลือก "all" ไม่ส่ง category ไป
       },
     });
 
@@ -39,6 +40,7 @@ export const fetchRecipes = async (
     return { recipes: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
   }
 };
+
 
 
 
