@@ -25,7 +25,6 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   favoriteRecipes: initialFavoriteRecipes,
   loading: initialLoading,
   favorites,
-  onFavoriteToggle,
   isLoggedIn
 }) => {
   // ✅ ดึงข้อมูลผู้ใช้
