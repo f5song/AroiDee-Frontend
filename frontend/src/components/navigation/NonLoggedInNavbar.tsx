@@ -53,13 +53,13 @@ const NonLoggedInNavbar: React.FC = () => {
                                 to="/login" 
                                 className="px-4 py-2 text-orange-500 rounded-md hover:bg-orange-50 transition-colors"
                             >
-                                เข้าสู่ระบบ
+                                Login
                             </Link>
                             <Link 
                                 to="/signup" 
                                 className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors shadow-sm"
                             >
-                                สมัครสมาชิก
+                                Sign Up
                             </Link>
                         </div>
 

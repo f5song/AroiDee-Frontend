@@ -102,7 +102,7 @@ const NonLoggedInMobileMenu: React.FC<NonLoggedInMobileMenuProps> = ({ isOpen, o
               className="block w-full text-center px-4 py-3 text-orange-500 border border-orange-500 rounded-md hover:bg-orange-50 transition-colors"
               onClick={onClose}
             >
-              เข้าสู่ระบบ
+              Login
             </Link>
             
             <Link 
@@ -110,7 +110,7 @@ const NonLoggedInMobileMenu: React.FC<NonLoggedInMobileMenuProps> = ({ isOpen, o
               className="block w-full text-center px-4 py-3 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors shadow-sm"
               onClick={onClose}
             >
-              สมัครสมาชิก
+              Sign Up
             </Link>
           </div>
         </div>
