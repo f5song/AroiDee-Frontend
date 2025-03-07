@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ExploreSidebar } from "@/components/explore/sidebar";
 import PageHeader from "@/components/explore/PageHeader";
-import RecipeGrid from "@/components/explore/RecipeGrid";
+// import RecipeGrid from "@/components/explore/RecipeGrid";
 import { NoResultsMessage } from "@/components/explore/FeedbackComponents";
 import PaginationControls from "@/components/explore/PaginationControls";
 import {
@@ -31,7 +31,10 @@ export default function ExplorePage() {
     totalItems: 0,
   });
 
-  const isLoggedIn = !!user; // ✅ ตรวจสอบการล็อกอิน
+  // const isLoggedIn = !!user; // ✅ ตรวจสอบการล็อกอิน
+
+  console.log(favorites)
+
 
   // ✅ โหลดสูตรอาหารที่ถูกบันทึก
   useEffect(() => {
@@ -116,13 +119,13 @@ export default function ExplorePage() {
               }
             />
 
-            {/* ✅ นำ RecipeGrid กลับมา */}
+            {/* ✅ นำ RecipeGrid กลับมา
             <RecipeGrid
               recipes={recipes}
               loading={loading}
               favorites={Array.from(favorites)} // ✅ แปลง Set เป็น Array
               isLoggedIn={isLoggedIn} // ✅ ส่งค่า isLoggedIn
-            />
+            /> */}
 
             {/* ✅ แสดงข้อความถ้าไม่มีผลลัพธ์ */}
             {recipes.length === 0 && !loading && (
