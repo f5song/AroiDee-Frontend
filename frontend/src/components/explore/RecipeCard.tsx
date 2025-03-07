@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // ใช้ react-router-dom
-
+import { Link } from "react-router-dom";
 interface RecipeCardProps {
   recipe: {
     id: number;
@@ -125,7 +125,7 @@ export function RecipeCard({
                 size="sm"
                 className="text-white bg-orange-500 hover:bg-orange-600"
               >
-                <a href={`/recipe/${id}`}>View Recipe</a>
+                <Link to={`/recipe/${id}`}>View Recipe</Link>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
