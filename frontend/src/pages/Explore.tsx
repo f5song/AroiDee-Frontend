@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { ExploreSidebar } from "@/components/explore/sidebar";
 import PageHeader from "@/components/explore/PageHeader";
 import RecipeGrid from "@/components/explore/RecipeGrid";
@@ -15,10 +15,10 @@ import {
 import { useAuth } from "@/components/auth/AuthContext";
 
 export default function ExplorePage() {
-  const { user } = useAuth(); // ดึง user จาก Context
+  const { user } = useAuth(); // ดึงข้อมูล user จาก Context
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [savedRecipes, setSavedRecipes] = useState<Set<number>>(new Set()); // ✅ เปลี่ยนเป็น Set เพื่อลดการคำนวณซ้ำ
+  const [loading, setLoading] = useState(false);
+  const [savedRecipes, setSavedRecipes] = useState<number[]>([]); // เปลี่ยนกลับมาใช้ Array
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     category: "all",
     search: "",
@@ -33,26 +33,30 @@ export default function ExplorePage() {
 
   const isLoggedIn = !!user;
 
-  // ✅ ใช้ useCallback ป้องกันการสร้างฟังก์ชันใหม่ในทุก re-render
-  const fetchSavedRecipes = useCallback(async () => {
+  /** ✅ โหลดสูตรอาหารที่ถูกบันทึกโดย user */
+  useEffect(() => {
     if (!user) return;
-    try {
-      const result = await getSavedRecipes(user.id);
-      setSavedRecipes(new Set(result.map((r: any) => r.recipe_id))); // ✅ ใช้ Set แทน Array
-    } catch (error) {
-      console.error("Error fetching saved recipes:", error);
-    }
+    
+    const fetchSavedRecipes = async () => {
+      try {
+        console.log("Fetching saved recipes...");
+        const result = await getSavedRecipes(user.id);
+        setSavedRecipes(result.map((r: any) => r.recipe_id));
+      } catch (error) {
+        console.error("Error fetching saved recipes:", error);
+      }
+    };
+
+    fetchSavedRecipes();
   }, [user]);
 
+  /** ✅ โหลดสูตรอาหาร */
   useEffect(() => {
-    fetchSavedRecipes();
-  }, [fetchSavedRecipes]);
+    setLoading(true);
 
-  useEffect(() => {
     const loadRecipes = async () => {
-      setLoading(true);
       try {
-        console.log("Fetching recipes..."); // ✅ Debugging
+        console.log("Fetching recipes...");
         const result = await fetchRecipes(filterOptions);
         setRecipes(result.recipes);
         setPagination(result.pagination);
@@ -66,32 +70,25 @@ export default function ExplorePage() {
     loadRecipes();
   }, [filterOptions]);
 
-  // ✅ ใช้ useCallback ป้องกันไม่ให้ฟังก์ชันเปลี่ยนแปลงโดยไม่จำเป็น
-  const handleFavorite = useCallback(
-    async (recipeId: number) => {
-      if (!user) {
-        console.error("User not logged in");
-        return;
-      }
+  /** ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร */
+  const handleFavorite = async (recipeId: number) => {
+    if (!user) {
+      console.warn("User not logged in");
+      return;
+    }
 
-      try {
-        if (savedRecipes.has(recipeId)) {
-          await unsaveRecipe(user.id, recipeId);
-          setSavedRecipes((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(recipeId);
-            return newSet;
-          });
-        } else {
-          await saveRecipe(user.id, recipeId);
-          setSavedRecipes((prev) => new Set(prev).add(recipeId));
-        }
-      } catch (error) {
-        console.error("Error toggling favorite:", error);
+    try {
+      if (savedRecipes.includes(recipeId)) {
+        await unsaveRecipe(user.id, recipeId);
+        setSavedRecipes((prev) => prev.filter((id) => id !== recipeId));
+      } else {
+        await saveRecipe(user.id, recipeId);
+        setSavedRecipes((prev) => [...prev, recipeId]);
       }
-    },
-    [user, savedRecipes]
-  );
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -102,7 +99,7 @@ export default function ExplorePage() {
           }
           onSearch={(search) =>
             setFilterOptions((prev) => ({ ...prev, search, page: 1 }))
-          } // ✅ เพิ่ม onSearch
+          }
         />
 
         <main className="flex-1 p-4 md:p-6 ml-12 md:ml-0">
@@ -118,7 +115,7 @@ export default function ExplorePage() {
             <RecipeGrid
               recipes={recipes}
               loading={loading}
-              favorites={Array.from(savedRecipes)} // ✅ แปลง Set กลับเป็น Array
+              favorites={savedRecipes}
               onFavoriteToggle={handleFavorite}
               isLoggedIn={isLoggedIn}
             />
