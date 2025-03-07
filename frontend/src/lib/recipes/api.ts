@@ -17,14 +17,13 @@ export const fetchRecipes = async (
     const response = await axios.get(`${API_URL}/recipes`, {
       params: {
         search: search ?? "",
-        sort: sort ?? "rating",
+        sort: sort ?? "rating", // ✅ เพิ่ม sort parameter
         page: page ?? 1,
       },
     });
 
     console.log("✅ API Response fetchRecipes:", response.data); // Debug API Response
 
-    // แก้ให้ดึงค่าจาก data.data
     const recipes = response.data?.data ?? []; 
 
     return {
@@ -32,7 +31,7 @@ export const fetchRecipes = async (
       pagination: {
         currentPage: page ?? 1,
         totalPages: 1,
-        totalItems: recipes.length, // ใช้ data.length แทน ถ้า API ไม่มี pagination
+        totalItems: recipes.length,
       },
     };
   } catch (error) {
