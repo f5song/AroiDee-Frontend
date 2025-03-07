@@ -1,19 +1,10 @@
 import { Heart, Clock, Star } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 interface RecipeCardProps {
   recipe: {
@@ -25,21 +16,43 @@ interface RecipeCardProps {
     image: string;
     rating: number;
     difficulty: string;
-    categories: string[]; // แทนที่ tags ด้วย categories
+    categories: string[];
   };
   isFavorite: boolean;
   onFavoriteToggle: () => void;
+  isLoggedIn: boolean; // เพิ่ม prop สำหรับตรวจสอบสถานะล็อกอิน
 }
 
-/**
- * Recipe card component displaying a single recipe
- */
 export function RecipeCard({
   recipe,
   isFavorite,
   onFavoriteToggle,
+  isLoggedIn, // รับค่าจาก prop
 }: RecipeCardProps) {
   const { id, title, calories, cook_time, image, categories, rating } = recipe;
+  const router = useRouter(); // ใช้ useRouter สำหรับการนำทางไปหน้า login
+
+  const handleFavoriteToggle = async () => {
+    if (!isLoggedIn) {
+      // ถ้าผู้ใช้ยังไม่ได้ล็อกอิน ให้ redirect ไปหน้า login
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const user_id = 1; // สามารถเปลี่ยนให้ดึงจาก user ที่ล็อกอิน
+      if (isFavorite) {
+        // ถ้าเป็นสูตรที่บันทึกแล้วให้ยกเลิก
+        await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe", { user_id, recipe_id: id });
+      } else {
+        // ถ้ายังไม่ได้บันทึกให้ทำการบันทึก
+        await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe", { user_id, recipe_id: id });
+      }
+      onFavoriteToggle(); // เปลี่ยนสถานะ favorite
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+  };
 
   return (
     <TooltipProvider>
@@ -63,11 +76,7 @@ export function RecipeCard({
           </CardTitle>
           <div className="flex flex-wrap gap-1 mb-2">
             {categories?.slice(0, 2).map((category) => (
-              <Badge
-                key={category}
-                variant="secondary"
-                className="text-xs bg-green-50"
-              >
+              <Badge key={category} variant="secondary" className="text-xs bg-green-50">
                 {category}
               </Badge>
             ))}
@@ -100,15 +109,10 @@ export function RecipeCard({
                 variant="outline"
                 size="sm"
                 className={isFavorite ? "bg-red-50" : "hover:bg-red-50"}
-                onClick={(e) => {
-                  e.preventDefault();
-                  onFavoriteToggle();
-                }}
+                onClick={handleFavoriteToggle}
               >
                 <Heart
-                  className={`w-4 h-4 mr-2 ${
-                    isFavorite ? "fill-red-500 text-red-500" : "text-red-500"
-                  }`}
+                  className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : "text-red-500"}`}
                 />
                 {isFavorite ? "Saved" : "Save"}
               </Button>
