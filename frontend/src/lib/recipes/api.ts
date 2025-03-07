@@ -7,25 +7,25 @@ const API_URL = "https://aroi-dee-backend.vercel.app/api";
 
 export type { FilterOptions, Recipe };
 
-// ✅ ดึงสูตรอาหารจาก Backend
+
 export const fetchRecipes = async (
   options: FilterOptions = {}
 ): Promise<{ recipes: Recipe[]; pagination: PaginationInfo }> => {
+  const { search, sort, page } = options;
+
   try {
-    const response = await axios.get(`${API_URL}/api/recipes`, {
+    const response = await axios.get(`${API_URL}/recipes`, {
       params: {
-        category: options.category ?? "all",
-        search: options.search ?? "",
-        page: options.page ?? 1,
-        sort: options.sort ?? "rating",
+        search: search ?? "",
+        sort: sort ?? "rating",
+        page: page ?? 1,
       },
     });
 
-    // ✅ ตรวจสอบโครงสร้างข้อมูลที่ได้จาก API
-    console.log("✅ API Response:", response.data);
+    console.log("✅ API Response:", response.data); // Debug API Response
 
     return {
-      recipes: response.data?.data ?? [], // ✅ ป้องกัน undefined
+      recipes: response.data?.recipes ?? [],
       pagination: response.data?.pagination ?? { currentPage: 1, totalPages: 1, totalItems: 0 },
     };
   } catch (error) {
@@ -33,6 +33,7 @@ export const fetchRecipes = async (
     return { recipes: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
   }
 };
+
 
 
 

@@ -10,6 +10,7 @@ import {
   fetchRecipes,
   saveRecipe,
   unsaveRecipe,
+
 } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext";
 
@@ -39,9 +40,10 @@ export default function ExplorePage() {
     setLoading(true);
     const loadRecipes = async () => {
       try {
-        console.log("🔍 Fetching recipes with filters:", filterOptions);
-        const result = await fetchRecipes(filterOptions);
-        console.log("✅ API Response:", result); // ตรวจสอบข้อมูลที่ได้จาก API
+        console.log("🔍 Fetching all recipes...");
+        const result = await fetchRecipes({ search: "", sort: "rating", page: 1 }); // ✅ ลบ category
+        console.log("✅ API Response:", result);
+  
         setRecipes(result.recipes);
         setPagination(result.pagination);
       } catch (error) {
@@ -50,9 +52,10 @@ export default function ExplorePage() {
         setLoading(false);
       }
     };
-
+  
     loadRecipes();
-  }, [filterOptions]);
+  }, []);
+  
 
   // กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
   const handleFavorite = async (recipeId: number) => {

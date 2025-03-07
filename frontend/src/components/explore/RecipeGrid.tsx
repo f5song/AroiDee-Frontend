@@ -20,6 +20,10 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   if (loading) {
     return null; // ✅ ลดการ re-render
   }
+  if (!loading && recipes.length === 0) {
+    return <p className="text-center text-gray-500">🔍 No recipes found!</p>;
+  }
+  
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -32,8 +36,10 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           isLoggedIn={isLoggedIn}
         />
       ))}
+      
     </div>
   );
+  
 };
 
 
