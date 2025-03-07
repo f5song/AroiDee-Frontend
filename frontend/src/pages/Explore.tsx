@@ -36,19 +36,31 @@ export default function ExplorePage() {
   // โหลดข้อมูลสูตรที่ถูกบันทึกเมื่อ component ถูกโหลด
   useEffect(() => {
     if (!user) return;
-
+  
     const fetchSavedRecipes = async () => {
       try {
+        console.log("🔍 Fetching saved recipes for user:", user.id);
         const result = await getSavedRecipes(user.id);
+        
+        console.log("✅ Saved Recipes API Response:", result);
+  
+        // ✅ ป้องกันกรณี API คืน undefined
+        if (!Array.isArray(result)) {
+          console.warn("⚠ No saved recipes found, setting empty array.");
+          setFavorites([]);
+          return;
+        }
+  
         setFavorites(result.map((r: any) => r.recipe_id));
       } catch (error) {
-        console.error("Error fetching saved recipes:", error);
+        console.error("❌ Error fetching saved recipes:", error);
+        setFavorites([]); // ✅ ป้องกัน undefined
       }
     };
-
+  
     fetchSavedRecipes();
   }, [user]);
-
+  
   // โหลดสูตรอาหาร
   useEffect(() => {
     setLoading(true);

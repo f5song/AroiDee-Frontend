@@ -41,15 +41,16 @@ export const fetchRecipes = async (
 
 
 // ✅ ดึงสูตรอาหารที่ผู้ใช้บันทึก
-export const getSavedRecipes = async (userId: number): Promise<number[]> => {
+export const getSavedRecipes = async (userId: number): Promise<any[]> => {
   try {
-    const response = await axios.get(`${API_URL}/users/${userId}/saved-recipes`);
-    return response.data?.savedRecipes.map((r: { recipe_id: number }) => r.recipe_id) ?? [];
+    const response = await axios.get(`${API_URL}/api/saved-recipes/${userId}/saved-recipes`);
+    return response.data ?? [];
   } catch (error) {
-    console.error("Error fetching saved recipes:", error);
-    return [];
+    console.error("❌ Error fetching saved recipes:", error);
+    return []; // ✅ ป้องกัน undefined
   }
 };
+
 
 // ✅ บันทึกสูตรอาหารลงฐานข้อมูล
 export const saveRecipe = async (userId: number, recipeId: number): Promise<{ success: boolean }> => {
