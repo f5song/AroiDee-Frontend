@@ -1,12 +1,9 @@
 import axios from "axios";
 import { Recipe, FilterOptions, PaginationInfo, CategoryOption } from "./types";
-import { RECIPES_PER_PAGE, CATEGORIES } from "./constants";
+import { CATEGORIES } from "./constants";
 // import { sortRecipes, filterRecipes, paginateData } from "./utils";
 
 const API_URL = "https://aroi-dee-backend.vercel.app/api";
-
-// ✅ ฟังก์ชันจำลอง delay
-const delay = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
 export type { FilterOptions, Recipe };
 
@@ -14,30 +11,29 @@ export type { FilterOptions, Recipe };
 export const fetchRecipes = async (
   options: FilterOptions = {}
 ): Promise<{ recipes: Recipe[]; pagination: PaginationInfo }> => {
-  const { category, search, sort, page, cookingTime, difficulty, calorieRange } = options;
-
   try {
-    await delay(500); // หน่วงเวลาจำลอง API
-    const response = await axios.get(`${API_URL}/recipes`, {
+    const response = await axios.get(`${API_URL}/api/recipes`, {
       params: {
-        category: category ?? "all",
-        search: search ?? "",
-        cookingTime,
-        difficulty,
-        calorieRange,
-        page: page ?? 1,
-        limit: RECIPES_PER_PAGE,
-        sort: sort ?? "rating",
+        category: options.category ?? "all",
+        search: options.search ?? "",
+        page: options.page ?? 1,
+        sort: options.sort ?? "rating",
       },
     });
 
-    console.log("✅ API Response:", response.data); // Debugging API Response
-    return response.data; // ✅ ส่งข้อมูลกลับโดยไม่กรอง
+    // ✅ ตรวจสอบโครงสร้างข้อมูลที่ได้จาก API
+    console.log("✅ API Response:", response.data);
+
+    return {
+      recipes: response.data?.data ?? [], // ✅ ป้องกัน undefined
+      pagination: response.data?.pagination ?? { currentPage: 1, totalPages: 1, totalItems: 0 },
+    };
   } catch (error) {
     console.error("❌ Error fetching recipes:", error);
-    return { recipes: [], pagination: { currentPage: page ?? 1, totalPages: 0, totalItems: 0 } };
+    return { recipes: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
   }
 };
+
 
 
 // ✅ ดึงสูตรอาหารที่ผู้ใช้บันทึก
