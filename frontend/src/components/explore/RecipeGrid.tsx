@@ -8,7 +8,6 @@ interface RecipeGridProps {
   loading: boolean;
   favorites: number[];
   onFavoriteToggle: (id: number) => void;
-  isLoggedIn: boolean; // เพิ่ม isLoggedIn ที่นี่
 }
 
 const RecipeGrid: React.FC<RecipeGridProps> = ({
@@ -16,7 +15,6 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   loading,
   favorites,
   onFavoriteToggle,
-  isLoggedIn,  // รับค่าของ isLoggedIn จาก props
 }) => {
   if (loading) {
     return (
@@ -25,7 +23,6 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
         loading={true}
         favorites={[]}
         onFavoriteToggle={() => {}}
-        isLoggedIn={isLoggedIn}  // ส่ง isLoggedIn ไปให้ ExploreRecipeGrid
       />
     );
   }
@@ -38,7 +35,6 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           recipe={recipe}
           isFavorite={favorites.includes(recipe.id)}
           onFavoriteToggle={() => onFavoriteToggle(recipe.id)}
-          isLoggedIn={isLoggedIn}  // ส่ง isLoggedIn ไปให้ RecipeCard
         />
       ))}
     </div>

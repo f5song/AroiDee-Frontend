@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // ใช้ react-router-dom
+
 
 interface RecipeCardProps {
   recipe: {
@@ -20,23 +20,17 @@ interface RecipeCardProps {
   };
   isFavorite: boolean;
   onFavoriteToggle: () => void;
-  isLoggedIn: boolean; // เพิ่ม prop สำหรับตรวจสอบสถานะล็อกอิน
 }
 
 export function RecipeCard({
   recipe,
   isFavorite,
   onFavoriteToggle,
-  isLoggedIn, // รับค่าจาก prop
 }: RecipeCardProps) {
   const { id, title, calories, cook_time, image, categories, rating } = recipe;
-  const navigate = useNavigate(); // ใช้ useNavigate สำหรับการนำทางไปหน้า login
 
   const handleFavoriteToggle = async () => {
-    if (!isLoggedIn) {
-      navigate("/login"); // นำทางไปหน้า login ถ้าผู้ใช้ยังไม่ได้ล็อกอิน
-      return;
-    }
+
 
     try {
       const user_id = 1; // สามารถเปลี่ยนให้ดึงจาก user ที่ล็อกอิน
