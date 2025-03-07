@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/components/auth/AuthContext"; // ✅ เพิ่ม useAuth
+import { useAuth } from "@/components/auth/AuthContext"; // ✅ ใช้ useAuth() เพื่อตรวจสอบผู้ใช้
 import { 
   Recipe, 
   fetchRecipesBySource, 
@@ -12,7 +12,7 @@ import PageHeader from "@/components/myRecipe/PageHeader";
  * My Recipes page component
  */
 export default function MyRecipesPage() {
-  const { user } = useAuth(); // ✅ ดึง user จาก Context
+  const { user } = useAuth(); // ✅ ดึงข้อมูลผู้ใช้จาก Context
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,12 +25,14 @@ export default function MyRecipesPage() {
     const fetchRecipes = async () => {
       setLoading(true);
       try {
+        // ✅ โหลดสูตรอาหารของฉัน
         const userRecipesResponse = await fetchRecipesBySource("USER", user.id);
-        const favoritesResponse = await fetchRecipesBySource("FAVORITE", user.id);
-
         setMyRecipes(userRecipesResponse.recipes);
+
+        // ✅ โหลดสูตรอาหารที่บันทึกไว้
+        const favoritesResponse = await fetchRecipesBySource("FAVORITE", user.id);
         setFavoriteRecipes(favoritesResponse.recipes);
-        setFavorites(favoritesResponse.recipes.map((r) => r.id));
+        setFavorites(favoritesResponse.recipes.map((r) => r.id)); // ดึงเฉพาะ id ของสูตรที่ถูกบันทึก
       } catch (error) {
         console.error("Error fetching recipes:", error);
       } finally {
@@ -39,7 +41,7 @@ export default function MyRecipesPage() {
     };
 
     fetchRecipes();
-  }, [user]);
+  }, [user]); // ✅ ทำงานใหม่เมื่อ user เปลี่ยน
 
   // ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร
   const handleFavoriteToggle = async (recipeId: number) => {
@@ -49,19 +51,21 @@ export default function MyRecipesPage() {
     }
 
     try {
-      const success = await toggleFavoriteRecipe(user.id, recipeId); // ✅ ต้องส่ง `user.id` ไปด้วย
+      const isCurrentlyFavorite = favorites.includes(recipeId);
+      const success = await toggleFavoriteRecipe(user.id, recipeId); // ✅ ส่ง user.id ไปด้วย
 
       if (success) {
-        setFavorites((prev) => {
-          const isFavorite = prev.includes(recipeId);
-          return isFavorite
-            ? prev.filter((id) => id !== recipeId)
-            : [...prev, recipeId];
-        });
+        setFavorites((prev) => 
+          isCurrentlyFavorite 
+            ? prev.filter((id) => id !== recipeId)  // เอาออกจาก Favorites
+            : [...prev, recipeId]                   // เพิ่มเข้า Favorites
+        );
 
-        if (favorites.includes(recipeId)) {
-          setFavoriteRecipes((prev) => prev.filter((recipe) => recipe.id !== recipeId));
-        }
+        setFavoriteRecipes((prev) => 
+          isCurrentlyFavorite 
+            ? prev.filter((recipe) => recipe.id !== recipeId)  // ลบออกจากรายการ
+            : [...prev, myRecipes.find((recipe) => recipe.id === recipeId)!] // เพิ่มเข้า
+        );
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
@@ -78,6 +82,7 @@ export default function MyRecipesPage() {
           loading={loading}
           favorites={favorites}
           onFavoriteToggle={handleFavoriteToggle}
+          isLoggedIn={!!user} // ส่งค่า isLoggedIn โดยตรวจสอบว่าผู้ใช้ล็อกอินหรือไม่
         />
       </div>
     </div>

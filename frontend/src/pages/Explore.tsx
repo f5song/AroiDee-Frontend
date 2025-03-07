@@ -12,7 +12,7 @@ import {
   unsaveRecipe,
   getSavedRecipes,
 } from "@/lib/recipes/api";
-import { useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/components/auth/AuthContext"; // ✅ ดึง user จาก Context
 
 /**
  * Main component for the Explore page
@@ -34,6 +34,9 @@ export default function ExplorePage() {
     totalItems: 0,
   });
 
+  // กำหนด isLoggedIn ตาม user
+  const isLoggedIn = !!user;
+
   // โหลดสูตรอาหารที่ถูกบันทึกโดย user
   useEffect(() => {
     if (!user) return;
@@ -49,7 +52,6 @@ export default function ExplorePage() {
   
     fetchSavedRecipes();
   }, [user]);
-  
 
   // โหลดสูตรอาหาร
   useEffect(() => {
@@ -105,7 +107,6 @@ export default function ExplorePage() {
     setFilterOptions((prev: FilterOptions) => ({ ...prev, page }));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  
 
   // รีเซ็ตตัวกรอง
   const handleResetFilters = () => {
@@ -143,6 +144,7 @@ export default function ExplorePage() {
               loading={loading}
               favorites={savedRecipes}
               onFavoriteToggle={handleFavorite}
+              isLoggedIn={isLoggedIn} // ส่ง isLoggedIn ไปที่ RecipeGrid
             />
 
             {noResults && <NoResultsMessage onReset={handleResetFilters} />}
