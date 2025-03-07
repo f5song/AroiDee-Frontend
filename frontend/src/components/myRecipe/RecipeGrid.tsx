@@ -1,35 +1,29 @@
-// components/myRecipe/RecipeGrid.tsx
-import React from "react";
+import React, { useCallback } from "react";
 import { Recipe } from "@/lib/recipes/types";
 import RecipeCard from "@/components/explore/RecipeCard";
-import { default as ExploreRecipeGrid } from "@/components/explore/RecipeGrid";
 
 interface RecipeGridProps {
   recipes: Recipe[];
   loading: boolean;
   favorites: number[];
   onFavoriteToggle: (id: number) => void;
-  isLoggedIn: boolean;  // ✅ เพิ่ม isLoggedIn ที่นี่
+  isLoggedIn: boolean;  
 }
-
 
 const RecipeGrid: React.FC<RecipeGridProps> = ({
   recipes,
   loading,
   favorites,
   onFavoriteToggle,
-  isLoggedIn,  // ✅ รับค่า isLoggedIn
+  isLoggedIn,
 }) => {
+  // ✅ ป้องกัน onFavoriteToggle เปลี่ยนแปลงตลอดเวลา
+  const handleFavorite = useCallback((id: number) => {
+    onFavoriteToggle(id);
+  }, [onFavoriteToggle]);
+
   if (loading) {
-    return (
-      <ExploreRecipeGrid
-        recipes={[]}
-        loading={true}
-        favorites={[]}
-        onFavoriteToggle={() => {}}
-        isLoggedIn={isLoggedIn}  // ✅ ส่ง isLoggedIn ไปให้ ExploreRecipeGrid
-      />
-    );
+    return <div>Loading recipes...</div>; // ✅ ไม่โหลด ExploreRecipeGrid เพื่อป้องกัน Loop
   }
 
   return (
@@ -39,13 +33,12 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           key={recipe.id}
           recipe={recipe}
           isFavorite={favorites.includes(recipe.id)}
-          onFavoriteToggle={() => onFavoriteToggle(recipe.id)}
-          isLoggedIn={isLoggedIn}  // ✅ ส่ง isLoggedIn ไปให้ RecipeCard
+          onFavoriteToggle={() => handleFavorite(recipe.id)} // ✅ ใช้ useCallback
+          isLoggedIn={isLoggedIn}
         />
       ))}
     </div>
   );
 };
-
 
 export default RecipeGrid;
