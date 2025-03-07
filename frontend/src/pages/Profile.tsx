@@ -3,8 +3,6 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ProfileForm from "@/components/profile/ProfileForm";
-import ProfileStats from "@/components/profile/ProfileStats";
-import ProfileActions from "@/components/profile/ProfileActions";
 import ResponsiveSidebar from "@/components/profile/ResponsiveSidebar";
 import { Profile } from "@/components/profile/ProfileTypes";
 import ProfileCalorieGoals from "@/components/profile/ProfileCalorieGoals";
@@ -27,7 +25,7 @@ const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false); // ✅ แก้ไข setIsSaving ที่ผิดพลาด
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -122,10 +120,10 @@ const ProfilePage: React.FC = () => {
               profile={profile}
               isEditing={isEditing}
               setIsEditing={setIsEditing}
+              isSaving={isSaving} // ✅ เพิ่ม isSaving
+              handleSave={handleSave} // ✅ เพิ่ม handleSave
               onProfileChange={handleProfileChange}
             />
-
-           
           </>
         ) : (
           <p className="text-center text-red-500">Failed to load profile.</p>

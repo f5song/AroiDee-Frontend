@@ -1,21 +1,18 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectItem,
-  SelectContent,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { User, Mail, Calendar, MapPin, Globe, Clock, Users } from "lucide-react";
+import { User, Mail, MapPin} from "lucide-react";
 import { Profile } from "./ProfileTypes";
 import AvatarUpload from "./AvatarUpload";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 
 interface ProfileFormProps {
   profile: Profile;
+  isEditing: boolean;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+  isSaving: boolean;
+  handleSave: () => Promise<void>;
+  onProfileChange: (updatedProfile: Profile) => void;
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({
@@ -57,7 +54,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{profile.fullName}</h1>
               <p className="text-gray-500 flex items-center justify-center sm:justify-start">
                 <MapPin className="h-3 w-3 mr-1" /> 
-                {profile.location || "No location set"}
               </p>
             </div>
           </div>
@@ -78,21 +74,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                     label="Email" 
                     value={profile.email} 
                   />
-                  <ProfileField 
-                    icon={<Calendar className="text-gray-500" />} 
-                    label="Date of Birth" 
-                    value={profile.dateOfBirth ? formatDate(profile.dateOfBirth) : "Not provided"} 
-                  />
-                  <ProfileField 
-                    icon={<Users className="text-gray-500" />} 
-                    label="Gender" 
-                    value={profile.gender || "Not specified"} 
-                  />
-                  <ProfileField 
-                    icon={<Clock className="text-gray-500" />} 
-                    label="Cooking Experience" 
-                    value={profile.cookingExperience || "Intermediate"} 
-                  />
+
+
                 </div>
               </CardContent>
             </Card>
@@ -103,15 +86,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   );
 };
 
-// Format date function
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
-  }).format(date);
-};
+
 
 // Profile field component
 interface ProfileFieldProps {

@@ -144,36 +144,7 @@ function useResourcePreloader(
 
         case 'font':
           // Using Font Face Observer pattern
-          const fontLoader = new Promise<void>((resolve, reject) => {
-            if ('fonts' in document) {
-              const font = new FontFace('CustomFont', `url(${resource.src})`);
-              font.load()
-                .then(() => {
-                  // Add font to document
-                  (document.fonts as any).add(font);
-                  if (!resourceStatus[index]) {
-                    resourceStatus[index] = true;
-                    updateProgress();
-                  }
-                  resolve();
-                })
-                .catch(() => {
-                  if (!resourceStatus[index]) {
-                    resourceStatus[index] = true;
-                    updateProgress();
-                    setError(`Failed to load font: ${resource.src}`);
-                  }
-                  reject();
-                });
-            } else {
-              // Fallback for browsers without Font Loading API
-              if (!resourceStatus[index]) {
-                resourceStatus[index] = true;
-                updateProgress();
-              }
-              resolve();
-            }
-          });
+          
           break;
 
         default:
