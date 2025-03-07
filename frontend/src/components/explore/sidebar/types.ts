@@ -19,25 +19,15 @@ export interface ExploreSidebarProps {
 
 export interface AdvancedFilters {
   cookingTime: number;
-  calorieRange: number; 
+  calorieRange: number;
 }
 
 export interface ActiveFiltersProps {
-  selectedCategory: string;
-  searchQuery: string;
   cookingTime: number;
-  difficulty: string;
-  ingredientsList: string[];
-  calorieRange: number; // Added calorieRange
+  calorieRange: number;
   resetFilters: () => void;
-  setSelectedCategory: (category: string) => void;
-  setSearchQuery: (query: string) => void;
   setCookingTime: (time: number) => void;
-  setDifficulty: (difficulty: string) => void;
-  setCalorieRange: (calories: number) => void; // Added setCalorieRange
-  removeIngredient: (ingredient: string) => void;
-  onCategoryChange: (category: string) => void;
-  onSearch: (query: string) => void;
+  setCalorieRange: (calories: number) => void;
   activeFiltersCount: number;
 }
 
@@ -65,32 +55,13 @@ export interface CalorieRangeSliderProps {
   setCalorieRange: (calories: number) => void;
 }
 
-export interface DifficultySelectProps {
-  difficulty: string;
-  setDifficulty: (difficulty: string) => void;
-}
-
-export interface IngredientInputProps {
-  ingredients: string;
-  setIngredients: (value: string) => void;
-  ingredientsList: string[];
-  handleAddIngredient: () => void;
-  removeIngredient: (ingredient: string) => void;
-}
-
 export interface AdvancedFiltersProps {
   cookingTime: number;
   setCookingTime: (time: number) => void;
-  difficulty: string;
-  setDifficulty: (difficulty: string) => void;
-  ingredients: string;
-  setIngredients: (value: string) => void;
-  ingredientsList: string[];
-  calorieRange: number; // Added calorieRange
-  setCalorieRange: (calories: number) => void; // Added setCalorieRange
-  handleAddIngredient: () => void;
-  removeIngredient: (ingredient: string) => void;
+  calorieRange: number;
+  setCalorieRange: (calories: number) => void;
   applyAdvancedFilters: () => void;
+  resetFilters: () => void;
   activeFiltersCount: number;
 }
 
@@ -99,7 +70,6 @@ export interface SidebarCollapsibleProps {
   setIsOpen: (isOpen: boolean) => void;
   isMobile: boolean;
   sidebarHeight: string;
-  selectedCategory: string;
   activeFiltersCount: number;
   searchQuery: string;
   children: React.ReactNode;
