@@ -24,15 +24,23 @@ export const fetchRecipes = async (
 
     console.log("✅ API Response fetchRecipes:", response.data); // Debug API Response
 
+    // แก้ให้ดึงค่าจาก data.data
+    const recipes = response.data?.data ?? []; 
+
     return {
-      recipes: response.data?.recipes ?? [],
-      pagination: response.data?.pagination ?? { currentPage: 1, totalPages: 1, totalItems: 0 },
+      recipes,
+      pagination: {
+        currentPage: page ?? 1,
+        totalPages: 1,
+        totalItems: recipes.length, // ใช้ data.length แทน ถ้า API ไม่มี pagination
+      },
     };
   } catch (error) {
     console.error("❌ Error fetching recipes:", error);
     return { recipes: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
   }
 };
+
 
 
 

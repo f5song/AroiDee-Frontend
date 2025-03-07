@@ -41,10 +41,14 @@ export default function ExplorePage() {
     const loadRecipes = async () => {
       try {
         console.log("🔍 Fetching all recipes...");
-        const result = await fetchRecipes({ search: "", sort: "rating", page: 1 }); // ✅ ลบ category
-        console.log("✅ API Response useEffect:", result);
-  
-        setRecipes(result.recipes);
+        const result = await fetchRecipes({ search: "", sort: "rating", page: 1 });
+        console.log("✅ API Response useEffect:", result); // เช็คค่าที่ได้จาก API
+    
+        if (!result.recipes || result.recipes.length === 0) {
+          console.warn("❌ No recipes received, check API mapping!");
+        }
+    
+        setRecipes(result.recipes || []);
         setPagination(result.pagination);
       } catch (error) {
         console.error("❌ Error loading recipes:", error);
@@ -52,6 +56,7 @@ export default function ExplorePage() {
         setLoading(false);
       }
     };
+    
   
     loadRecipes();
   }, []);
