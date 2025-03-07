@@ -1,15 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
-import { ExploreSidebar } from "@/components/explore/sidebar";
-import PageHeader from "@/components/explore/PageHeader";
-import RecipeGrid from "@/components/explore/RecipeGrid";
+// import { ExploreSidebar } from "@/components/explore/sidebar";
+// import PageHeader from "@/components/explore/PageHeader";
+// import RecipeGrid from "@/components/explore/RecipeGrid";
 import NoResultsMessage from "@/components/explore/NoResultsMessage";
 import PaginationControls from "@/components/explore/PaginationControls";
 import {
   FilterOptions,
   Recipe,
   fetchRecipes,
-  saveRecipe,
-  unsaveRecipe,
+  // saveRecipe,
+  // unsaveRecipe,
   getSavedRecipes,
 } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext"; // ✅ ดึง user จาก Context
@@ -34,8 +34,9 @@ export default function ExplorePage() {
     totalItems: 0,
   });
 
+  console.log(savedRecipes)
   // กำหนด isLoggedIn ตาม user
-  const isLoggedIn = !!user;
+  // const isLoggedIn = !!user;
 
   // โหลดสูตรอาหารที่ถูกบันทึกโดย user
   useEffect(() => {
@@ -71,37 +72,37 @@ export default function ExplorePage() {
     loadRecipes();
   }, [filterOptions]);
 
-  // เพิ่ม/ลบสูตรอาหารจาก favorites
-  const handleFavorite = async (recipeId: number) => {
-    if (!user) {
-      console.error("User not logged in");
-      return;
-    }
+  // // เพิ่ม/ลบสูตรอาหารจาก favorites
+  // const handleFavorite = async (recipeId: number) => {
+  //   if (!user) {
+  //     console.error("User not logged in");
+  //     return;
+  //   }
 
-    try {
-      if (savedRecipes.includes(recipeId)) {
-        await unsaveRecipe(user.id, recipeId);
-        setSavedRecipes((prev) => prev.filter((id) => id !== recipeId));
-      } else {
-        await saveRecipe(user.id, recipeId);
-        setSavedRecipes((prev) => [...prev, recipeId]);
-      }
-    } catch (error) {
-      console.error("Error toggling favorite:", error);
-    }
-  };
+  //   try {
+  //     if (savedRecipes.includes(recipeId)) {
+  //       await unsaveRecipe(user.id, recipeId);
+  //       setSavedRecipes((prev) => prev.filter((id) => id !== recipeId));
+  //     } else {
+  //       await saveRecipe(user.id, recipeId);
+  //       setSavedRecipes((prev) => [...prev, recipeId]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error toggling favorite:", error);
+  //   }
+  // };
 
-  const handleCategoryChange = (category: string) => {
-    setFilterOptions((prev: FilterOptions) => ({ ...prev, category, page: 1 }));
-  };
+  // const handleCategoryChange = (category: string) => {
+  //   setFilterOptions((prev: FilterOptions) => ({ ...prev, category, page: 1 }));
+  // };
   
-  const handleSearch = (search: string) => {
-    setFilterOptions((prev: FilterOptions) => ({ ...prev, search, page: 1 }));
-  };
+  // const handleSearch = (search: string) => {
+  //   setFilterOptions((prev: FilterOptions) => ({ ...prev, search, page: 1 }));
+  // };
   
-  const handleSortChange = (sort: string) => {
-    setFilterOptions((prev: FilterOptions) => ({ ...prev, sort }));
-  };
+  // const handleSortChange = (sort: string) => {
+  //   setFilterOptions((prev: FilterOptions) => ({ ...prev, sort }));
+  // };
   
   const handlePageChange = (page: number) => {
     setFilterOptions((prev: FilterOptions) => ({ ...prev, page }));
@@ -127,13 +128,13 @@ export default function ExplorePage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <div className="flex flex-1">
-        <ExploreSidebar
+        {/* <ExploreSidebar
           onCategoryChange={handleCategoryChange}
           onSearch={handleSearch}
-        />
+        /> */}
         <main className="flex-1 p-4 md:p-6 ml-12 md:ml-0">
           <div className="max-w-7xl mx-auto">
-            <PageHeader
+            {/* <PageHeader
               totalItems={pagination.totalItems}
               sort={filterOptions.sort || "rating"}
               onSortChange={handleSortChange}
@@ -145,7 +146,7 @@ export default function ExplorePage() {
               favorites={savedRecipes}
               onFavoriteToggle={handleFavorite}
               isLoggedIn={isLoggedIn} // ส่ง isLoggedIn ไปที่ RecipeGrid
-            />
+            /> */}
 
             {noResults && <NoResultsMessage onReset={handleResetFilters} />}
 
