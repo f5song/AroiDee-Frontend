@@ -39,7 +39,7 @@ export function RecipeCard({
   isFavorite,
   onFavoriteToggle,
 }: RecipeCardProps) {
-  const { id, title, calories, cook_time, image, categories } = recipe;
+  const { id, title, calories, cook_time, image, categories, rating } = recipe;
 
   return (
     <TooltipProvider>
@@ -53,7 +53,7 @@ export function RecipeCard({
           <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center">
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 mr-1" />
             <span className="text-sm font-medium">
-              {recipe.rating != null ? recipe.rating.toFixed(1) : "N/A"}
+              {rating}
             </span>
           </div>
         </CardHeader>
