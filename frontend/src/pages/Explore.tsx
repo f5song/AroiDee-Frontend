@@ -7,17 +7,17 @@ import PaginationControls from "@/components/explore/PaginationControls";
 import {
   FilterOptions,
   Recipe,
-  fetchRecipes,
+  // fetchRecipes,
   saveRecipe,
   unsaveRecipe,
-  // getSavedRecipes,
+  getSavedRecipes,
 } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext";
 
 export default function ExplorePage() {
   const { user } = useAuth(); // ดึงข้อมูล user จาก Context
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [recipes] = useState<Recipe[]>([]);
+  const [loading] = useState(true);
   const [favorites, setFavorites] = useState<Set<number>>(new Set()); // ✅ ใช้ Set เพื่อลด re-renders
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     category: "all",
@@ -25,7 +25,7 @@ export default function ExplorePage() {
     sort: "rating",
     page: 1,
   });
-  const [pagination, setPagination] = useState({
+  const [pagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
@@ -33,39 +33,39 @@ export default function ExplorePage() {
 
   const isLoggedIn = !!user; // ✅ ตรวจสอบการล็อกอิน
 
-  // // ✅ โหลดสูตรอาหารที่ถูกบันทึก
-  // useEffect(() => {
-  //   if (!user) return;
-
-  //   const fetchSavedRecipes = async () => {
-  //     try {
-  //       const result = await getSavedRecipes(user.id);
-  //       setFavorites(new Set(result.map((r: any) => r.recipe_id))); // ✅ ใช้ Set
-  //     } catch (error) {
-  //       console.error("Error fetching saved recipes:", error);
-  //     }
-  //   };
-
-  //   fetchSavedRecipes();
-  // }, [user]);
-
-  // ✅ โหลดสูตรอาหาร
+  // ✅ โหลดสูตรอาหารที่ถูกบันทึก
   useEffect(() => {
-    setLoading(true);
-    const loadRecipes = async () => {
+    if (!user) return;
+
+    const fetchSavedRecipes = async () => {
       try {
-        const result = await fetchRecipes(filterOptions);
-        setRecipes(result.recipes);
-        setPagination(result.pagination);
+        const result = await getSavedRecipes(user.id);
+        setFavorites(new Set(result.map((r: any) => r.recipe_id))); // ✅ ใช้ Set
       } catch (error) {
-        console.error("Error loading recipes:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching saved recipes:", error);
       }
     };
 
-    loadRecipes();
-  }, [filterOptions]);
+    fetchSavedRecipes();
+  }, [user]);
+
+  // // ✅ โหลดสูตรอาหาร
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const loadRecipes = async () => {
+  //     try {
+  //       const result = await fetchRecipes(filterOptions);
+  //       setRecipes(result.recipes);
+  //       setPagination(result.pagination);
+  //     } catch (error) {
+  //       console.error("Error loading recipes:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   loadRecipes();
+  // }, [filterOptions]);
 
   // ✅ กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
   const handleFavorite = useCallback(
