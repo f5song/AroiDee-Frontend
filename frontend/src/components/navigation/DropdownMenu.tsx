@@ -11,7 +11,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ items }) => (
     {items.map((item, index) => (
       <Link
         key={index}
-        to={item.path}
+        to={item.path || "#"} // Fallback to "#" if item.path is undefined
         className="flex items-center gap-3 px-4 py-3 rounded-md text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors duration-200"
       >
         {item.icon && <span className="text-orange-500">{item.icon}</span>}

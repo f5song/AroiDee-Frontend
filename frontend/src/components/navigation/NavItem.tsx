@@ -15,7 +15,6 @@ interface NavItemProps {
   isMobile?: boolean;
 }
 
-// Add keyframe animation CSS class
 const slideInAnimation = `
   @keyframes slideIn {
     from {
@@ -42,30 +41,28 @@ const NavItem: React.FC<NavItemProps> = ({
   const dropdownRef = useOutsideClick(() => setIsOpen(false));
   const timer = useRef<NodeJS.Timeout | null>(null);
 
-  // Mobile specific - close dropdown when route changes
   useEffect(() => {
     if (isMobile) setIsOpen(false);
   }, [path, isMobile]);
 
-  // Add animation style to document once when component mounts
   useEffect(() => {
     const styleEl = document.createElement('style');
     styleEl.textContent = slideInAnimation;
     document.head.appendChild(styleEl);
-    
+
     return () => {
       document.head.removeChild(styleEl);
     };
   }, []);
 
   const handleMouseEnter = () => {
-    if (isMobile) return; // Disable hover behavior on mobile
+    if (isMobile) return;
     if (timer.current) clearTimeout(timer.current);
     setIsOpen(true);
   };
 
   const handleMouseLeave = () => {
-    if (isMobile) return; // Disable hover behavior on mobile
+    if (isMobile) return;
     timer.current = setTimeout(() => setIsOpen(false), 150);
   };
 
@@ -89,7 +86,7 @@ const NavItem: React.FC<NavItemProps> = ({
     >
       {path && (!hasDropdown || !isMobile) ? (
         <Link
-          to={path}
+          to={path || "#"}  // Use "#" if `path` is undefined
           className={`flex items-center px-4 py-3 rounded-md transition-all duration-200 ${activeClass} ${isMobile ? 'w-full text-lg' : ''}`}
           onClick={handleClick}
         >
@@ -121,7 +118,7 @@ const NavItem: React.FC<NavItemProps> = ({
               {dropdownItems.map((item, index) => (
                 <Link
                   key={index}
-                  to={item.path}
+                  to={item.path || "#"}  // Ensure `item.path` is not undefined
                   className="flex items-center gap-3 px-4 py-3 rounded-md text-gray-700 hover:text-orange-500 hover:bg-orange-50 transition-colors duration-200"
                   style={{ 
                     animation: 'slideIn 0.3s ease forwards',
