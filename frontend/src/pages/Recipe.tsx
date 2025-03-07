@@ -4,6 +4,9 @@ import {
   Star, User, Clock, 
 } from "lucide-react";
 
+const { id } = useParams();
+console.log("🔍 Recipe ID from URL:", id); // ✅ Debug ตรวจสอบค่า
+
 // Types
 interface Nutrition {
   calories: number | null;
