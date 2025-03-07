@@ -35,21 +35,14 @@ export default function ExplorePage() {
   // โหลดสูตรอาหาร
   useEffect(() => {
     setLoading(true);
+    console.log("🔄 Sending sort request:", filterOptions.sort); // ✅ เช็คค่าที่ส่งไป API
+
     const loadRecipes = async () => {
       try {
-        console.log("🔍 Fetching all recipes...");
-        const result = await fetchRecipes({
-          search: "",
-          sort: "rating",
-          page: 1,
-        });
-        console.log("✅ API Response useEffect:", result); // เช็คค่าที่ได้จาก API
+        const result = await fetchRecipes(filterOptions);
+        console.log("✅ API Response (Frontend):", result); // ✅ Debug ค่าที่ API ส่งกลับมา
 
-        if (!result.recipes || result.recipes.length === 0) {
-          console.warn("❌ No recipes received, check API mapping!");
-        }
-
-        setRecipes(result.recipes || []);
+        setRecipes(result.recipes);
         setPagination(result.pagination);
       } catch (error) {
         console.error("❌ Error loading recipes:", error);
@@ -59,7 +52,7 @@ export default function ExplorePage() {
     };
 
     loadRecipes();
-  }, []);
+  }, [filterOptions]); // ✅ ดึงข้อมูลใหม่เมื่อ sort เปลี่ยน
 
   // กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
   const handleFavorite = async (recipeId: number) => {
@@ -98,9 +91,10 @@ export default function ExplorePage() {
             <PageHeader
               totalItems={pagination.totalItems}
               sort={filterOptions.sort || "rating"}
-              onSortChange={(sort) =>
-                setFilterOptions((prev) => ({ ...prev, sort, page: 1 }))
-              }
+              onSortChange={(sort) => {
+                console.log("🔄 Sort Changed to:", sort); // ✅ Debug ค่าที่ถูกเลือก
+                setFilterOptions((prev) => ({ ...prev, sort, page: 1 }));
+              }}
             />
 
             <RecipeGrid

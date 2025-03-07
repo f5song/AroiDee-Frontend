@@ -23,6 +23,8 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   if (!loading && recipes.length === 0) {
     return <p className="text-center text-gray-500">🔍 No recipes found!</p>;
   }
+
+  console.log("🔍 Rendering RecipeGrid with recipes:", recipes); // ✅ Debug
   
 
   return (
