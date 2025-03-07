@@ -19,9 +19,7 @@ export interface ExploreSidebarProps {
 
 export interface AdvancedFilters {
   cookingTime: number;
-  difficulty: string;
-  ingredients: string[];
-  calorieRange: number; // Added calorieRange
+  calorieRange: number; 
 }
 
 export interface ActiveFiltersProps {

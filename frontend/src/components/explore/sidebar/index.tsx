@@ -143,8 +143,6 @@ export function ExploreSidebar({
     if (onAdvancedFiltersChange) {
       onAdvancedFiltersChange({
         cookingTime,
-        difficulty,
-        ingredients: ingredientsList,
         calorieRange,
       });
     }
@@ -167,8 +165,6 @@ export function ExploreSidebar({
     if (onAdvancedFiltersChange) {
       onAdvancedFiltersChange({
         cookingTime: 30,
-        difficulty: "all",
-        ingredients: [],
         calorieRange: 500,
       });
     }
