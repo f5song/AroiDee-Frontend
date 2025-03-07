@@ -12,7 +12,6 @@ export type DropdownItem = {
   name: string;
   path: string;
   icon?: React.ReactNode;
-  onClick?: () => void;
 };
 
 export const RECIPE_MENU_ITEMS: DropdownItem[] = [

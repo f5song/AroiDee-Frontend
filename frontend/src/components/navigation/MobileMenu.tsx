@@ -1,15 +1,21 @@
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import NavItem from './NavItem';
-import ProfileMenu from './ProfileMenu';
-import { RECIPE_MENU_ITEMS, MEAL_PLANNING_ITEMS } from './constants';
+import { useLocation, Link } from 'react-router-dom';
+import { X } from 'lucide-react';
+import NavItem from '@/components/navigation/NavItem';
+import ProfileMenu from '@/components/navigation/ProfileMenu';
+import { RECIPE_MENU_ITEMS, MEAL_PLANNING_ITEMS } from '@/components/navigation/constants';
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  isAuthenticated?: boolean;
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
+const MobileMenu: React.FC<MobileMenuProps> = ({ 
+  isOpen, 
+  onClose, 
+  isAuthenticated = false 
+}) => {
   const location = useLocation();
 
   useEffect(() => {
@@ -32,7 +38,44 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
       dropdownItems: MEAL_PLANNING_ITEMS,
       isActive: location.pathname.startsWith('/meal-planning'),
     }
+
   ];
+
+  // Add the animation styles using a regular style tag
+  useEffect(() => {
+    // Create a style element
+    const styleEl = document.createElement('style');
+    // Define the keyframe animation
+    styleEl.innerHTML = `
+      @keyframes fadeSlideIn {
+        from {
+          opacity: 0;
+          transform: translateX(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+    `;
+    // Append to document head
+    document.head.appendChild(styleEl);
+    
+    // Clean up when component unmounts
+    return () => {
+      document.head.removeChild(styleEl);
+    };
+  }, []);
 
   return (
     <div 
@@ -42,15 +85,24 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
       onClick={onClose}
     >
       <div 
-        className={`fixed top-16 left-0 right-0 w-full max-w-sm mx-auto bg-white shadow-xl rounded-lg overflow-y-auto max-h-[80vh] transition-all duration-300 ${
-          isOpen ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0'
+        className={`fixed top-0 right-0 bottom-0 w-[80%] max-w-xs bg-white shadow-xl overflow-y-auto transition-all duration-300 ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         onClick={(e) => e.stopPropagation()}
         style={{
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
+          boxShadow: '-5px 0 25px -5px rgba(0, 0, 0, 0.1)'
         }}
       >
-        <div className="p-6 pb-10 space-y-5">
+        <div className="absolute top-4 right-4">
+          <button 
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+            aria-label="Close menu"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <div className="p-6 pb-10 space-y-5 mt-12">
           {navItems.map((item, index) => (
             <div 
               key={index} 
@@ -72,24 +124,30 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
               opacity: 0
             }}
           >
-            <ProfileMenu isMobile={true} />
+            {isAuthenticated ? (
+              <ProfileMenu isMobile={true} />
+            ) : (
+              <div className="space-y-3">
+                <Link 
+                  to="/login" 
+                  className="block w-full text-center px-4 py-3 text-orange-500 border border-orange-500 rounded-md hover:bg-orange-50 transition-colors"
+                  onClick={onClose}
+                >
+                  Login
+                </Link>
+                
+                <Link 
+                  to="/signup" 
+                  className="block w-full text-center px-4 py-3 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors shadow-sm"
+                  onClick={onClose}
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Add keyframe animation for menu items */}
-      <style>{`
-        @keyframes fadeSlideIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 };

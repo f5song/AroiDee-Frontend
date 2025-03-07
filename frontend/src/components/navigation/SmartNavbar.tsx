@@ -1,13 +1,11 @@
 import React from 'react';
-import Navbar from './index'; // Default navbar for logged-in users
-import NonLoggedInNavbar from './NonLoggedInNavbar';
+import Navbar from '@/components/navigation/index'; // Unified navbar component
 import { useAuth } from '@/components/auth/AuthContext';
 
 const SmartNavbar: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   
   // While checking authentication status, you could show a loading indicator
-  // or a simplified version of the navbar
   if (isLoading) {
     return (
       <div className="h-16 md:h-20 bg-white shadow-sm flex items-center justify-center">
@@ -16,8 +14,8 @@ const SmartNavbar: React.FC = () => {
     );
   }
   
-  // Render the appropriate navbar based on authentication state
-  return isAuthenticated ? <Navbar /> : <NonLoggedInNavbar />;
+  // Render the navbar with authentication state
+  return <Navbar isAuthenticated={isAuthenticated} />;
 };
 
 export default SmartNavbar;

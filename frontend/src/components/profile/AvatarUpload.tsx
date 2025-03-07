@@ -152,15 +152,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         className="hidden"
       />
       
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={triggerFileInput}
-        className="mt-2 text-sm text-gray-500"
-        disabled={isUploading}
-      >
-        Change Photo
-      </Button>
+      
     </div>
   );
 };

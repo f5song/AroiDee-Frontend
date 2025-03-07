@@ -106,7 +106,7 @@ const ProfilePage: React.FC = () => {
   const tabComponents = {
     profile: (
       <motion.div
-        className="w-full bg-white border border-gray-200 shadow-lg rounded-xl px-8 py-10 space-y-10"
+        className="w-full max-w-4xl mx-auto"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -125,15 +125,7 @@ const ProfilePage: React.FC = () => {
               onProfileChange={handleProfileChange}
             />
 
-            <ProfileStats />
-
-            <ProfileActions
-              profile={profile}
-              handleSave={handleSave}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-              isSaving={isSaving}
-            />
+           
           </>
         ) : (
           <p className="text-center text-red-500">Failed to load profile.</p>

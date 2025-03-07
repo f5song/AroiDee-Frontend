@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Search as SearchIcon } from 'lucide-react';
-import useOutsideClick from '../hooks/useOutsideClick';
+import useOutsideClick from '@/lib/hooks/useOutsideClick';
 
 const SearchBar: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
