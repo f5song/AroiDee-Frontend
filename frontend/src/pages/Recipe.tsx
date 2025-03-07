@@ -48,7 +48,7 @@ interface RecipeData {
   date: string;
   rating: number;
   comments: number;
-  image: string;
+  image_url: string;
   prepTime: string;
   cookTime: string;
   difficulty: string;
@@ -66,7 +66,7 @@ interface RecipeHeaderProps {
   date: string;
   rating: number;
   comments: number;
-  image: string;
+  image_url: string;
   liked: boolean;
   saved: boolean;
   setLiked: React.Dispatch<React.SetStateAction<boolean>>;
@@ -147,7 +147,7 @@ const recipe: RecipeData = {
   date: "February 10, 2025",
   rating: 4.5,
   comments: 25,
-  image: "/recipe.jpg",
+  image_url: "/recipe.jpg",
   prepTime: "30 minutes",
   cookTime: "6 hours",
   difficulty: "Medium",
@@ -200,7 +200,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   date, 
   rating, 
   comments, 
-  image, 
+  image_url, 
   liked, 
   saved, 
   setLiked, 
@@ -209,7 +209,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   <div className="relative rounded-xl overflow-hidden">
     <div className="relative h-[500px]">
       <img
-        src={image}
+        src={image_url}
         alt={title}
         className="w-full h-full object-cover"
       />
@@ -1042,7 +1042,7 @@ export default function RecipePage(): JSX.Element {
               date={recipe.date}
               rating={recipe.rating}
               comments={recipe.comments}
-              image={recipe.image}
+              image_url={recipe.image_url}
               liked={liked}
               saved={saved}
               setLiked={setLiked}
