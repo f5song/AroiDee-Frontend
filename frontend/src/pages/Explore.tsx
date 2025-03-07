@@ -37,7 +37,7 @@ export default function ExplorePage() {
   // โหลดข้อมูลสูตรที่ถูกบันทึกเมื่อ component ถูกโหลด
   useEffect(() => {
     if (!user) return;
-    
+
     const fetchSavedRecipes = async () => {
       try {
         const result = await getSavedRecipes(user.id);
@@ -55,11 +55,13 @@ export default function ExplorePage() {
     setLoading(true);
     const loadRecipes = async () => {
       try {
+        console.log("🔍 Fetching recipes with filters:", filterOptions); // ✅ Debugging
         const result = await fetchRecipes(filterOptions);
+        console.log("✅ API Response:", result); // ✅ ดูว่าข้อมูลมาหรือไม่
         setRecipes(result.recipes);
         setPagination(result.pagination);
       } catch (error) {
-        console.error("Error loading recipes:", error);
+        console.error("❌ Error loading recipes:", error);
       } finally {
         setLoading(false);
       }
