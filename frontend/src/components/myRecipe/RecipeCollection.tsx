@@ -16,6 +16,8 @@ interface RecipeCollectionProps {
   loading: boolean;
   favorites: number[];
   onFavoriteToggle: (id: number) => void;
+  isLoggedIn: boolean;
+  
 }
 
 const RecipeCollection: React.FC<RecipeCollectionProps> = ({
@@ -24,6 +26,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   loading: initialLoading,
   favorites,
   onFavoriteToggle,
+  isLoggedIn
 }) => {
   // ✅ ดึงข้อมูลผู้ใช้
   const { user } = useAuth(); // ⬅️ เพิ่มตรงนี้
@@ -96,6 +99,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
     currentPage,
     cookingTime,
     difficulty,
+    
   ]);
 
   // ✅ ตรวจสอบให้แน่ใจว่ามีการส่ง `onSearch`
@@ -127,6 +131,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                 loading={loading}
                 favorites={favorites}
                 onFavoriteToggle={onFavoriteToggle}
+                isLoggedIn={isLoggedIn}
               />
             )}
           </TabsContent>
@@ -142,6 +147,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                 loading={loading}
                 favorites={favorites}
                 onFavoriteToggle={onFavoriteToggle}
+                isLoggedIn={isLoggedIn}
               />
             )}
           </TabsContent>
