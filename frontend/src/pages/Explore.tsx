@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ExploreSidebar } from "@/components/explore/sidebar";
 import PageHeader from "@/components/explore/PageHeader";
 import RecipeGrid from "@/components/explore/RecipeGrid";
-import NoResultsMessage from "@/components/explore/NoResultsMessage";
+import { NoResultsMessage } from "@/components/explore/FeedbackComponents";
 import PaginationControls from "@/components/explore/PaginationControls";
 import {
   FilterOptions,
@@ -17,8 +17,8 @@ import { useAuth } from "@/components/auth/AuthContext";
 export default function ExplorePage() {
   const { user } = useAuth(); // ดึงข้อมูล user จาก Context
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [savedRecipes, setSavedRecipes] = useState<number[]>([]); // เปลี่ยนกลับมาใช้ Array
+  const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState<number[]>([]);
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     category: "all",
     search: "",
@@ -31,17 +31,16 @@ export default function ExplorePage() {
     totalItems: 0,
   });
 
-  const isLoggedIn = !!user;
+  const isLoggedIn = !!user; // ตรวจสอบว่ามีการล็อกอินหรือไม่
 
-  /** ✅ โหลดสูตรอาหารที่ถูกบันทึกโดย user */
+  // โหลดข้อมูลสูตรที่ถูกบันทึกเมื่อ component ถูกโหลด
   useEffect(() => {
     if (!user) return;
     
     const fetchSavedRecipes = async () => {
       try {
-        console.log("Fetching saved recipes...");
         const result = await getSavedRecipes(user.id);
-        setSavedRecipes(result.map((r: any) => r.recipe_id));
+        setFavorites(result.map((r: any) => r.recipe_id));
       } catch (error) {
         console.error("Error fetching saved recipes:", error);
       }
@@ -50,13 +49,11 @@ export default function ExplorePage() {
     fetchSavedRecipes();
   }, [user]);
 
-  /** ✅ โหลดสูตรอาหาร */
+  // โหลดสูตรอาหาร
   useEffect(() => {
     setLoading(true);
-
     const loadRecipes = async () => {
       try {
-        console.log("Fetching recipes...");
         const result = await fetchRecipes(filterOptions);
         setRecipes(result.recipes);
         setPagination(result.pagination);
@@ -70,7 +67,7 @@ export default function ExplorePage() {
     loadRecipes();
   }, [filterOptions]);
 
-  /** ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร */
+  // กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
   const handleFavorite = async (recipeId: number) => {
     if (!user) {
       console.warn("User not logged in");
@@ -78,12 +75,12 @@ export default function ExplorePage() {
     }
 
     try {
-      if (savedRecipes.includes(recipeId)) {
+      if (favorites.includes(recipeId)) {
         await unsaveRecipe(user.id, recipeId);
-        setSavedRecipes((prev) => prev.filter((id) => id !== recipeId));
+        setFavorites((prev) => prev.filter((id) => id !== recipeId));
       } else {
         await saveRecipe(user.id, recipeId);
-        setSavedRecipes((prev) => [...prev, recipeId]);
+        setFavorites((prev) => [...prev, recipeId]);
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
@@ -115,9 +112,9 @@ export default function ExplorePage() {
             <RecipeGrid
               recipes={recipes}
               loading={loading}
-              favorites={savedRecipes}
+              favorites={favorites}
               onFavoriteToggle={handleFavorite}
-              isLoggedIn={isLoggedIn}
+              isLoggedIn={isLoggedIn} // ✅ เพิ่มค่า isLoggedIn ที่ถูกต้อง
             />
 
             {recipes.length === 0 && !loading && (
