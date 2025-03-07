@@ -19,14 +19,14 @@ interface RecipeCardProps {
     categories: string[];
   };
   isFavorite: boolean;
-
+  onFavoriteToggle: () => void;
   isLoggedIn: boolean; // เพิ่ม prop สำหรับตรวจสอบสถานะล็อกอิน
 }
 
 export function RecipeCard({
   recipe,
   isFavorite,
-
+  onFavoriteToggle,
   isLoggedIn, // รับค่าจาก prop
 }: RecipeCardProps) {
   const { id, title, calories, cook_time, image, categories, rating } = recipe;
@@ -45,7 +45,7 @@ export function RecipeCard({
       } else {
         await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe", { user_id, recipe_id: id });
       }
-
+      onFavoriteToggle(); // เปลี่ยนสถานะ favorite
     } catch (error) {
       console.error("Error toggling favorite:", error);
     }

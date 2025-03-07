@@ -25,6 +25,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   favoriteRecipes: initialFavoriteRecipes,
   loading: initialLoading,
   favorites,
+  onFavoriteToggle,
   isLoggedIn
 }) => {
   // ✅ ดึงข้อมูลผู้ใช้
@@ -129,6 +130,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                 recipes={filteredRecipes}
                 loading={loading}
                 favorites={favorites}
+                onFavoriteToggle={onFavoriteToggle}
                 isLoggedIn={isLoggedIn}
               />
             )}
@@ -144,6 +146,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                 recipes={filteredRecipes}
                 loading={loading}
                 favorites={favorites}
+                onFavoriteToggle={onFavoriteToggle}
                 isLoggedIn={isLoggedIn}
               />
             )}
