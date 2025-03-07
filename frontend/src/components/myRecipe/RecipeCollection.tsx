@@ -130,7 +130,6 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                 recipes={filteredRecipes}
                 loading={loading}
                 favorites={favorites}
-                onFavoriteToggle={onFavoriteToggle}
                 isLoggedIn={isLoggedIn}
               />
             )}
@@ -146,7 +145,6 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                 recipes={filteredRecipes}
                 loading={loading}
                 favorites={favorites}
-                onFavoriteToggle={onFavoriteToggle}
                 isLoggedIn={isLoggedIn}
               />
             )}
