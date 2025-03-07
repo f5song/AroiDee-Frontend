@@ -29,7 +29,7 @@ export interface RecipeInput {
   calories: number;
   difficulty: string;
   servings: number;
-  image: string | null;
+  image_url: string | null;
   tags: string[];
   ingredients: IngredientInput[];
   instructions: InstructionInput[];
@@ -78,7 +78,7 @@ export const recipeInputToRecipe = (input: RecipeInput): Partial<Recipe> => {
     cook_time: input.time,
     calories: input.calories,
     difficulty: input.difficulty,
-    image: input.image || "/placeholder.svg",
+    image_url: input.image_url || "/placeholder.svg",
     categories: input.tags,
     rating: 0 // New recipe starts with 0 rating
   };
