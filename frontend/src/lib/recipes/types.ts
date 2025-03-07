@@ -9,7 +9,7 @@ export interface Recipe {
   title: string;
   calories: number;
   cook_time: number;
-  image: string;
+  image_url: string;
   rating: number;
   difficulty: string;
   categories: string[];  // แทนที่ tags ด้วย categories

@@ -11,7 +11,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ผัดกระเพราไก่",
     calories: 380,
     cook_time: 25,
-    image: "/images/recipes/thai-basil-chicken.jpg",
+    image_url: "/images/recipes/thai-basil-chicken.jpg",
     rating: 4.8,
     difficulty: "medium",
     categories: ["thai", "spicy", "chicken", "quick-meals"]
@@ -22,7 +22,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "พิซซ่ามาร์เกริต้า",
     calories: 450,
     cook_time: 35,
-    image: "/images/recipes/margherita-pizza.jpg",
+    image_url: "/images/recipes/margherita-pizza.jpg",
     rating: 4.5,
     difficulty: "easy",
     categories: ["italian", "vegetarian", "pizza"]
@@ -33,7 +33,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ทาโก้เนื้อซอสซัลซ่า",
     calories: 320,
     cook_time: 30,
-    image: "/images/recipes/beef-tacos.jpg",
+    image_url: "/images/recipes/beef-tacos.jpg",
     rating: 4.7,
     difficulty: "easy",
     categories: ["mexican", "beef", "quick-meals"]
@@ -44,7 +44,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "แกงกะหรี่ผัก",
     calories: 280,
     cook_time: 40,
-    image: "/images/recipes/vegetable-curry.jpg",
+    image_url: "/images/recipes/vegetable-curry.jpg",
     rating: 4.6,
     difficulty: "medium",
     categories: ["vegan", "curry", "gluten-free", "healthy"]
@@ -55,7 +55,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ริซอตโต้เห็ด",
     calories: 420,
     cook_time: 45,
-    image: "/images/recipes/mushroom-risotto.jpg",
+    image_url: "/images/recipes/mushroom-risotto.jpg",
     rating: 4.4,
     difficulty: "medium",
     categories: ["italian", "vegetarian", "dinner"]
@@ -66,7 +66,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ขนมปังอะโวคาโด",
     calories: 220,
     cook_time: 10,
-    image: "/images/recipes/avocado-toast.jpg",
+    image_url: "/images/recipes/avocado-toast.jpg",
     rating: 4.3,
     difficulty: "easy",
     categories: ["breakfast", "vegetarian", "quick-meals", "healthy"]
@@ -77,7 +77,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ปลาแซลมอนย่างเนยมะนาว",
     calories: 350,
     cook_time: 20,
-    image: "/images/recipes/grilled-salmon.jpg",
+    image_url: "/images/recipes/grilled-salmon.jpg",
     rating: 4.9,
     difficulty: "medium",
     categories: ["seafood", "keto", "dinner", "healthy"]
@@ -88,7 +88,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "คุกกี้ช็อคโกแลตชิพ",
     calories: 180,
     cook_time: 30,
-    image: "/images/recipes/chocolate-cookies.jpg",
+    image_url: "/images/recipes/chocolate-cookies.jpg",
     rating: 4.7,
     difficulty: "easy",
     categories: ["dessert", "sweet", "baking"]
@@ -99,7 +99,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "สลัดซีซาร์ไก่",
     calories: 290,
     cook_time: 15,
-    image: "/images/recipes/caesar-salad.jpg",
+    image_url: "/images/recipes/caesar-salad.jpg",
     rating: 4.2,
     difficulty: "easy",
     categories: ["salad", "chicken", "lunch", "healthy"]
@@ -110,7 +110,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "เนื้อผัดบร็อคโคลี่",
     calories: 340,
     cook_time: 20,
-    image: "/images/recipes/beef-broccoli.jpg",
+    image_url: "/images/recipes/beef-broccoli.jpg",
     rating: 4.5,
     difficulty: "medium",
     categories: ["asian", "beef", "quick-meals"]
@@ -121,7 +121,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ต้มยำกุ้ง",
     calories: 200,
     cook_time: 35,
-    image: "/images/recipes/tom-yum.jpg",
+    image_url: "/images/recipes/tom-yum.jpg",
     rating: 4.9,
     difficulty: "medium",
     categories: ["thai", "seafood", "spicy", "soup"]
@@ -132,7 +132,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ข้าวผัดสับปะรด",
     calories: 420,
     cook_time: 25,
-    image: "/images/recipes/pineapple-rice.jpg",
+    image_url: "/images/recipes/pineapple-rice.jpg",
     rating: 4.3,
     difficulty: "easy",
     categories: ["thai", "rice", "quick-meals"]
@@ -143,7 +143,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ส้มตำไทย",
     calories: 150,
     cook_time: 15,
-    image: "/images/recipes/som-tam.jpg",
+    image_url: "/images/recipes/som-tam.jpg",
     rating: 4.7,
     difficulty: "easy",
     categories: ["thai", "spicy", "healthy", "salad"]
@@ -154,7 +154,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ลาบเห็ด",
     calories: 180,
     cook_time: 20,
-    image: "/images/recipes/mushroom-larb.jpg",
+    image_url: "/images/recipes/mushroom-larb.jpg",
     rating: 4.4,
     difficulty: "easy",
     categories: ["thai", "vegetarian", "spicy"]
@@ -165,7 +165,7 @@ export const MOCK_RECIPES: Recipe[] = [
     title: "ชาไทยมะพร้าว",
     calories: 220,
     cook_time: 10,
-    image: "/images/recipes/thai-tea.jpg",
+    image_url: "/images/recipes/thai-tea.jpg",
     rating: 4.6,
     difficulty: "easy",
     categories: ["beverage", "sweet", "thai"]
@@ -182,7 +182,7 @@ export const MOCK_USER_RECIPES: Recipe[] = [
     title: "สปาเกตตี้ซอสเนื้อโฮมเมด",
     calories: 450,
     cook_time: 40,
-    image: "/images/recipes/spaghetti-bolognese.jpg",
+    image_url: "/images/recipes/spaghetti-bolognese.jpg",
     rating: 4.8,
     difficulty: "medium",
     categories: ["italian", "pasta", "dinner", "beef"]
@@ -193,7 +193,7 @@ export const MOCK_USER_RECIPES: Recipe[] = [
     title: "ซุปไก่ใส่เส้น",
     calories: 320,
     cook_time: 50,
-    image: "/images/recipes/chicken-soup.jpg",
+    image_url: "/images/recipes/chicken-soup.jpg",
     rating: 4.6,
     difficulty: "medium",
     categories: ["soup", "chicken", "comfort-food"]
@@ -204,7 +204,7 @@ export const MOCK_USER_RECIPES: Recipe[] = [
     title: "ออมเลตเช้าเร็วทันใจ",
     calories: 280,
     cook_time: 15,
-    image: "/images/recipes/omelette.jpg",
+    image_url: "/images/recipes/omelette.jpg",
     rating: 4.3,
     difficulty: "easy",
     categories: ["breakfast", "eggs", "quick-meals"]

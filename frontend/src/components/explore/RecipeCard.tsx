@@ -13,7 +13,7 @@ interface RecipeCardProps {
     title: string;
     calories: number;
     cook_time: number;
-    image: string;
+    image_url : string;
     rating: number;
     difficulty: string;
     categories: string[];
@@ -29,7 +29,7 @@ export function RecipeCard({
   onFavoriteToggle,
   isLoggedIn, // รับค่าจาก prop
 }: RecipeCardProps) {
-  const { id, title, calories, cook_time, image, categories, rating } = recipe;
+  const { id, title, calories, cook_time, image_url , categories, rating } = recipe;
   const navigate = useNavigate(); // ใช้ useNavigate สำหรับการนำทางไปหน้า login
 
   const handleFavoriteToggle = async () => {
@@ -56,7 +56,7 @@ export function RecipeCard({
       <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         <CardHeader className="p-0 relative">
           <img
-            src={image || "/placeholder.svg"}
+            src={image_url  || "/placeholder.svg"}
             alt={title}
             className="w-full h-48 object-cover"
           />
