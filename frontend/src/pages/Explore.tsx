@@ -35,13 +35,13 @@ export default function ExplorePage() {
   // โหลดสูตรอาหาร
   useEffect(() => {
     setLoading(true);
-    console.log("🔄 Fetching recipes for category:", filterOptions.category); // Debugging
-  
+    console.log("🔄 Fetching recipes with filters:", filterOptions);
+
     const loadRecipes = async () => {
       try {
         const result = await fetchRecipes(filterOptions);
-        console.log("✅ API Response:", result);
-  
+        console.log("✅ API Response (Frontend):", result);
+
         setRecipes(result.recipes);
         setPagination(result.pagination);
       } catch (error) {
@@ -50,10 +50,9 @@ export default function ExplorePage() {
         setLoading(false);
       }
     };
-  
+
     loadRecipes();
-  }, [filterOptions]); // ✅ ดึงข้อมูลใหม่เมื่อ category เปลี่ยน
-  
+  }, [filterOptions]); // ✅ ดึงข้อมูลใหม่เมื่อ filterOptions เปลี่ยน
 
   // กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
   const handleFavorite = async (recipeId: number) => {

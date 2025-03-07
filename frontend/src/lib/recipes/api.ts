@@ -17,15 +17,15 @@ export const fetchRecipes = async (
     const response = await axios.get(`${API_URL}/recipes`, {
       params: {
         search: search ?? "",
-        sort: sort ?? "rating", // ✅ เพิ่ม sort parameter
+        sort: sort ?? "rating",
+        category: category !== "all" ? category : undefined, // ✅ ส่งเฉพาะเมื่อ category ถูกเลือก
         page: page ?? 1,
-        category: category !== "all" ? category : undefined, // ✅ ถ้าเลือก "all" ไม่ส่ง category ไป
       },
     });
 
-    console.log("✅ API Response fetchRecipes:", response.data); // Debug API Response
+    console.log("✅ API Response fetchRecipes:", response.data);
 
-    const recipes = response.data?.data ?? []; 
+    const recipes = response.data?.data ?? [];
 
     return {
       recipes,
@@ -40,6 +40,7 @@ export const fetchRecipes = async (
     return { recipes: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
   }
 };
+
 
 
 

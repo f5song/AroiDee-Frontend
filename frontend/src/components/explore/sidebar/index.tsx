@@ -2,15 +2,9 @@ import React, { useState, useEffect } from "react";
 import { ChefHat, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-
-import { ExploreSidebarProps} from "@/components/explore/sidebar/types";
+import { ExploreSidebarProps } from "@/components/explore/sidebar/types";
 import { categories } from "@/components/explore/sidebar/constants";
 import SearchBar from "@/components/explore/sidebar/SearchBar";
 import CategoryList from "@/components/explore/sidebar/CategoryList";
@@ -33,7 +27,7 @@ export function ExploreSidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarHeight] = useState("auto");
   const [activeTab, setActiveTab] = useState("categories");
-  
+
   // Advanced filters state
   const [cookingTime, setCookingTime] = useState(30);
   const [calorieRange, setCalorieRange] = useState(500);
@@ -47,7 +41,7 @@ export function ExploreSidebar({
     function handleResize() {
       const isMobileView = window.innerWidth < 768;
       setIsMobile(isMobileView);
-      
+
       // ในโหมดมือถือให้ปิด sidebar โดยค่าเริ่มต้น
       // ในโหมดเดสก์ท็อปให้เปิด sidebar โดยค่าเริ่มต้น
       if (window.innerWidth < 768) {
@@ -56,15 +50,15 @@ export function ExploreSidebar({
         setIsOpen(true); // เดสก์ท็อปเปิด sidebar เสมอ
       }
     }
-    
+
     // Set initial value
     handleResize();
-    
+
     // Add event listener
-    window.addEventListener('resize', handleResize);
-    
+    window.addEventListener("resize", handleResize);
+
     // Clean up
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // แจ้งสถานะ sidebar ไปยัง parent component
@@ -77,7 +71,9 @@ export function ExploreSidebar({
   // Find parent category
   const findParentCategory = (slug: string): string | null => {
     for (const category of categories) {
-      const subcategory = category.subcategories.find(sub => sub.slug === slug);
+      const subcategory = category.subcategories.find(
+        (sub) => sub.slug === slug
+      );
       if (subcategory) return category.slug;
     }
     return null;
@@ -97,7 +93,7 @@ export function ExploreSidebar({
     // Auto-expand parent category when subcategory is selected
     const parentSlug = findParentCategory(selectedCategory);
     if (parentSlug && !expandedCategories.includes(parentSlug)) {
-      setExpandedCategories(prev => [...prev, parentSlug]);
+      setExpandedCategories((prev) => [...prev, parentSlug]);
     }
   }, [selectedCategory, expandedCategories]);
 
@@ -105,13 +101,17 @@ export function ExploreSidebar({
   useEffect(() => {
     // Just make sure the navbar height is set correctly
     const navHeight = document.querySelector("header")?.offsetHeight || 0;
-    document.documentElement.style.setProperty('--navbar-height', `${navHeight}px`);
+    document.documentElement.style.setProperty(
+      "--navbar-height",
+      `${navHeight}px`
+    );
   }, []);
 
   const handleCategoryClick = (slug: string) => {
+    if (slug === selectedCategory) return; // ✅ ป้องกันการเรียกซ้ำ
     setSelectedCategory(slug);
     onCategoryChange(slug);
-    
+
     // On mobile, close sidebar after selecting a category
     if (isMobile) {
       setIsOpen(false);
@@ -121,7 +121,7 @@ export function ExploreSidebar({
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(searchQuery);
-    
+
     // On mobile, close sidebar after search
     if (isMobile) {
       setIsOpen(false);
@@ -130,13 +130,13 @@ export function ExploreSidebar({
 
   const handleAddIngredient = () => {
     if (ingredients.trim() && !ingredientsList.includes(ingredients.trim())) {
-      setIngredientsList(prev => [...prev, ingredients.trim()]);
+      setIngredientsList((prev) => [...prev, ingredients.trim()]);
       setIngredients("");
     }
   };
 
   const removeIngredient = (ingredient: string) => {
-    setIngredientsList(prev => prev.filter(item => item !== ingredient));
+    setIngredientsList((prev) => prev.filter((item) => item !== ingredient));
   };
 
   const applyAdvancedFilters = () => {
@@ -145,10 +145,10 @@ export function ExploreSidebar({
         cookingTime,
         difficulty,
         ingredients: ingredientsList,
-        calorieRange
+        calorieRange,
       });
     }
-    
+
     // On mobile, close sidebar after applying filters
     if (isMobile) {
       setIsOpen(false);
@@ -169,7 +169,7 @@ export function ExploreSidebar({
         cookingTime: 30,
         difficulty: "all",
         ingredients: [],
-        calorieRange: 500
+        calorieRange: 500,
       });
     }
   };
@@ -183,9 +183,9 @@ export function ExploreSidebar({
             <Tooltip key={category.slug} content={category.name}>
               <Button
                 variant={
-                  selectedCategory === category.slug || 
-                  (findParentCategory(selectedCategory) === category.slug) 
-                    ? "secondary" 
+                  selectedCategory === category.slug ||
+                  findParentCategory(selectedCategory) === category.slug
+                    ? "secondary"
                     : "ghost"
                 }
                 size="icon"
@@ -214,18 +214,18 @@ export function ExploreSidebar({
     >
       {/* This is rendered in the collapsed state */}
       {renderCollapsedIcons()}
-      
+
       {/* Search bar */}
-      <SearchBar 
-        searchQuery={searchQuery} 
-        setSearchQuery={setSearchQuery} 
-        handleSearch={handleSearch} 
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        handleSearch={handleSearch}
       />
-      
+
       {/* Main content area */}
       <div className="p-4 overflow-y-auto flex-grow">
         {/* Active filters */}
-        <ActiveFilters 
+        <ActiveFilters
           selectedCategory={selectedCategory}
           searchQuery={searchQuery}
           cookingTime={cookingTime}
@@ -243,9 +243,13 @@ export function ExploreSidebar({
           onSearch={onSearch}
           activeFiltersCount={activeFiltersCount}
         />
-        
+
         {/* Tabs for categories and filters */}
-        <Tabs defaultValue="categories" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="categories"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <TabsList className="w-full grid grid-cols-2 mb-4">
             <TabsTrigger value="categories" className="flex items-center gap-1">
               <ChefHat className="h-4 w-4" />
@@ -261,10 +265,10 @@ export function ExploreSidebar({
               )}
             </TabsTrigger>
           </TabsList>
-          
+
           {/* Categories tab content */}
           <TabsContent value="categories" className="m-0">
-            <CategoryList 
+            <CategoryList
               categories={categories}
               selectedCategory={selectedCategory}
               expandedCategories={expandedCategories}
@@ -272,10 +276,10 @@ export function ExploreSidebar({
               handleCategoryClick={handleCategoryClick}
             />
           </TabsContent>
-          
+
           {/* Filters tab content */}
           <TabsContent value="filters" className="space-y-6 m-0">
-            <AdvancedFilters 
+            <AdvancedFilters
               cookingTime={cookingTime}
               setCookingTime={setCookingTime}
               difficulty={difficulty}
