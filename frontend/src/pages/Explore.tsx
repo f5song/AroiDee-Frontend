@@ -10,7 +10,7 @@ import {
   fetchRecipes,
   saveRecipe,
   unsaveRecipe,
-  getSavedRecipes,
+  // getSavedRecipes,
 } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext";
 
@@ -33,21 +33,21 @@ export default function ExplorePage() {
 
   const isLoggedIn = !!user; // ✅ ตรวจสอบการล็อกอิน
 
-  // ✅ โหลดสูตรอาหารที่ถูกบันทึก
-  useEffect(() => {
-    if (!user) return;
+  // // ✅ โหลดสูตรอาหารที่ถูกบันทึก
+  // useEffect(() => {
+  //   if (!user) return;
 
-    const fetchSavedRecipes = async () => {
-      try {
-        const result = await getSavedRecipes(user.id);
-        setFavorites(new Set(result.map((r: any) => r.recipe_id))); // ✅ ใช้ Set
-      } catch (error) {
-        console.error("Error fetching saved recipes:", error);
-      }
-    };
+  //   const fetchSavedRecipes = async () => {
+  //     try {
+  //       const result = await getSavedRecipes(user.id);
+  //       setFavorites(new Set(result.map((r: any) => r.recipe_id))); // ✅ ใช้ Set
+  //     } catch (error) {
+  //       console.error("Error fetching saved recipes:", error);
+  //     }
+  //   };
 
-    fetchSavedRecipes();
-  }, [user]);
+  //   fetchSavedRecipes();
+  // }, [user]);
 
   // ✅ โหลดสูตรอาหาร
   useEffect(() => {
