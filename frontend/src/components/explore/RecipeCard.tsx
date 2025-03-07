@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useNavigate } from "react-router-dom"; // ใช้ react-router-dom
 
 interface RecipeCardProps {
   recipe: {
@@ -30,22 +30,19 @@ export function RecipeCard({
   isLoggedIn, // รับค่าจาก prop
 }: RecipeCardProps) {
   const { id, title, calories, cook_time, image, categories, rating } = recipe;
-  const router = useRouter(); // ใช้ useRouter สำหรับการนำทางไปหน้า login
+  const navigate = useNavigate(); // ใช้ useNavigate สำหรับการนำทางไปหน้า login
 
   const handleFavoriteToggle = async () => {
     if (!isLoggedIn) {
-      // ถ้าผู้ใช้ยังไม่ได้ล็อกอิน ให้ redirect ไปหน้า login
-      router.push("/login");
+      navigate("/login"); // นำทางไปหน้า login ถ้าผู้ใช้ยังไม่ได้ล็อกอิน
       return;
     }
 
     try {
       const user_id = 1; // สามารถเปลี่ยนให้ดึงจาก user ที่ล็อกอิน
       if (isFavorite) {
-        // ถ้าเป็นสูตรที่บันทึกแล้วให้ยกเลิก
         await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe", { user_id, recipe_id: id });
       } else {
-        // ถ้ายังไม่ได้บันทึกให้ทำการบันทึก
         await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe", { user_id, recipe_id: id });
       }
       onFavoriteToggle(); // เปลี่ยนสถานะ favorite
