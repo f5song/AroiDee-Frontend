@@ -23,16 +23,7 @@ export {
 
 // API functions
 // lib/recipes/api.ts
-export { 
-  fetchRecipes, 
-  fetchUserRecipes, 
-  fetchFavoriteRecipes, 
-  fetchRecipeById, 
-  fetchRecipesBySource, 
-  toggleFavoriteRecipe, 
-  fetchCategories 
-} from './api';
-
+export * from './api'; // ✅ ตรวจสอบให้แน่ใจว่า api.ts export ฟังก์ชันทั้งหมด
 
 // Utils
 export {
