@@ -289,9 +289,9 @@ export default function CreateRecipePage() {
                         <Label className="text-base font-medium">Recipe Image</Label>
                         <div className="mt-2 flex flex-col md:flex-row gap-4 items-start">
                           <div className="border rounded-md overflow-hidden bg-gray-50 flex items-center justify-center w-full md:w-36 h-36">
-                            {recipe.image ? (
+                            {recipe.image_url ? (
                               <img
-                                src={recipe.image}
+                                src={recipe.image_url}
                                 alt="Recipe preview"
                                 className="w-full h-full object-cover"
                               />
@@ -317,7 +317,7 @@ export default function CreateRecipePage() {
                             <p className="text-xs text-gray-500 mt-2">
                               Recommended: Square image, at least 500x500px
                             </p>
-                            {recipe.image && (
+                            {recipe.image_url && (
                               <Button
                                 type="button"
                                 variant="outline"

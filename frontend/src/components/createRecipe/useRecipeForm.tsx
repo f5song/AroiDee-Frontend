@@ -169,14 +169,14 @@ export const useRecipeForm = () => {
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        updateBasicInfo('image', reader.result as string);
+        updateBasicInfo('image_url', reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
   
   const removeImage = () => {
-    updateBasicInfo('image', null);
+    updateBasicInfo('image_url', null);
     setImageFile(null);
   };
   
