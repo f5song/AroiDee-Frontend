@@ -22,7 +22,7 @@ export const fetchRecipes = async (
       },
     });
 
-    console.log("✅ API Response:", response.data); // Debug API Response
+    console.log("✅ API Response fetchRecipes:", response.data); // Debug API Response
 
     return {
       recipes: response.data?.recipes ?? [],

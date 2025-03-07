@@ -42,7 +42,7 @@ export default function ExplorePage() {
       try {
         console.log("🔍 Fetching all recipes...");
         const result = await fetchRecipes({ search: "", sort: "rating", page: 1 }); // ✅ ลบ category
-        console.log("✅ API Response:", result);
+        console.log("✅ API Response useEffect:", result);
   
         setRecipes(result.recipes);
         setPagination(result.pagination);
