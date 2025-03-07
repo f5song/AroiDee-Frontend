@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { ExploreSidebar } from "@/components/explore/sidebar";
 import PageHeader from "@/components/explore/PageHeader";
 import RecipeGrid from "@/components/explore/RecipeGrid";
@@ -8,8 +8,8 @@ import {
   FilterOptions,
   Recipe,
   fetchRecipes,
-  saveRecipe,
-  unsaveRecipe,
+  // saveRecipe,
+  // unsaveRecipe,
   getSavedRecipes,
 } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext";
@@ -67,32 +67,32 @@ export default function ExplorePage() {
     loadRecipes();
   }, [filterOptions]);
 
-  // ✅ กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
-  const handleFavorite = useCallback(
-    async (recipeId: number) => {
-      if (!user) {
-        console.warn("User not logged in");
-        return;
-      }
+  // // ✅ กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
+  // const handleFavorite = useCallback(
+  //   async (recipeId: number) => {
+  //     if (!user) {
+  //       console.warn("User not logged in");
+  //       return;
+  //     }
 
-      try {
-        if (favorites.has(recipeId)) {
-          await unsaveRecipe(user.id, recipeId);
-          setFavorites((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(recipeId);
-            return newSet;
-          });
-        } else {
-          await saveRecipe(user.id, recipeId);
-          setFavorites((prev) => new Set(prev).add(recipeId));
-        }
-      } catch (error) {
-        console.error("Error toggling favorite:", error);
-      }
-    },
-    [user, favorites]
-  );
+  //     try {
+  //       if (favorites.has(recipeId)) {
+  //         await unsaveRecipe(user.id, recipeId);
+  //         setFavorites((prev) => {
+  //           const newSet = new Set(prev);
+  //           newSet.delete(recipeId);
+  //           return newSet;
+  //         });
+  //       } else {
+  //         await saveRecipe(user.id, recipeId);
+  //         setFavorites((prev) => new Set(prev).add(recipeId));
+  //       }
+  //     } catch (error) {
+  //       console.error("Error toggling favorite:", error);
+  //     }
+  //   },
+  //   [user, favorites]
+  // );
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -121,7 +121,6 @@ export default function ExplorePage() {
               recipes={recipes}
               loading={loading}
               favorites={Array.from(favorites)} // ✅ แปลง Set เป็น Array
-              onFavoriteToggle={handleFavorite}
               isLoggedIn={isLoggedIn} // ✅ ส่งค่า isLoggedIn
             />
 
