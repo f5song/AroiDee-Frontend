@@ -53,6 +53,11 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     setIsProcessing((prev) => ({ ...prev, [recipeId]: true }));
 
+    // ✅ อัปเดต UI ทันที โดยไม่รอ API
+    setFavorites((prev) =>
+      prev.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
+    );
+
     try {
       const token = localStorage.getItem("authToken");
       if (!token) return;
@@ -68,10 +73,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.data.success) {
-        // ✅ อัปเดต UI ทันที และโหลดข้อมูลใหม่จาก API
-        fetchFavorites();
-      } else {
+      if (!response.data.success) {
         console.error("❌ API error:", response.data.message);
         fetchFavorites(); // ✅ โหลดใหม่ถ้า API error
       }

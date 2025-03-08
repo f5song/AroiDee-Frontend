@@ -13,15 +13,14 @@ interface RecipeGridProps {
 }
 
 const RecipeGrid: React.FC<RecipeGridProps> = ({ recipes, loading }) => {
-  const { favorites, isProcessing, toggleFavorite, isLoadingFavorites } =
-    useFavorites();
-
-  if (loading || isLoadingFavorites) return null; // ✅ ป้องกัน UI กระพริบระหว่างโหลด
-
-  if (!loading && recipes.length === 0)
-    return <p className="text-center text-gray-500">🔍 No recipes found!</p>;
-
-  return (
+    const { favorites, isProcessing, toggleFavorite, isLoadingFavorites } = useFavorites();
+  
+    if (loading || isLoadingFavorites) return null; // ✅ ป้องกัน UI กระพริบระหว่างโหลด
+  
+    if (!loading && recipes.length === 0)
+      return <p className="text-center text-gray-500">🔍 No recipes found!</p>;
+  
+    return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {recipes.map((recipe) => (
         <RecipeCard
@@ -39,7 +38,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({ recipes, loading }) => {
                 )
               : [],
           }}
-          isFavorite={favorites.includes(recipe.id)}
+          isFavorite={favorites.includes(recipe.id)} // ✅ ใช้ค่าจาก database
           isProcessing={isProcessing[recipe.id] ?? false}
           onFavoriteToggle={() => toggleFavorite(recipe.id)}
         />
