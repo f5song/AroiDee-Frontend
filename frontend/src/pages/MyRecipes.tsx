@@ -31,7 +31,7 @@ export default function MyRecipesPage() {
       setLoading(true);
 
       try {
-        const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
+        const response = await axios.get(`${API_URL}/recipes/user/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
