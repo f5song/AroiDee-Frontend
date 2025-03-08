@@ -32,14 +32,11 @@ export default function MyRecipesPage() {
 
       setLoading(true);
       try {
-        const response = await axios.get(
-          `${API_URL}/recipes/user/${user.id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${API_URL}/recipes/user/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.data.success) throw new Error(response.data.message);
 
@@ -63,11 +60,14 @@ export default function MyRecipesPage() {
         const token = localStorage.getItem("authToken");
         if (!token) return;
 
-        const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${API_URL}/saved-recipes/${user.id}/saved-recipes`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         if (response.data.success) {
           setFavorites(response.data.savedRecipeIds);
@@ -83,10 +83,7 @@ export default function MyRecipesPage() {
 
   // ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร
   const handleFavoriteToggle = async (recipeId: number) => {
-    if (!user) {
-      console.error("User not logged in");
-      return;
-    }
+    if (!user) return;
 
     try {
       const isCurrentlyFavorite = favorites.includes(recipeId);

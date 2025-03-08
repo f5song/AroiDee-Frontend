@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Recipe, Category } from "@/components/common/types";
 import RecipeCard from "@/components/common/RecipeCard";
 import axios from "axios";
@@ -17,15 +17,16 @@ interface RecipeGridProps {
 const RecipeGrid: React.FC<RecipeGridProps> = ({
   recipes,
   loading,
+  favorites,
   onFavoriteToggle,
   isLoggedIn,
 }) => {
   const { user } = useAuth();
-  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>([]);
+  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
 
-  // ✅ โหลดค่า favorite จาก backend
+  // ✅ โหลดค่า favorite จาก backend (ป้องกัน API call ซ้ำ)
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || favorites.length > 0) return; // ✅ ป้องกันการโหลดซ้ำถ้ามีข้อมูลอยู่แล้ว
 
     const fetchFavoriteRecipes = async () => {
       try {
@@ -50,7 +51,18 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
     };
 
     fetchFavoriteRecipes();
-  }, [user]);
+  }, [user, favorites]); // ✅ ใช้ `favorites` เพื่อลด API call ซ้ำ
+
+  // ✅ ปรับฟังก์ชันให้ไม่อัปเดต state ซ้ำซ้อน
+  const handleFavoriteToggle = useCallback(
+    (recipeId: number) => {
+      setFavoriteRecipeIds((prev) =>
+        prev.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
+      );
+      onFavoriteToggle(recipeId); // ✅ ส่งไปอัปเดตที่ `MyRecipesPage.tsx`
+    },
+    [onFavoriteToggle]
+  );
 
   if (loading) {
     return null;
@@ -77,14 +89,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
               : [],
           }}
           isFavorite={favoriteRecipeIds.includes(recipe.id)}
-          onFavoriteToggle={() => {
-            setFavoriteRecipeIds((prev) =>
-              prev.includes(recipe.id)
-                ? prev.filter((id) => id !== recipe.id)
-                : [...prev, recipe.id]
-            );
-            onFavoriteToggle(recipe.id);
-          }}
+          onFavoriteToggle={() => handleFavoriteToggle(recipe.id)} // ✅ ใช้ฟังก์ชันใหม่
           isLoggedIn={isLoggedIn}
         />
       ))}

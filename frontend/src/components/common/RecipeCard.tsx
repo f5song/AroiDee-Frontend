@@ -45,42 +45,43 @@ interface RecipeCardProps {
 export function RecipeCard({
   recipe,
   isFavorite,
-  onFavoriteToggle,
 }: RecipeCardProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
   // ✅ ฟังก์ชันบันทึก/ยกเลิก Favorite
-  const handleFavoriteToggle = async () => {
+  const handleFavoriteToggle = async (event: React.MouseEvent) => {
+    event.stopPropagation(); // ✅ ป้องกันการ trigger หลาย event ซ้อนกัน
+  
     if (!user?.id) {
       navigate("/login");
       return;
     }
-
+  
     try {
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.error("❌ No authentication token found.");
         return;
       }
-
+  
       const url = isFavorite
         ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe"
         : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
-
+  
       console.log("📌 Sending request to:", url);
       console.log("📌 Payload:", { user_id: user.id, recipe_id: recipe.id });
-
+  
       const response = await axios.post(
         url,
         { user_id: user.id, recipe_id: recipe.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
+  
       console.log("✅ API Response:", response.data);
-
+  
       if (response.data.success) {
-        onFavoriteToggle();
+        // ✅ ไม่ต้องเรียก onFavoriteToggle() ที่นี่!
       } else {
         console.error("❌ API Error:", response.data.message);
       }
@@ -88,6 +89,7 @@ export function RecipeCard({
       console.error("❌ Error toggling favorite:", error);
     }
   };
+  
 
   return (
     <TooltipProvider>
