@@ -49,7 +49,6 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   // ✅ อัปเดต `myRecipes` เมื่อ API โหลดข้อมูลเสร็จ
   useEffect(() => {
     setMyRecipes(initialMyRecipes);
-    console.log(totalItems)
   }, [initialMyRecipes]);
 
   // ✅ โหลดข้อมูลเมื่อผู้ใช้เปลี่ยนแท็บ / ค้นหา / เปลี่ยนตัวกรอง
@@ -100,7 +99,6 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
     selectedCategories,
   ]);
 
-
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -122,13 +120,20 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
             {!loading && myRecipes.length === 0 ? (
               <EmptyState type="my-recipes" />
             ) : (
-              <RecipeGrid
-                recipes={myRecipes}
-                loading={loading}
-                favorites={favorites}
-                onFavoriteToggle={onFavoriteToggle}
-                isLoggedIn={isLoggedIn}
-              />
+              <>
+                <div className="text-gray-600 text-sm text-center mb-3">
+                  {totalItems > 0
+                    ? `Total Recipes Found: ${totalItems}`
+                    : "No recipes available"}
+                </div>
+                <RecipeGrid
+                  recipes={myRecipes}
+                  loading={loading}
+                  favorites={favorites}
+                  onFavoriteToggle={onFavoriteToggle}
+                  isLoggedIn={isLoggedIn}
+                />
+              </>
             )}
           </TabsContent>
 
