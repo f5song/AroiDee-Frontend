@@ -19,21 +19,28 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
 
-  // ✅ โหลดรายการ Favorites จาก API (อิง database)
+  // ✅ โหลด Favorites จาก API (อ้างอิง database)
   const fetchFavorites = async () => {
     if (!user) return;
     setIsLoadingFavorites(true);
 
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) return;
+      if (!token) {
+        console.error("❌ No auth token found.");
+        return;
+      }
+
+      console.log("📌 Fetching favorites...");
 
       const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log("✅ API Response:", response.data);
+
       if (response.data.success) {
-        setFavorites(response.data.savedRecipeIds || []); // ✅ ใช้ค่าจาก database
+        setFavorites(response.data.savedRecipeIds || []);
       }
     } catch (error) {
       console.error("❌ Error fetching saved recipes:", error);
@@ -53,19 +60,22 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     try {
       const token = localStorage.getItem("authToken");
-      if (!token) return;
+      if (!token) {
+        console.error("❌ No authentication token found.");
+        return;
+      }
+
+      if (!recipeId) {
+        console.error("❌ Recipe ID is missing!");
+        return;
+      }
 
       const isCurrentlyFavorite = favorites.includes(recipeId);
       const url = isCurrentlyFavorite
         ? `${API_URL}/saved-recipes/unsave-recipe`
         : `${API_URL}/saved-recipes/save-recipe`;
 
-      // ✅ อัปเดต UI ทันที **ก่อน** เรียก API
-      setFavorites((prev) =>
-        isCurrentlyFavorite
-          ? prev.filter((id) => id !== recipeId) // ลบออก
-          : [...prev, recipeId] // เพิ่มเข้า
-      );
+      console.log(`📌 Sending request to ${url} for recipe ID: ${recipeId}`);
 
       const response = await axios.post(
         url,
@@ -73,13 +83,22 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      console.log("✅ API Response:", response.data);
+
       if (!response.data.success) {
         console.error("❌ API error:", response.data.message);
-        fetchFavorites(); // ✅ รีโหลดจาก database ถ้า API error
+        fetchFavorites(); // โหลดใหม่ถ้า API มีปัญหา
+      } else {
+        // ✅ อัปเดต Favorites โดยตรง
+        setFavorites((prev) =>
+          isCurrentlyFavorite
+            ? prev.filter((id) => id !== recipeId) // ลบออก
+            : [...prev, recipeId] // เพิ่มเข้า
+        );
       }
     } catch (error) {
       console.error("❌ Error toggling favorite:", error);
-      fetchFavorites(); // ✅ โหลดใหม่จาก database ถ้ามีปัญหา
+      fetchFavorites(); // โหลดใหม่จาก database ถ้ามีปัญหา
     } finally {
       setTimeout(() => {
         setIsProcessing((prev) => {

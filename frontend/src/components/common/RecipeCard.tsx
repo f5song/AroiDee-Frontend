@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useFavorites } from "../auth/FavoritesContext";
 
 interface Category {
   id: number;
@@ -25,40 +26,42 @@ interface Category {
 }
 
 interface RecipeCardProps {
-  recipe: {
-    id: number;
-    description: string;
-    title: string;
-    calories: number;
-    cook_time: number;
-    image_url: string;
-    rating: number;
-    difficulty: string;
-    categories: Category[];
-  };
-  isFavorite: boolean;
-  isProcessing: boolean; // ✅ เพิ่ม isProcessing
-  onFavoriteToggle: () => void;
-}
+    recipe: {
+      id: number;
+      description: string;
+      title: string;
+      calories: number;
+      cook_time: number;
+      image_url: string;
+      rating: number;
+      difficulty: string;
+      categories: Category[];
+    };
+    isFavorite: boolean;  // ✅ เพิ่ม isFavorite ที่นี่
+    isProcessing: boolean; // ✅ เพิ่ม isProcessing ที่นี่
+    onFavoriteToggle: () => void;
+  }
+  
 
-export function RecipeCard({
-  recipe,
-  isFavorite,
-  isProcessing, // ✅ รับค่าจาก RecipeGrid.tsx
-  onFavoriteToggle,
-}: RecipeCardProps) {
+export function RecipeCard({ recipe }: RecipeCardProps) {
   const { user } = useAuth();
+  const { favorites, isProcessing, toggleFavorite } = useFavorites();
   const navigate = useNavigate();
 
-  // ✅ ป้องกันกดปุ่มซ้ำระหว่างรอ API
+  const isFavorite = favorites.includes(recipe.id);
+  const isDisabled = isProcessing[recipe.id] ?? false;
+
+  console.log(`📌 Recipe ID: ${recipe.id}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}`);
+
   const handleFavoriteToggle = async (event: React.MouseEvent) => {
     event.preventDefault();
     if (!user?.id) {
       navigate("/login");
       return;
     }
-    if (isProcessing) return; // ✅ ถ้ากำลังโหลดอยู่ ห้ามกดซ้ำ
-    onFavoriteToggle();
+    if (isDisabled) return; // ป้องกันกดซ้ำระหว่างรอ API
+
+    await toggleFavorite(recipe.id);
   };
 
   return (
@@ -117,7 +120,7 @@ export function RecipeCard({
               <Button
                 variant="outline"
                 size="sm"
-                disabled={isProcessing} // ✅ ปิดการกดปุ่มระหว่าง API request
+                disabled={isDisabled} // ✅ ป้องกันกดปุ่มซ้ำระหว่าง API request
                 className={isFavorite ? "bg-red-50" : "hover:bg-red-50"}
                 onClick={handleFavoriteToggle}
               >
