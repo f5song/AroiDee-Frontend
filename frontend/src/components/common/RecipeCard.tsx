@@ -19,7 +19,6 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthContext";
 import axios from "axios";
 
-
 interface Category {
   id: number;
   name: string;
@@ -69,14 +68,17 @@ export function RecipeCard({
         ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe"
         : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
 
+      console.log("📌 Sending request to:", url);
+      console.log("📌 Payload:", { user_id: user.id, recipe_id: recipe.id });
+
       const response = await axios.post(
         url,
         { user_id: user.id, recipe_id: recipe.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      console.log("✅ API Response:", response.data);
       if (response.data.success) {
-        console.log("✅ API Response:", response.data);
         onFavoriteToggle();
       } else {
         console.error("❌ API Error:", response.data.message);
