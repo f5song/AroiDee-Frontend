@@ -17,28 +17,29 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
 
-  useEffect(() => {
+  // ✅ ฟังก์ชันโหลดรายการ Favorites
+  const fetchFavorites = async () => {
     if (!user) return;
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
 
-    const fetchFavorites = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) return;
+      const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (response.data.success) {
-          setFavorites(response.data.savedRecipeIds || []);
-        }
-      } catch (error) {
-        console.error("❌ Error fetching saved recipes:", error);
+      if (response.data.success) {
+        setFavorites(response.data.savedRecipeIds || []);
       }
-    };
+    } catch (error) {
+      console.error("❌ Error fetching saved recipes:", error);
+    }
+  };
 
+  // ✅ โหลดรายการ Favorites ทันทีเมื่อผู้ใช้เข้าสู่ระบบ หรือ Favorites มีการเปลี่ยนแปลง
+  useEffect(() => {
     fetchFavorites();
-  }, [user]);
+  }, [user]); // 🔄 โหลดใหม่ทุกครั้งที่ `user` เปลี่ยน
 
   const toggleFavorite = async (recipeId: number) => {
     if (!user) return;
@@ -50,7 +51,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const token = localStorage.getItem("authToken");
       if (!token) return;
 
-      const url = favorites.includes(recipeId)
+      const isFavorite = favorites.includes(recipeId);
+      const url = isFavorite
         ? `${API_URL}/saved-recipes/unsave-recipe`
         : `${API_URL}/saved-recipes/save-recipe`;
 
@@ -61,9 +63,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       );
 
       if (response.data.success) {
-        setFavorites((prev) =>
-          favorites.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
-        );
+        // ✅ โหลด Favorites ใหม่จาก API หลังจากกด Save หรือ Unsave
+        fetchFavorites();
       }
     } catch (error) {
       console.error("❌ Error toggling favorite:", error);

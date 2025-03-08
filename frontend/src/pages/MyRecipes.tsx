@@ -1,14 +1,13 @@
-import  { useState, useEffect } from "react";
-import { useAuth } from "@/components/auth/AuthContext";
-import { Recipe } from "@/lib/recipes/types";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/components/auth/AuthContext"; // ✅ ใช้ useAuth() เพื่อตรวจสอบผู้ใช้
+import { Recipe, fetchRecipesBySource } from "@/lib/recipes";
 import RecipeCollection from "@/components/myRecipe/RecipeCollection";
 import PageHeader from "@/components/myRecipe/PageHeader";
-import axios from "axios";
-
-const API_URL = "https://aroi-dee-backend.vercel.app/api";
+import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ Context
 
 export default function MyRecipesPage() {
   const { user } = useAuth();
+  const { favorites, toggleFavorite, isProcessing } = useFavorites(); // ✅ ใช้ FavoritesContext
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,38 +15,39 @@ export default function MyRecipesPage() {
   useEffect(() => {
     if (!user) return;
 
-    const fetchUserData = async () => {
+    const fetchRecipes = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) return;
+        // ✅ โหลดสูตรอาหารของฉัน
+        const userRecipesResponse = await fetchRecipesBySource("USER", user.id);
+        setMyRecipes(userRecipesResponse.recipes);
 
-        const [userRecipesRes, favoriteRecipesRes] = await Promise.all([
-          axios.get(`${API_URL}/recipes/user/${user.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        setMyRecipes(userRecipesRes.data.data || []);
-        setFavoriteRecipes(favoriteRecipesRes.data.savedRecipes || []);
+        // ✅ โหลดสูตรอาหารที่บันทึกไว้
+        const favoritesResponse = await fetchRecipesBySource("FAVORITE", user.id);
+        setFavoriteRecipes(favoritesResponse.recipes);
       } catch (error) {
-        console.error("❌ Error fetching user data:", error);
+        console.error("Error fetching recipes:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserData();
-  }, [user]);
+    fetchRecipes();
+  }, [user, favorites]); // ✅ ทำงานใหม่เมื่อ user หรือ favorites เปลี่ยน
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
       <div className="max-w-7xl mx-auto">
         <PageHeader />
-        <RecipeCollection myRecipes={myRecipes} favoriteRecipes={favoriteRecipes} loading={loading} />
+        <RecipeCollection 
+          myRecipes={myRecipes}
+          favoriteRecipes={favoriteRecipes}
+          loading={loading}
+          favorites={favorites}
+          onFavoriteToggle={toggleFavorite}
+          isProcessing={isProcessing}
+          isLoggedIn={!!user}
+        />
       </div>
     </div>
   );
