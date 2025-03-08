@@ -6,8 +6,11 @@ const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
 
   useEffect(() => {
+    console.log("🔄 useEffect is running", recipeId);
+
     const fetchRecipe = async () => {
       try {
+        console.log("🚀 Fetching API for Recipe ID:", recipeId);
         const recipe = await getRecipeById(recipeId as string);
         console.log("📌 API Response in Frontend:", recipe);
       } catch (error) {
@@ -17,6 +20,8 @@ const RecipePage: React.FC = () => {
 
     if (recipeId) {
       fetchRecipe();
+    } else {
+      console.warn("⚠️ No recipeId provided!");
     }
   }, [recipeId]);
 
