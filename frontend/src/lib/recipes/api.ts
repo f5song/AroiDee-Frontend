@@ -99,26 +99,7 @@ export const fetchCategories = async (): Promise<CategoryOption[]> => {
   }
 };
 
-// ✅ ฟังก์ชันดึงข้อมูลจากแหล่งที่กำหนด (User หรือ Favorite)
-export const fetchRecipesBySource = async (
-  source: "USER" | "FAVORITE",
-  userId: number,
-  options: FilterOptions = {} // ✅ รองรับตัวกรอง
-): Promise<{ recipes: Recipe[]; pagination: PaginationInfo }> => {
-  try {
-    const response = await axios.get(`${API_URL}/users/${userId}/${source.toLowerCase()}-recipes`, {
-      params: options, // ✅ ใช้ options เป็นพารามิเตอร์
-    });
 
-    return {
-      recipes: response.data?.recipes ?? [],
-      pagination: response.data?.pagination ?? { currentPage: options.page ?? 1, totalPages: 0, totalItems: 0 },
-    };
-  } catch (error) {
-    console.error(`Error fetching ${source.toLowerCase()} recipes:`, error);
-    return { recipes: [], pagination: { currentPage: options.page ?? 1, totalPages: 0, totalItems: 0 } };
-  }
-};
 
 // ✅ สลับสถานะบันทึก/เลิกบันทึกสูตรอาหาร
 export const toggleFavoriteRecipe = async (userId: number, recipeId: number): Promise<{ success: boolean }> => {
