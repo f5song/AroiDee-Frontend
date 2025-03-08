@@ -52,40 +52,33 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
       navigate("/login");
       return;
     }
-
+  
     try {
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.error("❌ No authentication token found.");
         return;
       }
-
-      // ตรวจสอบค่าก่อนส่ง API
-      if (!recipe?.id || !user?.id) {
-        console.error("❌ Missing required parameters:", {
-          user_id: user?.id,
-          recipe_id: recipe?.id,
-        });
-        return;
-      }
-
-      const url = isFavorite
+  
+      // ตรวจสอบค่า `isFavorite` ที่แท้จริงก่อนเรียก API
+      const isCurrentlyFavorite = isFavorite;
+      
+      const url = isCurrentlyFavorite
         ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe"
         : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
-
+  
       console.log("📌 Sending request to:", url);
       console.log("📌 Payload:", { user_id: user.id, recipe_id: recipe.id });
-
+  
       const response = await axios.post(
         url,
         { user_id: user.id, recipe_id: recipe.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      console.log("✅ API Response:", response.data);
-
+  
       if (response.data.success) {
-        onFavoriteToggle();
+        console.log("✅ API Response:", response.data);
+        onFavoriteToggle(); // ต้องแน่ใจว่ามีการอัปเดต state ที่ถูกต้อง
       } else {
         console.error("❌ API Error:", response.data.message);
       }
@@ -93,6 +86,7 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
       console.error("❌ Error toggling favorite:", error);
     }
   };
+  
 
   return (
     <TooltipProvider>

@@ -22,12 +22,11 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   isLoggedIn,
 }) => {
   const { user } = useAuth();
-  const [favoriteRecipeIds, setFavoriteRecipeIds] =
-    useState<number[]>(favorites);
+  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
 
   // ✅ โหลดค่า favorite จาก backend (ป้องกัน API call ซ้ำ)
   useEffect(() => {
-    if (!user?.id || favorites.length > 0) return; // ✅ ป้องกันการโหลดซ้ำถ้ามีข้อมูลอยู่แล้ว
+    if (!user?.id) return;
 
     const fetchFavoriteRecipes = async () => {
       try {
@@ -39,20 +38,13 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
 
         const response = await axios.get(
           `${API_URL}/${user.id}/saved-recipes`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         if (response.data.success) {
-          setFavoriteRecipeIds(
-            response.data.savedRecipes.map((r: any) => r.recipe_id)
-          );
+          setFavoriteRecipeIds(response.data.savedRecipes.map((r: any) => r.recipe_id));
         } else {
-          console.error(
-            "❌ Failed to fetch saved recipes:",
-            response.data.message
-          );
+          console.error("❌ Failed to fetch saved recipes:", response.data.message);
         }
       } catch (error) {
         console.error("❌ Error fetching saved recipes:", error);
@@ -60,9 +52,9 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
     };
 
     fetchFavoriteRecipes();
-  }, [user, favorites]); // ✅ ใช้ `favorites` เพื่อลด API call ซ้ำ
+  }, [user]); // ✅ ไม่ให้ `useEffect()` ทำงานซ้ำบ่อยเกินไป
 
-  // ✅ ปรับฟังก์ชันให้ไม่อัปเดต state ซ้ำซ้อน
+  // ✅ ใช้ `useCallback` เพื่ออัปเดต favorites อย่างถูกต้อง
   const handleFavoriteToggle = useCallback(
     (recipeId: number) => {
       setFavoriteRecipeIds((prev) =>
@@ -70,7 +62,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           ? prev.filter((id) => id !== recipeId)
           : [...prev, recipeId]
       );
-      onFavoriteToggle(recipeId); // ✅ ส่งไปอัปเดตที่ MyRecipesPage.tsx
+      onFavoriteToggle(recipeId); // ✅ อัปเดตไปยัง component หลัก
     },
     [onFavoriteToggle]
   );
@@ -100,7 +92,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
               : [],
           }}
           isFavorite={favoriteRecipeIds.includes(recipe.id)}
-          onFavoriteToggle={() => handleFavoriteToggle(recipe.id)} // ✅ ใช้ฟังก์ชันใหม่
+          onFavoriteToggle={() => handleFavoriteToggle(recipe.id)} // ✅ ใช้ฟังก์ชันที่ถูกต้อง
           isLoggedIn={isLoggedIn}
         />
       ))}
