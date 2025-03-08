@@ -30,7 +30,7 @@ export const DEFAULT_RECIPE_FORM: RecipeInput = {
   calories: 300,
   difficulty: DIFFICULTY_OPTIONS.MEDIUM,
   servings: 4,
-  image: null,
+  image_url: null,
   tags: [],
   ingredients: [DEFAULT_INGREDIENT],
   instructions: [DEFAULT_INSTRUCTION]

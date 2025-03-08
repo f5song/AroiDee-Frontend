@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthContext"; // ✅ ใช้ useAuth() เพื่อตรวจสอบผู้ใช้
 import { 
   Recipe, 
-  fetchRecipesBySource, 
   toggleFavoriteRecipe 
 } from "@/lib/recipes";
 import RecipeCollection from "@/components/myRecipe/RecipeCollection";
 import PageHeader from "@/components/myRecipe/PageHeader";
+import axios from "axios";
 
 /**
  * My Recipes page component
@@ -18,30 +18,26 @@ export default function MyRecipesPage() {
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<number[]>([]);
 
-  // ✅ โหลดสูตรอาหารของผู้ใช้และที่บันทึกไว้
-  useEffect(() => {
-    if (!user) return; // ✅ ป้องกัน error ถ้า user ยังไม่ได้ล็อกอิน
+ // ✅ โหลดสูตรอาหารของผู้ใช้จาก backend
+ useEffect(() => {
+  if (!user) return; // ✅ ป้องกัน error ถ้า user ยังไม่ได้ล็อกอิน
 
-    const fetchRecipes = async () => {
-      setLoading(true);
-      try {
-        // ✅ โหลดสูตรอาหารของฉัน
-        const userRecipesResponse = await fetchRecipesBySource("USER", user.id);
-        setMyRecipes(userRecipesResponse.recipes);
+  const fetchUserRecipes = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`https://aroi-dee-backend.vercel.app/api/recipes/user/${user.id}`);
+      if (!response.data.success) throw new Error(response.data.message);
+      setMyRecipes(response.data.data);
+    } catch (error) {
+      console.error("Error fetching user recipes:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // ✅ โหลดสูตรอาหารที่บันทึกไว้
-        const favoritesResponse = await fetchRecipesBySource("FAVORITE", user.id);
-        setFavoriteRecipes(favoritesResponse.recipes);
-        setFavorites(favoritesResponse.recipes.map((r) => r.id)); // ดึงเฉพาะ id ของสูตรที่ถูกบันทึก
-      } catch (error) {
-        console.error("Error fetching recipes:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  fetchUserRecipes();
+}, [user]); // ✅ ทำงานใหม่เมื่อ user เปลี่ยน
 
-    fetchRecipes();
-  }, [user]); // ✅ ทำงานใหม่เมื่อ user เปลี่ยน
 
   // ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร
   const handleFavoriteToggle = async (recipeId: number) => {

@@ -11,20 +11,22 @@ export type { FilterOptions, Recipe };
 export const fetchRecipes = async (
   options: FilterOptions = {}
 ): Promise<{ recipes: Recipe[]; pagination: PaginationInfo }> => {
-  const { search, sort, page } = options;
+  const { search, sort, page, category, cookingTime, calorieRange } = options; // ✅ เพิ่ม cookingTime และ calorieRange
 
   try {
     const response = await axios.get(`${API_URL}/recipes`, {
       params: {
         search: search ?? "",
-        sort: sort ?? "rating", // ✅ เพิ่ม sort parameter
+        sort: sort ?? "rating",
+        category: category !== "all" ? category : undefined,
+        cookingTime: cookingTime !== 30 ? cookingTime : undefined,
+        calorieRange: calorieRange !== 500 ? calorieRange : undefined,
         page: page ?? 1,
       },
     });
 
-    console.log("✅ API Response fetchRecipes:", response.data); // Debug API Response
-
-    const recipes = response.data?.data ?? []; 
+    console.log("✅ API Response fetchRecipes:", response.data);
+    const recipes = response.data?.data ?? [];
 
     return {
       recipes,
@@ -39,6 +41,9 @@ export const fetchRecipes = async (
     return { recipes: [], pagination: { currentPage: 1, totalPages: 1, totalItems: 0 } };
   }
 };
+
+
+
 
 
 

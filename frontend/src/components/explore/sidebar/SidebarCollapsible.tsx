@@ -13,14 +13,13 @@ export function SidebarCollapsible({
   setIsOpen,
   isMobile,
 
-  selectedCategory,
   activeFiltersCount,
   searchQuery,
   children,
 }: SidebarCollapsibleProps) {
   // Total active filters count
   const totalActiveCount = 
-    (selectedCategory !== "all" ? 1 : 0) + 
+
     (searchQuery ? 1 : 0) + 
     activeFiltersCount;
   

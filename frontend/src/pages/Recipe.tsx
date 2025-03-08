@@ -192,7 +192,7 @@ const RecipePage: React.FC = () => {
               date={recipe.date}
               rating={recipe.rating}
               comments={recipe.comments}
-              image_url={recipe.image_url}
+              image={recipe.image}
               liked={liked}
               saved={saved}
               setLiked={setLiked}

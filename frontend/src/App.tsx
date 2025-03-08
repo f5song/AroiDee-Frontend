@@ -42,11 +42,11 @@ const App = () => {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/about-us" element={<AboutUs />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/recipe/:id" element={<Recipe />} />
                 <Route
                   path="/meal-planning/planner"
                   element={<MealPlanner />}
                 />
-                <Route path="/recipe" element={<Recipe />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>

@@ -1,22 +1,15 @@
 import { Button } from "@/components/ui/button";
 import CookingTimeSlider from "@/components/explore/sidebar/CookingTimeSlider";
 import CalorieRangeSlider from "@/components/explore/sidebar/CalorieRangeSlider";
-import DifficultySelect from "@/components/explore/sidebar/DifficultySelect";
-import IngredientInput from "@/components/explore/sidebar/IngredientInput";
+
 import { AdvancedFiltersProps } from "@/components/explore/sidebar/types";
 
 export function AdvancedFilters({
   cookingTime,
   setCookingTime,
-  difficulty,
-  setDifficulty,
-  ingredients,
-  setIngredients,
-  ingredientsList,
   calorieRange,
   setCalorieRange,
-  handleAddIngredient,
-  removeIngredient,
+
   applyAdvancedFilters,
   activeFiltersCount,
 }: AdvancedFiltersProps) {
@@ -26,15 +19,7 @@ export function AdvancedFilters({
       
       <CalorieRangeSlider calorieRange={calorieRange} setCalorieRange={setCalorieRange} />
       
-      <DifficultySelect difficulty={difficulty} setDifficulty={setDifficulty} />
       
-      <IngredientInput
-        ingredients={ingredients}
-        setIngredients={setIngredients}
-        ingredientsList={ingredientsList}
-        handleAddIngredient={handleAddIngredient}
-        removeIngredient={removeIngredient}
-      />
       
       <Button 
         className="w-full mt-4" 
