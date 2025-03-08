@@ -4,9 +4,14 @@ import RecipeCard from "@/components/common/RecipeCard";
 import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ Context
 
 interface RecipeGridProps {
-  recipes: Recipe[];
-  loading: boolean;
-}
+    recipes: Recipe[];
+    loading: boolean;
+    favorites: number[]; // ✅ เพิ่ม Favorites
+    isProcessing: Record<number, boolean>;
+    onFavoriteToggle: (recipeId: number) => Promise<void>;
+    isLoggedIn: boolean;
+  }
+
 
 const RecipeGrid: React.FC<RecipeGridProps> = ({ recipes, loading }) => {
   const { favorites, isProcessing, isLoadingFavorites, toggleFavorite } = useFavorites();
