@@ -48,8 +48,8 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           ? `${API_URL}/save-recipe`
           : `${API_URL}/unsave-recipe`;
 
-        console.log("📌 Sending request to:", url);
-        console.log("📌 Payload:", { user_id: user?.id, recipe_id: recipeId });
+        console.log("📌 Sending request to grid:", url);
+        console.log("📌 Payload grid:", { user_id: user?.id, recipe_id: recipeId });
 
         const response = await axios.post(
           url,
@@ -68,7 +68,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           );
         }
       } catch (error) {
-        console.error("❌ Error toggling favorite:", error);
+        console.error("❌ Error toggling favorite grid:", error);
         setFavoriteRecipeIds((prev) =>
           isCurrentlyFavorite
             ? [...prev, recipeId]

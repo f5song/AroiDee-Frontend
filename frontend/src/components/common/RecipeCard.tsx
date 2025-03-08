@@ -77,8 +77,8 @@ export function RecipeCard({
         ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe"
         : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
 
-      console.log("📌 Sending request to:", url);
-      console.log("📌 Payload:", { user_id: user.id, recipe_id: recipe.id });
+      console.log("📌 Sending request to card:", url);
+      console.log("📌 Payload card:", { user_id: user.id, recipe_id: recipe.id });
 
       const response = await axios.post(
         url,
@@ -93,7 +93,7 @@ export function RecipeCard({
         console.error("❌ API Error:", response.data.message);
       }
     } catch (error) {
-      console.error("❌ Error toggling favorite:", error);
+      console.error("❌ Error toggling favorite card:", error);
     } finally {
       setLoading(false); // ✅ รีเซ็ต loading หลังจาก API response กลับมา
     }

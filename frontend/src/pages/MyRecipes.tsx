@@ -77,7 +77,7 @@ export default function MyRecipesPage() {
         ? `${API_URL}/saved-recipes/save-recipe`
         : `${API_URL}/saved-recipes/unsave-recipe`;
 
-      console.log(`📌 Sending request to ${url} for recipe ${recipeId}`);
+      console.log(`📌 Sending request to recipe ${url} for recipe ${recipeId}`);
 
       const response = await axios.post(
         url,
@@ -102,7 +102,7 @@ export default function MyRecipesPage() {
         console.error("❌ API Error:", response.data.message);
       }
     } catch (error) {
-      console.error("❌ Error toggling favorite:", error);
+      console.error("❌ Error toggling favorite myrecipe:", error);
     }
   };
 
