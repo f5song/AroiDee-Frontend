@@ -43,31 +43,37 @@ interface RecipeCardProps {
   isLoggedIn: boolean;
 }
 
-export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardProps) {
+export function RecipeCard({
+  recipe,
+  isFavorite,
+  onFavoriteToggle,
+}: RecipeCardProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); // ป้องกันการกดซ้ำ
 
   // ✅ ฟังก์ชันบันทึก/ยกเลิก Favorite
-  const handleFavoriteToggle = async () => {
+  const handleFavoriteToggle = async (event: React.MouseEvent) => {
+    event.preventDefault(); // ✅ ป้องกันการเกิด event ที่ไม่จำเป็น
+    event.stopPropagation(); // ✅ ป้องกัน Click Event Bubble ที่อาจทำให้ถูกเรียกซ้ำ
     if (!user?.id) {
       navigate("/login");
       return;
     }
 
-    if (loading) return; // ป้องกันการกดซ้ำ
+    // ✅ ป้องกันการเรียก API ซ้ำระหว่างรอผลลัพธ์
+    if (loading) return;
     setLoading(true);
 
     try {
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.error("❌ No authentication token found.");
-        setLoading(false);
         return;
       }
 
-      // ตรวจสอบค่า `isFavorite` ก่อนเรียก API
-      const url = isFavorite
+      const isCurrentlyFavorite = isFavorite;
+      const url = isCurrentlyFavorite
         ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe"
         : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
 
@@ -82,14 +88,14 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
 
       if (response.data.success) {
         console.log("✅ API Response:", response.data);
-        onFavoriteToggle(recipe.id); // ส่งค่าไปอัปเดตที่ `RecipeGrid.tsx`
+        onFavoriteToggle(recipe.id); // ✅ ส่งค่า recipeId ไปให้ฟังก์ชัน Parent Component
       } else {
         console.error("❌ API Error:", response.data.message);
       }
     } catch (error) {
       console.error("❌ Error toggling favorite:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ รีเซ็ต loading หลังจาก API response กลับมา
     }
   };
 
@@ -113,7 +119,11 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
           </CardTitle>
           <div className="flex flex-wrap gap-1 mb-2">
             {recipe.categories.map((category) => (
-              <Badge key={category.id} variant="secondary" className="text-xs bg-green-50">
+              <Badge
+                key={category.id}
+                variant="secondary"
+                className="text-xs bg-green-50"
+              >
                 {category.name}
               </Badge>
             ))}
@@ -145,11 +155,15 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
               <Button
                 variant="outline"
                 size="sm"
-                disabled={loading} // ปิดการกดปุ่มระหว่าง API request
+                disabled={loading} // ✅ ปิดการกดปุ่มระหว่าง API request
                 className={isFavorite ? "bg-red-50" : "hover:bg-red-50"}
                 onClick={handleFavoriteToggle}
               >
-                <Heart className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : "text-red-500"}`} />
+                <Heart
+                  className={`w-4 h-4 mr-2 ${
+                    isFavorite ? "fill-red-500 text-red-500" : "text-red-500"
+                  }`}
+                />
                 {isFavorite ? "Saved" : "Save"}
               </Button>
             </TooltipTrigger>
@@ -159,7 +173,11 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild size="sm" className="text-white bg-orange-500 hover:bg-orange-600">
+              <Button
+                asChild
+                size="sm"
+                className="text-white bg-orange-500 hover:bg-orange-600"
+              >
                 <Link to={`/recipe/${recipe.id}`}>View Recipe</Link>
               </Button>
             </TooltipTrigger>

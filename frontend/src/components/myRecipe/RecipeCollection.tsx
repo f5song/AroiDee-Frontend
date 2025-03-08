@@ -47,9 +47,9 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   const [totalPages, setTotalPages] = useState<number>(1);
   const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
 
-  // ✅ อัปเดต `myRecipes` และ `favoriteRecipes` เมื่อ API โหลดข้อมูลเสร็จ
+  // ✅ อัปเดต `myRecipes` และ `favoriteRecipeIds` เมื่อมีการเปลี่ยนแปลง
   useEffect(() => {
-    setMyRecipes(Array.isArray(initialMyRecipes) ? initialMyRecipes : []);
+    setMyRecipes(initialMyRecipes);
     setFavoriteRecipeIds(favorites);
   }, [initialMyRecipes, favorites]);
 
@@ -116,6 +116,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
 
   console.log("📢 Render myRecipes:", myRecipes);
   console.log("📢 Render filteredRecipes:", filteredRecipes);
+  console.log("📢 Favorite Recipes:", favoriteRecipeIds);
 
   return (
     <>
