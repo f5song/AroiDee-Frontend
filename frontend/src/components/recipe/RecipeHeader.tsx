@@ -62,14 +62,6 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
       {/* Action Buttons */}
       <div className="absolute top-6 right-6 flex space-x-3">
         <button
-          onClick={() => setLiked(!liked)}
-          className={`p-3 rounded-full backdrop-blur-md transition-all ${
-            liked ? "bg-red-500 text-white" : "bg-white/20 hover:bg-white/30 text-white"
-          }`}
-        >
-          <Heart size={20} fill={liked ? "currentColor" : "none"} />
-        </button>
-        <button
           onClick={() => setSaved(!saved)}
           className={`p-3 rounded-full backdrop-blur-md transition-all ${
             saved ? "bg-yellow-500 text-white" : "bg-white/20 hover:bg-white/30 text-white"
