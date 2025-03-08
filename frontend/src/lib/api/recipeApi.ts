@@ -3,9 +3,9 @@ import { apiClient } from "../apiClient";
 export const getRecipeById = async (recipeId: string) => {
   const response = await apiClient.get(`/recipes/${recipeId}`);
 
-  // 🔍 Debug: เช็คว่าข้อมูลถูกต้องไหม
+  // 🔍 Debug: เช็คค่าที่ API ส่งกลับมา
   console.log("API Full Response:", response.data);
 
-  // ✅ ดึงสูตรอาหารออกมาจาก `savedRecipes`
-  return response.data.savedRecipes?.[0] || null;
+  // ✅ ดึงข้อมูลสูตรอาหารจาก `data`
+  return response.data?.data || null;
 };

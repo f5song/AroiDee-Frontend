@@ -17,7 +17,6 @@ import CookingModeView from "../components/recipe/CookingModeView";
 
 const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
-
   const {
     data: recipe,
     isLoading,
@@ -25,26 +24,20 @@ const RecipePage: React.FC = () => {
   } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
-    enabled: !!recipeId, // โหลดข้อมูลเฉพาะเมื่อ recipeId มีค่า
+    enabled: !!recipeId, // โหลดข้อมูลเมื่อ recipeId มีค่า
   });
 
-  // 🔍 Debug: ตรวจสอบ API Response
+  // 🔍 Debug: ตรวจสอบค่าที่ API ส่งมา
   useEffect(() => {
     console.log("Recipe Data:", recipe);
   }, [recipe]);
 
-  // ⏳ กำลังโหลดข้อมูล
   if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
-
-  // ❌ เกิดข้อผิดพลาด
   if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
-
-  // ❌ ถ้า `recipe` ไม่มีข้อมูล
   if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
 
   // กำหนดค่า State
-  const [liked, setLiked] = useState<boolean>(false);
-  const [saved, setSaved] = useState<boolean>(false);
+
   const [activeTab, setActiveTab] = useState<string>("ingredients");
   const [cookingMode, setCookingMode] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(0);
@@ -82,19 +75,19 @@ const RecipePage: React.FC = () => {
             {/* Hero Section */}
             <RecipeHeader
               title={recipe?.title || "ไม่มีชื่อสูตร"}
-              author={recipe?.user?.username || "Unknown"}
+              author={"Unknown"} // API ยังไม่มีข้อมูล author
               date={
                 recipe?.created_at
                   ? new Date(recipe.created_at).toLocaleDateString()
                   : ""
               }
               rating={recipe?.rating || 0}
-              comments={recipe?.saved_recipes?.length || 0}
+              comments={0} // API ยังไม่มี comments
               image_url={recipe?.image_url || "/default-recipe.jpg"}
-              liked={liked}
-              saved={saved}
-              setLiked={setLiked}
-              setSaved={setSaved}
+              liked={false} // เพิ่ม state ภายหลัง
+              saved={false} // เพิ่ม state ภายหลัง
+              setLiked={() => {}} // เพิ่ม state handler ภายหลัง
+              setSaved={() => {}} // เพิ่ม state handler ภายหลัง
             />
 
             {/* Control Bar */}
