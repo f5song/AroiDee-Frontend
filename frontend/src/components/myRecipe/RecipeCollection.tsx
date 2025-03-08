@@ -8,7 +8,7 @@ import NoResultsMessage from "@/components/explore/NoResultsMessage";
 import TabsNavigation from "@/components/myRecipe/TabsNavigation";
 import RecipeGrid from "@/components/myRecipe/RecipeGrid";
 import EmptyState from "@/components/myRecipe/EmptyState";
-import { useAuth } from "@/components/auth/AuthContext"; // ✅ ดึง `useAuth()` เพื่อใช้ `user`
+import { useAuth } from "@/components/auth/AuthContext";
 
 interface RecipeCollectionProps {
   myRecipes: Recipe[];
@@ -28,7 +28,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   isLoggedIn,
 }) => {
   // ✅ ดึงข้อมูลผู้ใช้
-  const { user } = useAuth(); // ⬅️ เพิ่มตรงนี้
+  const { user } = useAuth();
 
   // UI state
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,19 +38,18 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   const [selectedCategories] = useState<string[]>([]);
   const [cookingTime] = useState<number | undefined>(undefined);
   const [difficulty] = useState<string | undefined>(undefined);
-  const [myRecipes] = useState<Recipe[]>(initialMyRecipes); // ✅ เพิ่ม state
 
-  // Data state
+  // ✅ ใช้ state สำหรับ myRecipes และอัปเดตจาก initialMyRecipes
+  const [myRecipes, setMyRecipes] = useState<Recipe[]>(initialMyRecipes);
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(initialLoading);
-  // ✅ ใช้ `useState` ให้ถูกต้อง
   const [totalItems, setTotalItems] = useState<number>(0);
-
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  // ✅ ใช้ `string` แทน enum เพื่อแก้ปัญหา
-  const source: "USER" | "FAVORITE" =
-    activeTab === TAB_VALUES.MY_RECIPES ? "USER" : "FAVORITE";
+  // ✅ อัปเดต `myRecipes` เมื่อ API โหลดข้อมูลเสร็จ
+  useEffect(() => {
+    setMyRecipes(initialMyRecipes);
+  }, [initialMyRecipes]);
 
   // ✅ โหลดข้อมูลเมื่อผู้ใช้เปลี่ยนแท็บ / ค้นหา / เปลี่ยนตัวกรอง
   useEffect(() => {
@@ -70,19 +69,18 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
         };
 
         const response = await fetchRecipesBySource(
-          source,
+          activeTab === TAB_VALUES.MY_RECIPES ? "USER" : "FAVORITE",
           user.id,
           filterOptions
         );
 
         setFilteredRecipes(response.recipes);
         setTotalItems(response.pagination.totalItems);
-        <p>Total Recipes Found: {totalItems}</p>;
         setTotalPages(response.pagination.totalPages);
       } catch (error) {
         console.error("Error fetching filtered recipes:", error);
         setFilteredRecipes([]);
-        setTotalItems(0); // ✅ ใช้ setTotalItems(0) แทนการกำหนดค่าโดยตรง
+        setTotalItems(0);
         setTotalPages(1);
       } finally {
         setLoading(false);
@@ -93,15 +91,16 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   }, [
     user,
     activeTab,
-    selectedCategories,
     searchQuery,
     sort,
     currentPage,
     cookingTime,
     difficulty,
+    selectedCategories,
   ]);
 
-  // ✅ ตรวจสอบให้แน่ใจว่ามีการส่ง `onSearch`
+  console.log(totalItems)
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
@@ -116,7 +115,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
             sort={sort}
             onSearchChange={setSearchQuery}
             onSortChange={setSort}
-            onSearch={() => setCurrentPage(1)} // ✅ เพิ่ม `onSearch`
+            onSearch={() => setCurrentPage(1)}
           />
 
           <TabsContent value={TAB_VALUES.MY_RECIPES} className="mt-4">
@@ -124,7 +123,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
               <EmptyState type="my-recipes" />
             ) : (
               <RecipeGrid
-                recipes={myRecipes} // ✅ ใช้ myRecipes
+                recipes={myRecipes}
                 loading={loading}
                 favorites={favorites}
                 onFavoriteToggle={onFavoriteToggle}
