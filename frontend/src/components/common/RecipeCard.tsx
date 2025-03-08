@@ -26,22 +26,21 @@ interface Category {
 }
 
 interface RecipeCardProps {
-    recipe: {
-      id: number;
-      description: string;
-      title: string;
-      calories: number;
-      cook_time: number;
-      image_url: string;
-      rating: number;
-      difficulty: string;
-      categories: Category[];
-    };
-    isFavorite: boolean;  // ✅ เพิ่ม isFavorite ที่นี่
-    isProcessing: boolean; // ✅ เพิ่ม isProcessing ที่นี่
-    onFavoriteToggle: () => void;
-  }
-  
+  recipe: {
+    id: number;
+    description: string;
+    title: string;
+    calories: number;
+    cook_time: number;
+    image_url: string;
+    rating: number;
+    difficulty: string;
+    categories: Category[];
+  };
+  isFavorite: boolean; // ✅ เพิ่ม isFavorite ที่นี่
+  isProcessing: boolean; // ✅ เพิ่ม isProcessing ที่นี่
+  onFavoriteToggle: () => void;
+}
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
   const { user } = useAuth();
@@ -51,7 +50,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
   const isFavorite = favorites.includes(recipe.id);
   const isDisabled = isProcessing[recipe.id] ?? false;
 
-  console.log(`📌 Recipe ID: ${recipe.id}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}`);
+  console.log(
+    `📌 Recipe ID: ${recipe.id}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}`
+  );
 
   const handleFavoriteToggle = async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -60,6 +61,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
       return;
     }
     if (isDisabled) return; // ป้องกันกดซ้ำระหว่างรอ API
+
+    console.log(`📌 Toggling favorite for recipe ID: ${recipe.id}`);
+    console.log(`📌 Sending user_id: ${user.id}, recipe_id: ${recipe.id}`);
 
     await toggleFavorite(recipe.id);
   };

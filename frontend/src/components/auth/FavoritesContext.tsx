@@ -19,7 +19,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
 
-  // ✅ โหลด Favorites จาก API (อ้างอิง database)
+  // ✅ โหลดรายการ Favorites จาก API
   const fetchFavorites = async () => {
     if (!user) return;
     setIsLoadingFavorites(true);
@@ -40,7 +40,9 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.log("✅ API Response:", response.data);
 
       if (response.data.success) {
-        setFavorites(response.data.savedRecipeIds || []);
+        const savedRecipeIds = response.data.savedRecipes.map((r: any) => r.id);
+        setFavorites(savedRecipeIds);
+        console.log("✅ Updated favorites:", savedRecipeIds);
       }
     } catch (error) {
       console.error("❌ Error fetching saved recipes:", error);
