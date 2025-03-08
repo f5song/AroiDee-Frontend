@@ -1,4 +1,3 @@
-// components/myRecipe/RecipeGrid.tsx
 import React from "react";
 import { Recipe } from "@/lib/recipes/types";
 import RecipeCard from "@/components/explore/RecipeCard";
@@ -9,7 +8,7 @@ interface RecipeGridProps {
   loading: boolean;
   favorites: number[];
   onFavoriteToggle: (id: number) => void;
-  isLoggedIn: boolean; // ✅ เพิ่ม isLoggedIn ที่นี่
+  isLoggedIn: boolean;
 }
 
 const RecipeGrid: React.FC<RecipeGridProps> = ({
@@ -17,7 +16,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   loading,
   favorites,
   onFavoriteToggle,
-  isLoggedIn, // ✅ รับค่า isLoggedIn
+  isLoggedIn,
 }) => {
   if (loading) {
     return (
@@ -26,12 +25,12 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
         loading={true}
         favorites={[]}
         onFavoriteToggle={() => {}}
-        isLoggedIn={isLoggedIn} // ✅ ส่ง isLoggedIn ไปให้ ExploreRecipeGrid
+        isLoggedIn={isLoggedIn}
       />
     );
   }
-  console.log("📢 Recipes in RecipeGrid:", recipes);
 
+  console.log("📢 Recipes in RecipeGrid:", recipes);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -39,7 +38,16 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
         recipes.map((recipe) => (
           <RecipeCard
             key={recipe.id}
-            recipe={recipe}
+            recipe={{
+              ...recipe, // ✅ คัดลอกค่าทั้งหมดของ recipe
+              categories: Array.isArray(recipe.categories)
+                ? recipe.categories.map((cat) =>
+                    typeof cat === "string"
+                      ? { id: 0, name: cat, image_url: "" } // 🔹 ถ้าเป็น string ให้แปลงเป็น Category
+                      : cat
+                  )
+                : [],
+            }}
             isFavorite={favorites.includes(recipe.id)}
             onFavoriteToggle={() => onFavoriteToggle(recipe.id)}
             isLoggedIn={isLoggedIn}

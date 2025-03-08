@@ -4,8 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // ใช้ react-router-dom
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/components/auth/AuthContext"; // ✅ ใช้ useAuth()
+
+interface Category {
+  id: number;
+  name: string;
+  image_url: string;
+}
+
 interface RecipeCardProps {
   recipe: {
     id: number;
@@ -13,39 +21,45 @@ interface RecipeCardProps {
     title: string;
     calories: number;
     cook_time: number;
-    image_url : string;
+    image_url: string;
     rating: number;
     difficulty: string;
-    categories: string[];
+    categories: Category[];
   };
   isFavorite: boolean;
   onFavoriteToggle: () => void;
-  isLoggedIn: boolean; // เพิ่ม prop สำหรับตรวจสอบสถานะล็อกอิน
+  isLoggedIn: boolean;
 }
 
 export function RecipeCard({
   recipe,
   isFavorite,
   onFavoriteToggle,
-  isLoggedIn, // รับค่าจาก prop
 }: RecipeCardProps) {
-  const { id, title, calories, cook_time, image_url , categories, rating } = recipe;
-  const navigate = useNavigate(); // ใช้ useNavigate สำหรับการนำทางไปหน้า login
+  const { user } = useAuth(); // ✅ ดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
+  const { id, title, calories, cook_time, image_url, categories, rating } = recipe;
+  const navigate = useNavigate();
 
   const handleFavoriteToggle = async () => {
-    if (!isLoggedIn) {
-      navigate("/login"); // นำทางไปหน้า login ถ้าผู้ใช้ยังไม่ได้ล็อกอิน
+    if (!user?.id) {
+      navigate("/login"); // ✅ ตรวจสอบว่ามี user.id จริงก่อน
       return;
     }
 
     try {
-      const user_id = 1; // สามารถเปลี่ยนให้ดึงจาก user ที่ล็อกอิน
+      const user_id = user.id; // ✅ ใช้ user ที่ล็อกอินจริง
       if (isFavorite) {
-        await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe", { user_id, recipe_id: id });
+        await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe", {
+          user_id,
+          recipe_id: id,
+        });
       } else {
-        await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe", { user_id, recipe_id: id });
+        await axios.post("https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe", {
+          user_id,
+          recipe_id: id,
+        });
       }
-      onFavoriteToggle(); // เปลี่ยนสถานะ favorite
+      onFavoriteToggle();
     } catch (error) {
       console.error("Error toggling favorite:", error);
     }
@@ -53,31 +67,22 @@ export function RecipeCard({
 
   console.log("📢 Recipe in RecipeCard:", recipe);
 
-
   return (
     <TooltipProvider>
       <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         <CardHeader className="p-0 relative">
-          <img
-            src={image_url  || "/placeholder.svg"}
-            alt={title}
-            className="w-full h-48 object-cover"
-          />
+          <img src={image_url || "/placeholder.svg"} alt={title} className="w-full h-48 object-cover" />
           <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center">
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 mr-1" />
-            <span className="text-sm font-medium">
-              {rating}
-            </span>
+            <span className="text-sm font-medium">{rating}</span>
           </div>
         </CardHeader>
         <CardContent className="p-4 flex-grow">
-          <CardTitle className="text-lg font-semibold mb-2 line-clamp-2">
-            {title}
-          </CardTitle>
+          <CardTitle className="text-lg font-semibold mb-2 line-clamp-2">{title}</CardTitle>
           <div className="flex flex-wrap gap-1 mb-2">
             {categories?.slice(0, 2).map((category) => (
-              <Badge key={category} variant="secondary" className="text-xs bg-green-50">
-                {category}
+              <Badge key={category.id} variant="secondary" className="text-xs bg-green-50">
+                {category.name}
               </Badge>
             ))}
           </div>
@@ -111,9 +116,7 @@ export function RecipeCard({
                 className={isFavorite ? "bg-red-50" : "hover:bg-red-50"}
                 onClick={handleFavoriteToggle}
               >
-                <Heart
-                  className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : "text-red-500"}`}
-                />
+                <Heart className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : "text-red-500"}`} />
                 {isFavorite ? "Saved" : "Save"}
               </Button>
             </TooltipTrigger>
@@ -123,11 +126,7 @@ export function RecipeCard({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                asChild
-                size="sm"
-                className="text-white bg-orange-500 hover:bg-orange-600"
-              >
+              <Button asChild size="sm" className="text-white bg-orange-500 hover:bg-orange-600">
                 <Link to={`/recipe/${id}`}>View Recipe</Link>
               </Button>
             </TooltipTrigger>
