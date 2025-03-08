@@ -19,6 +19,7 @@ export interface Nutrition {
   }
   
   export interface RecipeData {
+    id: any;
     title: string;
     author: string;
     date: string;

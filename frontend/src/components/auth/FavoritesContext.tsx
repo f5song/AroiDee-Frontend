@@ -11,9 +11,13 @@ interface FavoritesContextProps {
   toggleFavorite: (recipeId: number) => Promise<void>;
 }
 
-const FavoritesContext = createContext<FavoritesContextProps | undefined>(undefined);
+const FavoritesContext = createContext<FavoritesContextProps | undefined>(
+  undefined
+);
 
-export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const { user } = useAuth();
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
@@ -33,14 +37,20 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       console.log("📌 Fetching favorites...");
 
-      const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `${API_URL}/saved-recipes/${user.id}/saved-recipes`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       console.log("✅ API Response:", response.data);
 
       if (response.data.success) {
-        const savedRecipeIds = response.data.savedRecipes.map((r: any) => r.id);
+        // ✅ แก้ไขตรงนี้: ใช้ map ค่าจาก `savedRecipes` ให้ถูกต้อง
+        const savedRecipeIds = response.data.savedRecipes.map(
+          (recipe: any) => recipe.recipe_id
+        );
         setFavorites(savedRecipeIds);
         console.log("✅ Updated favorites:", savedRecipeIds);
       }
@@ -92,10 +102,11 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         fetchFavorites(); // โหลดใหม่ถ้า API มีปัญหา
       } else {
         // ✅ อัปเดต Favorites โดยตรง
-        setFavorites((prev) =>
-          isCurrentlyFavorite
-            ? prev.filter((id) => id !== recipeId) // ลบออก
-            : [...prev, recipeId] // เพิ่มเข้า
+        setFavorites(
+          (prev) =>
+            isCurrentlyFavorite
+              ? prev.filter((id) => id !== recipeId) // ลบออก
+              : [...prev, recipeId] // เพิ่มเข้า
         );
       }
     } catch (error) {
@@ -113,7 +124,9 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, isLoadingFavorites, isProcessing, toggleFavorite }}>
+    <FavoritesContext.Provider
+      value={{ favorites, isLoadingFavorites, isProcessing, toggleFavorite }}
+    >
       {children}
     </FavoritesContext.Provider>
   );
