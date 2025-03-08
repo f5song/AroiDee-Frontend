@@ -3,16 +3,23 @@
 /**
  * สูตรอาหาร
  */
+export interface Category {
+  id: number;
+  name: string;
+  image_url: string;
+}
+
+
 export interface Recipe {
   id: number;
-  description: string;
   title: string;
+  description?: string; 
   calories: number;
-  cook_time: number;
+  cook_time?: number; 
   image_url: string;
   rating: number;
   difficulty: string;
-  categories: string[];  // แทนที่ tags ด้วย categories
+  categories: Category[];
 }
 
   
