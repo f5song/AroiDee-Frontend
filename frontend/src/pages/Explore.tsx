@@ -14,52 +14,67 @@ import {
 import { useAuth } from "@/components/auth/AuthContext";
 
 export default function ExplorePage() {
-  const { user } = useAuth(); // ดึงข้อมูล user จาก Context
+  const { user } = useAuth();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
 
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     search: "",
     sort: "rating",
     page: 1,
   });
+
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
     totalItems: 0,
   });
 
-  const isLoggedIn = !!user; // ตรวจสอบว่ามีการล็อกอินหรือไม่
+  const isLoggedIn = !!user;
 
-  // โหลดสูตรอาหาร
   useEffect(() => {
-    setLoading(true);
-    console.log("🔄 Fetching recipes with filters:", filterOptions);
+    if (!user) return;
 
-    const loadRecipes = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const result = await fetchRecipes(filterOptions);
-        console.log("✅ API Response (Frontend):", result);
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
 
-        setRecipes(result.recipes);
-        setPagination(result.pagination);
+        console.log("🔄 Fetching recipes & favorites...");
+        
+        const [recipesData, favoritesData] = await Promise.all([
+          fetchRecipes(filterOptions),
+          fetch(`https://aroi-dee-backend.vercel.app/api/saved-recipes/${user.id}/saved-recipes`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then(res => res.json()),
+        ]);
+
+        console.log("✅ API Response:", recipesData, favoritesData);
+
+        setRecipes(recipesData.recipes);
+        setPagination(recipesData.pagination);
+
+        if (favoritesData.success) {
+          setFavorites(favoritesData.savedRecipeIds || []);
+        }
       } catch (error) {
-        console.error("❌ Error loading recipes:", error);
+        console.error("❌ Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadRecipes();
-  }, [filterOptions]); // ✅ ดึงข้อมูลใหม่เมื่อ filterOptions เปลี่ยน
+    fetchData();
+  }, [user, filterOptions]);
 
-  // กดบันทึก / ยกเลิกบันทึกสูตรอาหาร
   const handleFavorite = async (recipeId: number) => {
-    if (!user) {
-      console.warn("User not logged in");
-      return;
-    }
+    if (!user) return;
+    if (isProcessing[recipeId]) return;
+
+    setIsProcessing((prev) => ({ ...prev, [recipeId]: true }));
 
     try {
       if (favorites.includes(recipeId)) {
@@ -71,6 +86,14 @@ export default function ExplorePage() {
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);
+    } finally {
+      setTimeout(() => {
+        setIsProcessing((prev) => {
+          const newProcessing = { ...prev };
+          delete newProcessing[recipeId];
+          return newProcessing;
+        });
+      }, 500);
     }
   };
 
@@ -92,7 +115,6 @@ export default function ExplorePage() {
               totalItems={pagination.totalItems}
               sort={filterOptions.sort || "rating"}
               onSortChange={(sort) => {
-                console.log("🔄 Sort Changed to:", sort); // ✅ Debug ค่าที่ถูกเลือก
                 setFilterOptions((prev) => ({ ...prev, sort, page: 1 }));
               }}
             />
@@ -102,7 +124,8 @@ export default function ExplorePage() {
               loading={loading}
               favorites={favorites}
               onFavoriteToggle={handleFavorite}
-              isLoggedIn={isLoggedIn} // ✅ เพิ่มค่า isLoggedIn ที่ถูกต้อง
+              isProcessing={isProcessing}
+              isLoggedIn={isLoggedIn}
             />
 
             {recipes.length === 0 && !loading && (

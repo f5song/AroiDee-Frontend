@@ -38,13 +38,13 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   const [selectedCategories] = useState<string[]>([]);
   const [cookingTime] = useState<number | undefined>(undefined);
   const [difficulty] = useState<string | undefined>(undefined);
+  const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
+  const [totalPages, setTotalPages] = useState<number>(1);
 
   // ✅ ใช้ state สำหรับ myRecipes และอัปเดตจาก API
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(initialLoading);
-  const [totalItems, setTotalItems] = useState<number>(0);
-  const [totalPages, setTotalPages] = useState<number>(1);
   const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
 
   // ✅ อัปเดต `myRecipes` และ `favoriteRecipeIds` เมื่อมีการเปลี่ยนแปลง
@@ -82,12 +82,10 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
           setFilteredRecipes([]);
         }
 
-        setTotalItems(response.pagination.totalItems || 0);
         setTotalPages(response.pagination.totalPages || 1);
       } catch (error) {
         console.error("Error fetching filtered recipes:", error);
         setFilteredRecipes([]);
-        setTotalItems(0);
         setTotalPages(1);
       } finally {
         setLoading(false);
@@ -106,17 +104,22 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
     selectedCategories,
   ]);
 
-  // ✅ ฟังก์ชันอัปเดต Favorite Recipes (Save/Unsave)
-  const handleFavoriteToggle = (recipeId: number, newState: boolean) => {
-    setFavoriteRecipeIds((prev) =>
-      newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
-    );
-    onFavoriteToggle(recipeId, newState);
-  };
+  // ✅ ฟังก์ชันอัปเดต Favorite Recipes (Save/Unsave) และป้องกันกดซ้ำ
+  const handleFavoriteToggle = async (recipeId: number, newState: boolean) => {
+    if (isProcessing[recipeId]) return; // ✅ ป้องกันกดซ้ำ
+    setIsProcessing((prev) => ({ ...prev, [recipeId]: true }));
 
-  console.log("📢 Render myRecipes:", myRecipes);
-  console.log("📢 Render filteredRecipes:", filteredRecipes);
-  console.log("📢 Favorite Recipes:", favoriteRecipeIds);
+    try {
+      setFavoriteRecipeIds((prev) =>
+        newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
+      );
+      await onFavoriteToggle(recipeId, newState);
+    } finally {
+      setTimeout(() => {
+        setIsProcessing((prev) => ({ ...prev, [recipeId]: false }));
+      }, 500); // ✅ ป้องกันกดซ้ำภายใน 0.5 วินาที
+    }
+  };
 
   return (
     <>
@@ -135,19 +138,14 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
             {!loading && myRecipes.length === 0 ? (
               <EmptyState type="my-recipes" />
             ) : (
-              <>
-                <div className="text-gray-600 text-sm text-center mb-3">
-                  {totalItems > 0 && <div className="text-gray-600 text-sm text-center mb-3">{`Total Recipes Found: ${totalItems}`}</div>}
-                </div>
-                <RecipeGrid
-                  recipes={myRecipes}
-                  loading={loading}
-                  favorites={favoriteRecipeIds}
-                  onFavoriteToggle={handleFavoriteToggle}
-                  isLoggedIn={isLoggedIn}
-
-                />
-              </>
+              <RecipeGrid
+                recipes={myRecipes}
+                loading={loading}
+                favorites={favoriteRecipeIds}
+                isProcessing={isProcessing} // ✅ ส่งค่าไป RecipeGrid
+                onFavoriteToggle={handleFavoriteToggle}
+                isLoggedIn={isLoggedIn}
+              />
             )}
           </TabsContent>
 
@@ -161,6 +159,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                 recipes={filteredRecipes}
                 loading={loading}
                 favorites={favoriteRecipeIds}
+                isProcessing={isProcessing} // ✅ ส่งค่าไป RecipeGrid
                 onFavoriteToggle={handleFavoriteToggle}
                 isLoggedIn={isLoggedIn}
               />

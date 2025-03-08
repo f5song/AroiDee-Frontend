@@ -10,6 +10,7 @@ interface RecipeGridProps {
   recipes: Recipe[];
   loading: boolean;
   favorites: number[];
+  isProcessing: Record<number, boolean>;
   onFavoriteToggle: (id: number, newState: boolean) => void;
   isLoggedIn: boolean;
 }
