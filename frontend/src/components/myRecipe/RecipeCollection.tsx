@@ -82,7 +82,10 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
         if (Array.isArray(response.recipes)) {
           setFilteredRecipes(response.recipes);
         } else {
-          console.error("❌ response.recipes is not an array:", response.recipes);
+          console.error(
+            "❌ response.recipes is not an array:",
+            response.recipes
+          );
           setFilteredRecipes([]);
         }
 
@@ -136,9 +139,11 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
             ) : (
               <>
                 <div className="text-gray-600 text-sm text-center mb-3">
-                  {totalItems > 0
-                    ? `Total Recipes Found: ${totalItems}`
-                    : "No recipes available"}
+                  {totalItems > 0 && (
+                    <div className="text-gray-600 text-sm text-center mb-3">
+                      {`Total Recipes Found: ${totalItems}`}
+                    </div>
+                  )}
                 </div>
                 <RecipeGrid
                   recipes={Array.isArray(myRecipes) ? myRecipes : []} // ✅ ป้องกันค่า undefined
