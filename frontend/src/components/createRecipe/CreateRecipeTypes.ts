@@ -69,8 +69,11 @@ export const recipeInputToRecipe = (input: RecipeInput): Partial<Recipe> => {
     calories: input.calories,
     difficulty: input.difficulty,
     image_url: input.image_url || "/placeholder.svg",
-    categories: input.categories,
+    categories: input.categories.map(cat => ({
+      id: 0, // Assign default ID for new categories
+      name: cat, // Keep category name from input
+      image_url: "" // Default image URL
+    })), // ✅ แปลง string[] เป็น Category[]
     rating: 0, // New recipe starts with 0 rating
-    // Add any other necessary conversions here
   };
 };

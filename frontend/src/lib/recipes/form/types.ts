@@ -25,7 +25,7 @@ export interface InstructionInput {
 export interface RecipeInput {
   title: string;
   description: string;
-  time: number;
+  cook_time: number;
   calories: number;
   difficulty: string;
   servings: number;
@@ -75,11 +75,15 @@ export const recipeInputToRecipe = (input: RecipeInput): Partial<Recipe> => {
   return {
     title: input.title,
     description: input.description,
-    cook_time: input.time,
+    cook_time: input.cook_time, // ✅ แก้จาก input.time เป็น input.cook_time
     calories: input.calories,
     difficulty: input.difficulty,
     image_url: input.image_url || "/placeholder.svg",
-    categories: input.tags,
+    categories: input.tags.map(tag => ({
+      id: 0, // ✅ ตั้งค่า default ID
+      name: tag, // ✅ ใช้ชื่อ category จาก tag
+      image_url: "" // ✅ กำหนดค่า default ให้ image_url
+    })), // ✅ แปลง string[] เป็น Category[]
     rating: 0 // New recipe starts with 0 rating
   };
 };
