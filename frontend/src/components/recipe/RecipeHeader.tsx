@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Star,
-  Heart,
   User,
   Clock,
   ChefHat,
@@ -17,9 +16,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   rating, 
   comments, 
   image_url, 
-  liked, 
   saved, 
-  setLiked, 
   setSaved 
 }) => (
   <div className="relative rounded-xl overflow-hidden">
