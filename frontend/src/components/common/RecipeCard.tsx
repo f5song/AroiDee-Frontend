@@ -19,7 +19,6 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthContext";
 import axios from "axios";
 
-const API_URL = "https://aroi-dee-backend.vercel.app/api/saved-recipes";
 
 interface Category {
   id: number;
