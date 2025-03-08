@@ -6,7 +6,7 @@ const API_URL = "https://aroi-dee-backend.vercel.app/api";
 
 interface FavoritesContextProps {
   favorites: number[];
-  isLoadingFavorites: boolean;  // ✅ เช็คว่าข้อมูลยังโหลดอยู่
+  isLoadingFavorites: boolean;
   isProcessing: Record<number, boolean>;
   toggleFavorite: (recipeId: number) => Promise<void>;
 }
@@ -17,12 +17,13 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { user } = useAuth();
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
-  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true); // ✅ ใช้สถานะโหลด
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
 
-  // ✅ ฟังก์ชันโหลดรายการ Favorites จาก API
+  // ✅ ฟังก์ชันโหลดรายการ Favorites จาก API (ตรวจสอบจาก database)
   const fetchFavorites = async () => {
     if (!user) return;
-    setIsLoadingFavorites(true); // ✅ ตั้งค่าสถานะว่า "กำลังโหลด"
+    setIsLoadingFavorites(true); // ✅ ตั้งค่าเป็นกำลังโหลด
+
     try {
       const token = localStorage.getItem("authToken");
       if (!token) return;
@@ -32,16 +33,16 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
 
       if (response.data.success) {
-        setFavorites(response.data.savedRecipeIds || []);
+        setFavorites(response.data.savedRecipeIds || []); // ✅ อัปเดต Favorites ตาม database
       }
     } catch (error) {
       console.error("❌ Error fetching saved recipes:", error);
     } finally {
-      setIsLoadingFavorites(false); // ✅ ตั้งค่าสถานะเป็น "โหลดเสร็จแล้ว"
+      setIsLoadingFavorites(false); // ✅ โหลดเสร็จแล้ว
     }
   };
 
-  // ✅ โหลด Favorites เมื่อผู้ใช้เข้าสู่ระบบ
+  // ✅ โหลด Favorites เมื่อผู้ใช้ล็อกอิน
   useEffect(() => {
     fetchFavorites();
   }, [user]);
@@ -61,18 +62,16 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ? `${API_URL}/saved-recipes/unsave-recipe`
         : `${API_URL}/saved-recipes/save-recipe`;
 
-      // ✅ อัปเดต UI ทันที
-      setFavorites((prev) =>
-        isFavorite ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
-      );
-
       const response = await axios.post(
         url,
         { user_id: user.id, recipe_id: recipeId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (!response.data.success) {
+      if (response.data.success) {
+        // ✅ อัปเดต UI ทันที และโหลดข้อมูลใหม่จาก API
+        fetchFavorites();
+      } else {
         console.error("❌ API error:", response.data.message);
         fetchFavorites(); // ✅ โหลดใหม่ถ้า API error
       }

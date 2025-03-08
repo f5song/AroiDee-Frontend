@@ -4,22 +4,23 @@ import RecipeCard from "@/components/common/RecipeCard";
 import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ Context
 
 interface RecipeGridProps {
-    recipes: Recipe[];
-    loading: boolean;
-    favorites: number[]; // ✅ เพิ่ม Favorites
-    isProcessing: Record<number, boolean>;
-    onFavoriteToggle: (recipeId: number) => Promise<void>;
-    isLoggedIn: boolean;
-  }
-
+  recipes: Recipe[];
+  loading: boolean;
+  favorites: number[]; // ✅ เพิ่ม Favorites
+  isProcessing: Record<number, boolean>;
+  onFavoriteToggle: (recipeId: number) => Promise<void>;
+  isLoggedIn: boolean;
+}
 
 const RecipeGrid: React.FC<RecipeGridProps> = ({ recipes, loading }) => {
-  const { favorites, isProcessing, isLoadingFavorites, toggleFavorite } = useFavorites();
+  const { favorites, isProcessing, toggleFavorite, isLoadingFavorites } =
+    useFavorites();
 
-  if (loading || isLoadingFavorites) return null; // ✅ รอจนกว่าข้อมูลจะโหลดเสร็จ
+  if (loading || isLoadingFavorites) return null; // ✅ ป้องกัน UI กระพริบระหว่างโหลด
 
   if (!loading && recipes.length === 0)
     return <p className="text-center text-gray-500">🔍 No recipes found!</p>;
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {recipes.map((recipe) => (
