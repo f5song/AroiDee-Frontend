@@ -49,6 +49,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   // ✅ อัปเดต `myRecipes` เมื่อ API โหลดข้อมูลเสร็จ
   useEffect(() => {
     setMyRecipes(initialMyRecipes);
+    console.log(totalItems)
   }, [initialMyRecipes]);
 
   // ✅ โหลดข้อมูลเมื่อผู้ใช้เปลี่ยนแท็บ / ค้นหา / เปลี่ยนตัวกรอง
@@ -99,7 +100,6 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
     selectedCategories,
   ]);
 
-  console.log(totalItems)
 
   return (
     <>
