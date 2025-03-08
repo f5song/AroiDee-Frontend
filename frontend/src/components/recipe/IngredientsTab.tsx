@@ -1,5 +1,4 @@
 import React from "react";
-import { Info } from "lucide-react";
 import { IngredientsTabProps } from "../../types/recipe";
 
 const IngredientsTab: React.FC<IngredientsTabProps> = ({ 
@@ -36,15 +35,6 @@ const IngredientsTab: React.FC<IngredientsTabProps> = ({
         </li>
       ))}
     </ul>
-    <div className="p-4 bg-orange-50 rounded-xl">
-      <h3 className="flex items-center text-orange-700 font-medium mb-2">
-        <Info size={18} className="mr-2" />
-        เคล็ดลับ
-      </h3>
-      <p className="text-sm text-orange-700">
-        สำหรับครีมชีสที่นุ่มกว่า ให้วางไว้ที่อุณหภูมิห้องประมาณ 30 นาทีก่อนใช้ เพื่อให้เนื้อเนียนและผสมได้ง่าย
-      </p>
-    </div>
   </div>
 );
 
