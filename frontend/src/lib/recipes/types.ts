@@ -1,4 +1,5 @@
 // lib/recipes/types.ts
+import { IngredientInput, InstructionInput } from "./form/types";
 
 /**
  * สูตรอาหาร
@@ -97,3 +98,20 @@ export interface Recipe {
     USER = 'user',
     FAVORITE = 'favorite'
   }
+
+  // src/lib/recipes/types.ts
+
+  export interface RecipeInput {
+    title: string;
+    description: string;
+    cook_time: number;
+    calories: number;
+    difficulty: string;
+    servings: number;
+    image_url: string | null;
+    categories: Category[];  // ✅ เปลี่ยนจาก tags: string[] เป็น categories: Category[]
+    ingredients: IngredientInput[];
+    instructions: InstructionInput[];
+  }
+  
+  

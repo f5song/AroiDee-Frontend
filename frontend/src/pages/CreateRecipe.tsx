@@ -8,6 +8,9 @@ import { IngredientsSection } from "@/components/createRecipe/IngredientsSection
 import { InstructionsSection } from "@/components/createRecipe/InstructionsSection";
 import { FormActions } from "@/components/createRecipe/FormActions";
 
+import { Category } from "../lib/recipes/types"; // ✅ เพิ่ม Category
+
+
 // Import from refactored files
 import { useRecipeForm } from "@/lib/recipes/form";
 import { createRecipe } from "@/lib/recipes/form/api";
@@ -71,22 +74,30 @@ export default function CreateRecipeSinglePage() {
       setIsSaving(false);
     }
   };
+
   
-  // Handle category selection
-  const handleCategorySelect = (category: string) => {
-    // Add the category as a tag if it's not already in the tags list
-    if (!recipe.tags.includes(category) && category !== "all") {
-      addTag(category);
+  
+  const handleCategorySelect = (categoryName: string) => {
+    // ตรวจสอบว่าหมวดหมู่ที่เลือกมีอยู่แล้วหรือไม่
+    const categoryExists = recipe.categories.some(cat => cat.name === categoryName);
+  
+    if (!categoryExists && categoryName !== "all") {
+      addTag({ id: 0, name: categoryName, image_url: "" }); // ✅ ส่ง Category object แทน string
     }
   };
   
-  // Handle tag input keydown
+  
   const handleTagKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addTag(tagInput);
+      if (tagInput.trim()) {
+        const newCategory: Category = { id: 0, name: tagInput.trim(), image_url: "" }; // ✅ แปลงเป็น Category
+        addTag(newCategory); // ✅ ส่ง Category object แทน string
+        setTagInput(""); // ✅ เคลียร์ input หลังเพิ่ม
+      }
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">

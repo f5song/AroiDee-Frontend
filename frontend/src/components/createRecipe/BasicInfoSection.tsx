@@ -1,10 +1,12 @@
 import React from "react";
-import { ChefHat, Clock, Plus, X, Flame } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChefHat } from "lucide-react";
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
+import { Category } from "../../lib/recipes/types"; // ✅ เพิ่ม Category
+
+
 import {
   Select,
   SelectContent,
@@ -13,52 +15,38 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Slider } from "@/components/ui/slider";
+
 import { getCategoryOptions } from "@/lib/recipes/utils";
 import { formatErrorMessage } from "@/lib/recipes/form/validation";
 import { RecipeImageUploader } from "./RecipeImageUploader";
 
-// Define RecipeInput type to match your form data structure
-interface RecipeInput {
-  title: string;
-  description: string;
-  time: number;
-  calories: number;
-  difficulty: string;
-  servings: number;
-  tags: string[];
-  ingredients: any[];
-  instructions: any[];
-  image_url: string | null;
-  // Include any other fields you have in your recipe form
-}
+
+import { RecipeInput } from "@/lib/recipes/types"; // ✅ Import RecipeInput 
 
 interface BasicInfoSectionProps {
-  recipe: any;
-  errors: any;
+  recipe: RecipeInput;
+  errors: Record<string, string>;
   tagInput: string;
   setTagInput: (value: string) => void;
-  updateBasicInfo: (field: string, value: any) => void;
-  addTag: (tag: string) => void;
-  removeTag: (tag: string) => void;
+  addTag: (category: Category) => void; // ✅ เปลี่ยนจาก string → Category
+  removeTag: (categoryName: string) => void; // ✅ ใช้ category.name
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   removeImage: () => void;
   handleCategorySelect: (category: string) => void;
   handleTagKeyDown: (e: React.KeyboardEvent) => void;
+  updateBasicInfo: <K extends keyof RecipeInput>(field: K, value: RecipeInput[K]) => void;
 }
+
+
 
 export function BasicInfoSection({
   recipe,
   errors,
-  tagInput,
-  setTagInput,
   updateBasicInfo,
-  addTag,
-  removeTag,
   handleImageChange,
   removeImage,
   handleCategorySelect,
-  handleTagKeyDown,
+
 }: BasicInfoSectionProps) {
   const categoryOptions = getCategoryOptions();
 
@@ -138,29 +126,6 @@ export function BasicInfoSection({
               </div>
             </div>
             
-            {/* Tags Display */}
-            {recipe.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {recipe.tags.map((tag: string) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="flex items-center gap-1 px-2 py-1"
-                  >
-                    {tag}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeTag(tag)}
-                      className="h-4 w-4 p-0 ml-1"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-            )}
             
             {/* Image Uploader */}
             <div className="py-1">

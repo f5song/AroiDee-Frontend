@@ -3,6 +3,8 @@ import { useState } from "react";
 import { RecipeInput, IngredientInput, ValidationErrors } from "./types";
 import { DEFAULT_RECIPE_FORM } from "./constants";
 import { validateRecipe, findErrorTab } from "./validation";
+import { Category } from "../types"; 
+
 
 /**
  * Custom hook สำหรับจัดการสถานะและตรรกะของฟอร์มสูตรอาหาร
@@ -41,15 +43,20 @@ export const useRecipeForm = (initialData?: Partial<RecipeInput>) => {
   /**
    * จัดการแท็ก
    */
-  const addTag = (tag: string) => {
-    if (tag.trim() && !recipe.tags.includes(tag.trim().toLowerCase())) {
-      updateBasicInfo('tags', [...recipe.tags, tag.trim().toLowerCase()]);
-      setTagInput("");
-    }
+  const addTag = (category: Category) => {  // ✅ เปลี่ยน type เป็น Category
+    setRecipe((prev) => ({
+      ...prev,
+      categories: [...prev.categories, category]  // ✅ เพิ่ม Category object
+    }));
   };
   
-  const removeTag = (tagToRemove: string) => {
-    updateBasicInfo('tags', recipe.tags.filter(tag => tag !== tagToRemove));
+  
+  
+  const removeTag = (categoryToRemove: string) => {
+    updateBasicInfo(
+      'categories',
+      recipe.categories.filter(cat => cat.name !== categoryToRemove) // ✅ กรองตามชื่อ category
+    );
   };
   
   /**

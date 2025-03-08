@@ -31,7 +31,7 @@ export const DEFAULT_RECIPE: RecipeInput = {
   difficulty: "medium",
   servings: 4,
   image_url: null,
-  tags: [],
+  categories: [], // ✅ เปลี่ยนจาก tags เป็น categories
   ingredients: [DEFAULT_INGREDIENT],
   instructions: [DEFAULT_INSTRUCTION]
 };

@@ -1,5 +1,6 @@
 // lib/recipes/form/types.ts
-import { Recipe } from "../types";
+import { Recipe, Category } from "../types"; // ✅ เพิ่ม Category
+
 
 /**
  * Input types for ingredient form
@@ -30,10 +31,11 @@ export interface RecipeInput {
   difficulty: string;
   servings: number;
   image_url: string | null;
-  tags: string[];
+  categories: Category[];  // ✅ เปลี่ยนจาก tags: string[] เป็น categories: Category[]
   ingredients: IngredientInput[];
   instructions: InstructionInput[];
 }
+
 
 /**
  * Response type for recipe creation API
@@ -47,17 +49,7 @@ export interface CreateRecipeResponse {
 /**
  * Validation errors interface
  */
-export interface ValidationErrors {
-  title?: string;
-  description?: string;
-  cookingTime?: string;
-  calories?: string;
-  servings?: string;
-  ingredients?: string;
-  instructions?: string;
-  submit?: string;
-  [key: string]: string | undefined;
-}
+export type ValidationErrors = Record<string, string>; // ✅ แก้ไขให้เป็น Record<string, string>
 
 /**
  * Dropdown option interface
@@ -75,15 +67,16 @@ export const recipeInputToRecipe = (input: RecipeInput): Partial<Recipe> => {
   return {
     title: input.title,
     description: input.description,
-    cook_time: input.cook_time, // ✅ แก้จาก input.time เป็น input.cook_time
+    cook_time: input.cook_time,
     calories: input.calories,
     difficulty: input.difficulty,
     image_url: input.image_url || "/placeholder.svg",
-    categories: input.tags.map(tag => ({
-      id: 0, // ✅ ตั้งค่า default ID
-      name: tag, // ✅ ใช้ชื่อ category จาก tag
-      image_url: "" // ✅ กำหนดค่า default ให้ image_url
-    })), // ✅ แปลง string[] เป็น Category[]
+    categories: input.categories.map(category => ({ // ✅ ใช้ input.categories แทน tags
+      id: category.id, 
+      name: category.name, 
+      image_url: category.image_url
+    })),
     rating: 0 // New recipe starts with 0 rating
   };
 };
+

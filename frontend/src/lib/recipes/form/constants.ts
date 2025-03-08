@@ -31,10 +31,11 @@ export const DEFAULT_RECIPE_FORM: RecipeInput = {
   difficulty: DIFFICULTY_OPTIONS.MEDIUM,
   servings: 4,
   image_url: null,
-  tags: [],
+  categories: [], // ✅ เปลี่ยนจาก tags เป็น categories
   ingredients: [DEFAULT_INGREDIENT],
   instructions: [DEFAULT_INSTRUCTION]
 };
+
 
 /**
  * Options for ingredient units
