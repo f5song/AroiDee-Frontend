@@ -90,12 +90,12 @@ export default function MyRecipesPage() {
       <div className="max-w-7xl mx-auto">
         <PageHeader />
         <RecipeCollection
-          myRecipes={myRecipes}
+          myRecipes={Array.isArray(myRecipes) ? myRecipes : []} // ✅ ป้องกันค่าผิดพลาด
           favoriteRecipes={favoriteRecipes}
           loading={loading}
           favorites={favorites}
           onFavoriteToggle={handleFavoriteToggle}
-          isLoggedIn={!!user} // ส่งค่า isLoggedIn โดยตรวจสอบว่าผู้ใช้ล็อกอินหรือไม่
+          isLoggedIn={!!user}
         />
       </div>
     </div>

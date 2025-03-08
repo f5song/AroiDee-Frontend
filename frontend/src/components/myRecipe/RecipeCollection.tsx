@@ -30,7 +30,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   // ✅ ดึงข้อมูลผู้ใช้
   const { user } = useAuth();
 
-  // UI state
+  // ✅ UI state
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(TAB_VALUES.MY_RECIPES);
   const [sort, setSort] = useState(SORT_OPTIONS.LATEST);
@@ -39,8 +39,8 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   const [cookingTime] = useState<number | undefined>(undefined);
   const [difficulty] = useState<string | undefined>(undefined);
 
-  // ✅ ใช้ state สำหรับ myRecipes และอัปเดตจาก initialMyRecipes
-  const [myRecipes, setMyRecipes] = useState<Recipe[]>(initialMyRecipes);
+  // ✅ ใช้ state สำหรับ myRecipes และอัปเดตจาก API
+  const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(initialLoading);
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -48,7 +48,12 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
 
   // ✅ อัปเดต `myRecipes` เมื่อ API โหลดข้อมูลเสร็จ
   useEffect(() => {
-    setMyRecipes(initialMyRecipes);
+    if (Array.isArray(initialMyRecipes)) {
+      setMyRecipes(initialMyRecipes);
+    } else {
+      console.error("❌ initialMyRecipes is not an array:", initialMyRecipes);
+      setMyRecipes([]); // ป้องกัน error โดยตั้งค่าให้เป็น array ว่าง
+    }
   }, [initialMyRecipes]);
 
   // ✅ โหลดข้อมูลเมื่อผู้ใช้เปลี่ยนแท็บ / ค้นหา / เปลี่ยนตัวกรอง
@@ -74,9 +79,15 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
           filterOptions
         );
 
-        setFilteredRecipes(response.recipes);
-        setTotalItems(response.pagination.totalItems);
-        setTotalPages(response.pagination.totalPages);
+        if (Array.isArray(response.recipes)) {
+          setFilteredRecipes(response.recipes);
+        } else {
+          console.error("❌ response.recipes is not an array:", response.recipes);
+          setFilteredRecipes([]);
+        }
+
+        setTotalItems(response.pagination.totalItems || 0);
+        setTotalPages(response.pagination.totalPages || 1);
       } catch (error) {
         console.error("Error fetching filtered recipes:", error);
         setFilteredRecipes([]);
@@ -98,6 +109,9 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
     difficulty,
     selectedCategories,
   ]);
+
+  console.log("📢 Render myRecipes:", myRecipes);
+  console.log("📢 Render filteredRecipes:", filteredRecipes);
 
   return (
     <>
@@ -127,7 +141,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                     : "No recipes available"}
                 </div>
                 <RecipeGrid
-                  recipes={myRecipes}
+                  recipes={Array.isArray(myRecipes) ? myRecipes : []} // ✅ ป้องกันค่า undefined
                   loading={loading}
                   favorites={favorites}
                   onFavoriteToggle={onFavoriteToggle}
@@ -144,7 +158,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
               <NoResultsMessage onReset={() => setSearchQuery("")} />
             ) : (
               <RecipeGrid
-                recipes={filteredRecipes}
+                recipes={Array.isArray(filteredRecipes) ? filteredRecipes : []} // ✅ ป้องกัน error
                 loading={loading}
                 favorites={favorites}
                 onFavoriteToggle={onFavoriteToggle}
