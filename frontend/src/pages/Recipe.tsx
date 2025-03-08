@@ -17,6 +17,7 @@ import CookingModeView from "../components/recipe/CookingModeView";
 
 const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
+
   const {
     data: recipe,
     isLoading,
@@ -24,11 +25,22 @@ const RecipePage: React.FC = () => {
   } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
-    enabled: !!recipeId,
+    enabled: !!recipeId, // โหลดข้อมูลเฉพาะเมื่อ recipeId มีค่า
   });
+
+  // 🔍 Debug: ตรวจสอบ API Response
   useEffect(() => {
     console.log("Recipe Data:", recipe);
   }, [recipe]);
+
+  // ⏳ กำลังโหลดข้อมูล
+  if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
+
+  // ❌ เกิดข้อผิดพลาด
+  if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
+
+  // ❌ ถ้า `recipe` ไม่มีข้อมูล
+  if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
 
   // กำหนดค่า State
   const [liked, setLiked] = useState<boolean>(false);
