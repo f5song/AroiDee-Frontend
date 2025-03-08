@@ -99,7 +99,7 @@ export function RecipeCard({
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span>{calories} cal</span>
+                <span>{calories} calll</span>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Calories per serving</p>
