@@ -20,8 +20,13 @@ export default function MyRecipesPage() {
     if (!user) return; // ✅ ป้องกัน error ถ้า user ยังไม่ได้ล็อกอิน
 
     const fetchUserRecipes = async () => {
-      if (!user) return; // ✅ ป้องกัน error ถ้า user ยังไม่ได้ล็อกอิน
-      const token = localStorage.getItem("token"); // ✅ ดึง Token จาก LocalStorage
+      if (!user) return;
+
+      const token = localStorage.getItem("authToken"); // ✅ ใช้ "authToken" แทน "token"
+      if (!token || token === "null") {
+        console.error("❌ No valid token found. Please log in again.");
+        return;
+      }
 
       setLoading(true);
       try {
@@ -29,15 +34,16 @@ export default function MyRecipesPage() {
           `https://aroi-dee-backend.vercel.app/api/recipes/user/${user.id}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // ✅ ส่ง Token ไปกับ API
+              Authorization: `Bearer ${token}`, // ✅ ใช้ Token ที่ถูกต้อง
             },
           }
         );
 
+        console.log("📢 API Response:", response.data);
         if (!response.data.success) throw new Error(response.data.message);
         setMyRecipes(response.data.data);
       } catch (error) {
-        console.error("Error fetching user recipes:", error);
+        console.error("❌ Error fetching user recipes:", error);
       } finally {
         setLoading(false);
       }
@@ -76,8 +82,6 @@ export default function MyRecipesPage() {
       console.error("Error toggling favorite:", error);
     }
   };
-
-  
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
