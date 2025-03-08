@@ -51,4 +51,5 @@ export const recipe: RecipeData = {
       date: "Feb 6, 2025",
     },
   ],
+  id: undefined
 };
