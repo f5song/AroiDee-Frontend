@@ -15,7 +15,6 @@ import InstructionsTab from "../components/recipe/InstructionsTab";
 import CommentsTab from "../components/recipe/CommentsTab";
 import TabContainer from "../components/ui/TabContainer";
 import NutritionFacts from "../components/recipe/NutritionFacts";
-import CookingTools from "../components/recipe/CookingTools";
 import RelatedRecipes from "../components/recipe/RelatedRecipes";
 import CookingModeView from "../components/recipe/CookingModeView";
 
@@ -237,9 +236,6 @@ const RecipePage: React.FC = () => {
                     showNutritionDetails={showNutritionDetails}
                     setShowNutritionDetails={setShowNutritionDetails}
                   />
-
-                  {/* Cooking Tools */}
-                  <CookingTools />
 
                   {/* Related Recipes */}
                   <RelatedRecipes recipes={recipe.freshRecipes} />

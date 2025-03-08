@@ -1,5 +1,5 @@
 import React from "react";
-import { Bell, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { IngredientsTabProps } from "../../types/recipe";
 
 const IngredientsTab: React.FC<IngredientsTabProps> = ({ 
@@ -11,10 +11,6 @@ const IngredientsTab: React.FC<IngredientsTabProps> = ({
   <div>
     <div className="flex justify-between items-center mb-5">
       <h2 className="text-2xl font-bold text-gray-800">ส่วนผสม</h2>
-      <button className="text-sm text-orange-500 hover:text-orange-600 flex items-center bg-orange-50 hover:bg-orange-100 px-3 py-2 rounded-lg transition-colors">
-        <Bell size={16} className="mr-2" />
-        แจ้งเตือนส่วนผสมขาด
-      </button>
     </div>
     <ul className="space-y-3 mb-6">
       {ingredients.map((item, index) => (

@@ -52,19 +52,9 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
         {/* Recipe Meta Info */}
         <div className="grid grid-cols-3 gap-4 max-w-xl">
           <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 flex flex-col items-center text-white">
-            <Clock className="mb-1" size={20} />
-            <span className="text-xs opacity-80">เวลาเตรียม</span>
-            <span className="font-medium">{date.includes("prep") ? date : "30 minutes"}</span>
-          </div>
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 flex flex-col items-center text-white">
             <ChefHat className="mb-1" size={20} />
-            <span className="text-xs opacity-80">เวลาทำ</span>
-            <span className="font-medium">{date.includes("cook") ? date : "6 hours"}</span>
-          </div>
-          <div className="bg-white/10 backdrop-blur-md rounded-lg p-3 flex flex-col items-center text-white">
-            <Star className="mb-1" size={20} />
-            <span className="text-xs opacity-80">ความยาก</span>
-            <span className="font-medium">Medium</span>
+            <span className="text-xs opacity-80">Cooking Time</span>
+            <span className="font-medium">{date.includes("cook") ? date : "6 Mins"}</span>
           </div>
         </div>
       </div>
