@@ -39,7 +39,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   // ✅ โหลดรายการ Favorites ทันทีเมื่อผู้ใช้เข้าสู่ระบบ หรือ Favorites มีการเปลี่ยนแปลง
   useEffect(() => {
     fetchFavorites();
-  }, [user]); // 🔄 โหลดใหม่ทุกครั้งที่ `user` เปลี่ยน
+  }, [user]);
 
   const toggleFavorite = async (recipeId: number) => {
     if (!user) return;
@@ -56,18 +56,24 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ? `${API_URL}/saved-recipes/unsave-recipe`
         : `${API_URL}/saved-recipes/save-recipe`;
 
+      // ✅ อัปเดต UI ทันทีที่กดปุ่ม ก่อนส่ง API
+      setFavorites((prev) =>
+        isFavorite ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
+      );
+
       const response = await axios.post(
         url,
         { user_id: user.id, recipe_id: recipeId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.data.success) {
-        // ✅ โหลด Favorites ใหม่จาก API หลังจากกด Save หรือ Unsave
-        fetchFavorites();
+      if (!response.data.success) {
+        console.error("❌ API error:", response.data.message);
+        fetchFavorites(); // ✅ รีโหลด Favorites ถ้า API error
       }
     } catch (error) {
       console.error("❌ Error toggling favorite:", error);
+      fetchFavorites(); // ✅ รีโหลด Favorites ถ้ามีข้อผิดพลาด
     } finally {
       setTimeout(() => {
         setIsProcessing((prev) => {
