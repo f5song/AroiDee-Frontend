@@ -63,7 +63,7 @@ export default function MyRecipesPage() {
         const token = localStorage.getItem("authToken");
         if (!token) return;
 
-        const response = await axios.get(`${API_URL}/saved-recipes/user/${user.id}`, {
+        const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
