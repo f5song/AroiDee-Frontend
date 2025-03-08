@@ -1,6 +1,6 @@
 import React from "react";
 import { Recipe } from "@/lib/recipes/types";
-import RecipeCard from "@/components/explore/RecipeCard";
+import RecipeCard from "@/components/common/RecipeCard";
 
 interface RecipeGridProps {
   recipes: Recipe[];

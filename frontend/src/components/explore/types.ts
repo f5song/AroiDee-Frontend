@@ -43,3 +43,10 @@ export interface Recipe {
     value: string;
     label: string;
   }
+
+  export interface RecipeFilters {
+    search?: string;
+    categories?: string[];
+    sort?: string;
+    page?: number;
+  }
