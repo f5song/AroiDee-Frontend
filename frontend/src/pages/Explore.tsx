@@ -4,21 +4,15 @@ import PageHeader from "@/components/explore/PageHeader";
 import RecipeGrid from "@/components/common/RecipeGrid";
 import { NoResultsMessage } from "@/components/explore/FeedbackComponents";
 import PaginationControls from "@/components/explore/PaginationControls";
-import {
-  FilterOptions,
-  Recipe,
-  fetchRecipes,
-  saveRecipe,
-  unsaveRecipe,
-} from "@/lib/recipes/api";
+import { FilterOptions, Recipe, fetchRecipes } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext";
+import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ Context
 
 export default function ExplorePage() {
   const { user } = useAuth();
+  const { favorites, isProcessing, toggleFavorite } = useFavorites(); // ✅ ใช้ฟังก์ชันจาก Context
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [favorites, setFavorites] = useState<number[]>([]);
-  const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
 
   const [filterOptions, setFilterOptions] = useState<FilterOptions>({
     search: "",
@@ -32,36 +26,18 @@ export default function ExplorePage() {
     totalItems: 0,
   });
 
-  const isLoggedIn = !!user;
-
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("authToken");
-        if (!token) return;
-
-        console.log("🔄 Fetching recipes & favorites...");
-        
-        const [recipesData, favoritesData] = await Promise.all([
-          fetchRecipes(filterOptions),
-          fetch(`https://aroi-dee-backend.vercel.app/api/saved-recipes/${user.id}/saved-recipes`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }).then(res => res.json()),
-        ]);
-
-        console.log("✅ API Response:", recipesData, favoritesData);
-
+        console.log("🔄 Fetching recipes...");
+        const recipesData = await fetchRecipes(filterOptions);
         setRecipes(recipesData.recipes);
         setPagination(recipesData.pagination);
-
-        if (favoritesData.success) {
-          setFavorites(favoritesData.savedRecipeIds || []);
-        }
       } catch (error) {
-        console.error("❌ Error fetching data:", error);
+        console.error("❌ Error fetching recipes:", error);
       } finally {
         setLoading(false);
       }
@@ -69,33 +45,6 @@ export default function ExplorePage() {
 
     fetchData();
   }, [user, filterOptions]);
-
-  const handleFavorite = async (recipeId: number) => {
-    if (!user) return;
-    if (isProcessing[recipeId]) return;
-
-    setIsProcessing((prev) => ({ ...prev, [recipeId]: true }));
-
-    try {
-      if (favorites.includes(recipeId)) {
-        await unsaveRecipe(user.id, recipeId);
-        setFavorites((prev) => prev.filter((id) => id !== recipeId));
-      } else {
-        await saveRecipe(user.id, recipeId);
-        setFavorites((prev) => [...prev, recipeId]);
-      }
-    } catch (error) {
-      console.error("Error toggling favorite:", error);
-    } finally {
-      setTimeout(() => {
-        setIsProcessing((prev) => {
-          const newProcessing = { ...prev };
-          delete newProcessing[recipeId];
-          return newProcessing;
-        });
-      }, 500);
-    }
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -114,18 +63,18 @@ export default function ExplorePage() {
             <PageHeader
               totalItems={pagination.totalItems}
               sort={filterOptions.sort || "rating"}
-              onSortChange={(sort) => {
-                setFilterOptions((prev) => ({ ...prev, sort, page: 1 }));
-              }}
+              onSortChange={(sort) =>
+                setFilterOptions((prev) => ({ ...prev, sort, page: 1 }))
+              }
             />
 
             <RecipeGrid
               recipes={recipes}
               loading={loading}
               favorites={favorites}
-              onFavoriteToggle={handleFavorite}
+              onFavoriteToggle={toggleFavorite} // ✅ ใช้ฟังก์ชันจาก Context
               isProcessing={isProcessing}
-              isLoggedIn={isLoggedIn}
+              isLoggedIn={!!user}
             />
 
             {recipes.length === 0 && !loading && (
