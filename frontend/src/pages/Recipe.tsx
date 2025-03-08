@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getRecipeById } from "../lib/api/recipeApi";
 
@@ -17,24 +17,37 @@ import CookingModeView from "../components/recipe/CookingModeView";
 
 const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
-  const {
-    data: recipe,
-    isLoading,
-    error,
-  } = useQuery({
+  const queryClient = useQueryClient(); // ✅ ใช้ Query Client
+
+  const { data: recipe, isLoading, error } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
     enabled: !!recipeId, // โหลดข้อมูลเมื่อ recipeId มีค่า
   });
 
-  // 🔍 Debug: ตรวจสอบค่าที่ API ส่งมา
+  // 🔄 บังคับโหลดข้อมูลใหม่เมื่อเปลี่ยน recipeId
   useEffect(() => {
-    console.log("Recipe Data:", recipe);
+    if (recipeId) {
+      queryClient.invalidateQueries({ queryKey: ["recipe", recipeId] }); // ✅ แก้ไข Syntax ให้ถูกต้อง
+    }
+  }, [recipeId, queryClient]);
+
+  // 🔍 Debug: ตรวจสอบค่าที่ได้จาก useQuery
+  useEffect(() => {
+    console.log("Recipe Data (หลังจากดึงจาก API):", recipe);
   }, [recipe]);
+
+  // 🔍 Debug: ตรวจสอบ Cache ของ React Query
+  useEffect(() => {
+    console.log(
+      "React Query Cache:",
+      queryClient.getQueryData(["recipe", recipeId])
+    );
+  }, [recipeId, queryClient]);
 
   if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
   if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
-  if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
+  if (!recipe) return <p>ไม่พบสูตรอาหาร</p>; // ✅ เพิ่มป้องกัน `undefined`
 
   // กำหนดค่า State
 
