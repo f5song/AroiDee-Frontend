@@ -35,12 +35,12 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           return;
         }
 
-        const response = await axios.get(`${API_URL}/user/${user.id}`, {
+        const response = await axios.get(`${API_URL}/${user.id}/saved-recipes`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.data.success) {
-          setFavoriteRecipeIds(response.data.savedRecipeIds);
+          setFavoriteRecipeIds(response.data.savedRecipes.map((r: any) => r.recipe_id));
         } else {
           console.error("❌ Failed to fetch saved recipes:", response.data.message);
         }
