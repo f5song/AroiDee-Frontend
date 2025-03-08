@@ -1,49 +1,35 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import axios from "axios";
-import { useAuth } from "./AuthContext";
+import { createContext, useContext, useState, useEffect } from "react";
+import { saveRecipe, unsaveRecipe } from "@/lib/recipes/api";
+import { useAuth } from "@/components/auth/AuthContext";
 
-const API_URL = "https://aroi-dee-backend.vercel.app/api";
+const FavoritesContext = createContext<any>(null);
 
-interface FavoritesContextProps {
-  favorites: number[];
-  isLoadingFavorites: boolean;
-  isProcessing: Record<number, boolean>;
-  toggleFavorite: (recipeId: number) => Promise<void>;
-}
-
-const FavoritesContext = createContext<FavoritesContextProps | undefined>(undefined);
-
-export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function FavoritesProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
-  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
 
-  // ✅ ฟังก์ชันโหลดรายการ Favorites จาก API (ตรวจสอบจาก database)
-  const fetchFavorites = async () => {
-    if (!user) return;
-    setIsLoadingFavorites(true); // ✅ ตั้งค่าเป็นกำลังโหลด
-
-    try {
-      const token = localStorage.getItem("authToken");
-      if (!token) return;
-
-      const response = await axios.get(`${API_URL}/saved-recipes/${user.id}/saved-recipes`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (response.data.success) {
-        setFavorites(response.data.savedRecipeIds || []); // ✅ อัปเดต Favorites ตาม database
-      }
-    } catch (error) {
-      console.error("❌ Error fetching saved recipes:", error);
-    } finally {
-      setIsLoadingFavorites(false); // ✅ โหลดเสร็จแล้ว
-    }
-  };
-
-  // ✅ โหลด Favorites เมื่อผู้ใช้ล็อกอิน
   useEffect(() => {
+    if (!user) return;
+    const fetchFavorites = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+
+        const response = await fetch(
+          `https://aroi-dee-backend.vercel.app/api/saved-recipes/${user.id}/saved-recipes`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const data = await response.json();
+        if (data.success) {
+          setFavorites(data.savedRecipeIds || []);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching saved recipes:", error);
+      }
+    };
     fetchFavorites();
   }, [user]);
 
@@ -54,30 +40,15 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsProcessing((prev) => ({ ...prev, [recipeId]: true }));
 
     try {
-      const token = localStorage.getItem("authToken");
-      if (!token) return;
-
-      const isFavorite = favorites.includes(recipeId);
-      const url = isFavorite
-        ? `${API_URL}/saved-recipes/unsave-recipe`
-        : `${API_URL}/saved-recipes/save-recipe`;
-
-      const response = await axios.post(
-        url,
-        { user_id: user.id, recipe_id: recipeId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.data.success) {
-        // ✅ อัปเดต UI ทันที และโหลดข้อมูลใหม่จาก API
-        fetchFavorites();
+      if (favorites.includes(recipeId)) {
+        await unsaveRecipe(user.id, recipeId);
+        setFavorites((prev) => prev.filter((id) => id !== recipeId));
       } else {
-        console.error("❌ API error:", response.data.message);
-        fetchFavorites(); // ✅ โหลดใหม่ถ้า API error
+        await saveRecipe(user.id, recipeId);
+        setFavorites((prev) => [...prev, recipeId]);
       }
     } catch (error) {
-      console.error("❌ Error toggling favorite:", error);
-      fetchFavorites(); // ✅ โหลดใหม่ถ้าพบข้อผิดพลาด
+      console.error("Error toggling favorite:", error);
     } finally {
       setTimeout(() => {
         setIsProcessing((prev) => {
@@ -90,16 +61,12 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, isLoadingFavorites, isProcessing, toggleFavorite }}>
+    <FavoritesContext.Provider value={{ favorites, isProcessing, toggleFavorite }}>
       {children}
     </FavoritesContext.Provider>
   );
-};
+}
 
-export const useFavorites = () => {
-  const context = useContext(FavoritesContext);
-  if (!context) {
-    throw new Error("useFavorites must be used within a FavoritesProvider");
-  }
-  return context;
-};
+export function useFavorites() {
+  return useContext(FavoritesContext);
+}
