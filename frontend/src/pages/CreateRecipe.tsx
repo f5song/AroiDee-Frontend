@@ -68,7 +68,7 @@ export default function CreateRecipeSinglePage() {
         updateBasicInfo('submit' as any, result.error || "Failed to save recipe");
       }
     } catch (error) {
-      console.error("Error saving recipe:", error);
+      console.error("Error saving recipe create recipe:", error);
       updateBasicInfo('submit' as any, "An unexpected error occurred. Please try again.");
     } finally {
       setIsSaving(false);

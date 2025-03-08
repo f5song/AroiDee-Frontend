@@ -69,7 +69,7 @@ export const saveRecipe = async (userId: number, recipeId: number): Promise<{ su
     await axios.post(`${API_URL}/saved-recipes/save-recipe`, { user_id: userId, recipe_id: recipeId });
     return { success: true };
   } catch (error) {
-    console.error("❌ Error saving recipe:", error);
+    console.error("❌ Error saving recipe api.ts:", error);
     return { success: false };
   }
 };
