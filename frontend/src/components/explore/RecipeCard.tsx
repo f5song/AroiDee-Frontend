@@ -51,6 +51,9 @@ export function RecipeCard({
     }
   };
 
+  console.log("📢 Recipe in RecipeCard:", recipe);
+
+
   return (
     <TooltipProvider>
       <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
