@@ -17,7 +17,6 @@ interface RecipeCollectionProps {
   favorites: number[];
   onFavoriteToggle: (id: number) => void;
   isLoggedIn: boolean;
-  
 }
 
 const RecipeCollection: React.FC<RecipeCollectionProps> = ({
@@ -26,7 +25,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   loading: initialLoading,
   favorites,
   onFavoriteToggle,
-  isLoggedIn
+  isLoggedIn,
 }) => {
   // ✅ ดึงข้อมูลผู้ใช้
   const { user } = useAuth(); // ⬅️ เพิ่มตรงนี้
@@ -39,6 +38,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   const [selectedCategories] = useState<string[]>([]);
   const [cookingTime] = useState<number | undefined>(undefined);
   const [difficulty] = useState<string | undefined>(undefined);
+  const [myRecipes] = useState<Recipe[]>(initialMyRecipes); // ✅ เพิ่ม state
 
   // Data state
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
@@ -76,8 +76,8 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
         );
 
         setFilteredRecipes(response.recipes);
-        setTotalItems(response.pagination.totalItems); 
-        <p>Total Recipes Found: {totalItems}</p>
+        setTotalItems(response.pagination.totalItems);
+        <p>Total Recipes Found: {totalItems}</p>;
         setTotalPages(response.pagination.totalPages);
       } catch (error) {
         console.error("Error fetching filtered recipes:", error);
@@ -99,7 +99,6 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
     currentPage,
     cookingTime,
     difficulty,
-    
   ]);
 
   // ✅ ตรวจสอบให้แน่ใจว่ามีการส่ง `onSearch`
@@ -121,13 +120,11 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
           />
 
           <TabsContent value={TAB_VALUES.MY_RECIPES} className="mt-4">
-            {!loading && initialMyRecipes.length === 0 ? (
+            {!loading && myRecipes.length === 0 ? (
               <EmptyState type="my-recipes" />
-            ) : filteredRecipes.length === 0 ? (
-              <NoResultsMessage onReset={() => setSearchQuery("")} />
             ) : (
               <RecipeGrid
-                recipes={filteredRecipes}
+                recipes={myRecipes} // ✅ ใช้ myRecipes
                 loading={loading}
                 favorites={favorites}
                 onFavoriteToggle={onFavoriteToggle}

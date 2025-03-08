@@ -22,9 +22,9 @@ export default function MyRecipesPage() {
     const fetchUserRecipes = async () => {
       if (!user) return;
 
-      const token = localStorage.getItem("authToken"); // ✅ ใช้ "authToken" แทน "token"
+      const token = localStorage.getItem("authToken");
       if (!token || token === "null") {
-        console.error("❌ No valid token found. Please log in again.");
+        console.error("❌ No valid token found.");
         return;
       }
 
@@ -34,14 +34,16 @@ export default function MyRecipesPage() {
           `https://aroi-dee-backend.vercel.app/api/recipes/user/${user.id}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // ✅ ใช้ Token ที่ถูกต้อง
+              Authorization: `Bearer ${token}`,
             },
           }
         );
 
-        console.log("📢 API Response:", response.data);
+        console.log("📢 API Response:", response.data); // ✅ Debug
         if (!response.data.success) throw new Error(response.data.message);
+
         setMyRecipes(response.data.data);
+        console.log("✅ Updated myRecipes:", response.data.data); // ✅ Debug ค่า myRecipes
       } catch (error) {
         console.error("❌ Error fetching user recipes:", error);
       } finally {
