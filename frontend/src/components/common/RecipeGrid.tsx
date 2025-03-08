@@ -10,7 +10,7 @@ interface RecipeGridProps {
   recipes: Recipe[];
   loading: boolean;
   favorites: number[];
-  onFavoriteToggle: (id: number) => void;
+  onFavoriteToggle: (id: number, newState: boolean) => void;
   isLoggedIn: boolean;
 }
 
@@ -22,57 +22,69 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   isLoggedIn,
 }) => {
   const { user } = useAuth();
-  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
+  const [favoriteRecipeIds, setFavoriteRecipeIds] =
+    useState<number[]>(favorites);
+  const [isProcessing, setIsProcessing] = useState<number | null>(null); // ป้องกันกดซ้ำระหว่างรอ API
 
-  // ✅ โหลดค่า favorite จาก backend (ป้องกัน API call ซ้ำ)
   useEffect(() => {
-    if (!user?.id) return;
+    setFavoriteRecipeIds(favorites);
+  }, [favorites]);
 
-    const fetchFavoriteRecipes = async () => {
+  const handleFavoriteToggle = useCallback(
+    async (recipeId: number) => {
+      if (isProcessing !== null) return; // ป้องกันการกดซ้ำ
+      setIsProcessing(recipeId);
+
+      const isCurrentlyFavorite = favoriteRecipeIds.includes(recipeId);
+      const newState = !isCurrentlyFavorite;
+      setFavoriteRecipeIds((prev) =>
+        newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
+      );
+
       try {
         const token = localStorage.getItem("authToken");
-        if (!token) {
-          console.error("❌ No authentication token found.");
-          return;
-        }
+        if (!token) throw new Error("No authentication token found.");
 
-        const response = await axios.get(
-          `${API_URL}/${user.id}/saved-recipes`,
+        const url = newState
+          ? `${API_URL}/save-recipe`
+          : `${API_URL}/unsave-recipe`;
+
+        console.log("📌 Sending request to:", url);
+        console.log("📌 Payload:", { user_id: user?.id, recipe_id: recipeId });
+
+        const response = await axios.post(
+          url,
+          { user_id: user?.id, recipe_id: recipeId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         if (response.data.success) {
-          setFavoriteRecipeIds(response.data.savedRecipes.map((r: any) => r.recipe_id));
+          onFavoriteToggle(recipeId, newState);
         } else {
-          console.error("❌ Failed to fetch saved recipes:", response.data.message);
+          console.error("❌ API Error:", response.data.message);
+          setFavoriteRecipeIds((prev) =>
+            isCurrentlyFavorite
+              ? [...prev, recipeId]
+              : prev.filter((id) => id !== recipeId)
+          );
         }
       } catch (error) {
-        console.error("❌ Error fetching saved recipes:", error);
+        console.error("❌ Error toggling favorite:", error);
+        setFavoriteRecipeIds((prev) =>
+          isCurrentlyFavorite
+            ? [...prev, recipeId]
+            : prev.filter((id) => id !== recipeId)
+        );
+      } finally {
+        setIsProcessing(null);
       }
-    };
-
-    fetchFavoriteRecipes();
-  }, [user]); // ✅ ไม่ให้ `useEffect()` ทำงานซ้ำบ่อยเกินไป
-
-  // ✅ ใช้ `useCallback` เพื่ออัปเดต favorites อย่างถูกต้อง
-  const handleFavoriteToggle = useCallback(
-    (recipeId: number) => {
-      setFavoriteRecipeIds((prev) =>
-        prev.includes(recipeId)
-          ? prev.filter((id) => id !== recipeId)
-          : [...prev, recipeId]
-      );
-      onFavoriteToggle(recipeId); // ✅ อัปเดตไปยัง component หลัก
     },
-    [onFavoriteToggle]
+    [favoriteRecipeIds, onFavoriteToggle, isProcessing]
   );
 
-  if (loading) {
-    return null;
-  }
-  if (!loading && recipes.length === 0) {
+  if (loading) return null;
+  if (!loading && recipes.length === 0)
     return <p className="text-center text-gray-500">🔍 No recipes found!</p>;
-  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -83,6 +95,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
             ...recipe,
             description: recipe.description ?? "", // ✅ ป้องกัน undefined
             cook_time: recipe.cook_time ?? 0, // ✅ ป้องกัน undefined
+            image_url: recipe.image_url ?? "/placeholder.svg", // ✅ ป้องกันภาพหาย
             categories: Array.isArray(recipe.categories)
               ? recipe.categories.map((cat) =>
                   typeof cat === "string"
@@ -92,7 +105,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
               : [],
           }}
           isFavorite={favoriteRecipeIds.includes(recipe.id)}
-          onFavoriteToggle={() => handleFavoriteToggle(recipe.id)} // ✅ ใช้ฟังก์ชันที่ถูกต้อง
+          onFavoriteToggle={() => handleFavoriteToggle(recipe.id)}
           isLoggedIn={isLoggedIn}
         />
       ))}
