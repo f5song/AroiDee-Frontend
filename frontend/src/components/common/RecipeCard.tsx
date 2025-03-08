@@ -66,7 +66,9 @@ export function RecipeCard({
         return;
       }
 
-      const url = isFavorite ? `${API_URL}/unsave-recipe` : `${API_URL}/save-recipe`;
+      const url = isFavorite
+        ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe"
+        : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
 
       const response = await axios.post(
         url,
@@ -89,17 +91,27 @@ export function RecipeCard({
     <TooltipProvider>
       <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         <CardHeader className="p-0 relative">
-          <img src={recipe.image_url || "/placeholder.svg"} alt={recipe.title} className="w-full h-48 object-cover" />
+          <img
+            src={recipe.image_url || "/placeholder.svg"}
+            alt={recipe.title}
+            className="w-full h-48 object-cover"
+          />
           <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center">
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 mr-1" />
             <span className="text-sm font-medium">{recipe.rating}</span>
           </div>
         </CardHeader>
         <CardContent className="p-4 flex-grow">
-          <CardTitle className="text-lg font-semibold mb-2">{recipe.title}</CardTitle>
+          <CardTitle className="text-lg font-semibold mb-2">
+            {recipe.title}
+          </CardTitle>
           <div className="flex flex-wrap gap-1 mb-2">
             {recipe.categories.map((category) => (
-              <Badge key={category.id} variant="secondary" className="text-xs bg-green-50">
+              <Badge
+                key={category.id}
+                variant="secondary"
+                className="text-xs bg-green-50"
+              >
                 {category.name}
               </Badge>
             ))}
@@ -111,13 +123,17 @@ export function RecipeCard({
                   <Clock className="w-4 h-4 mr-1" /> {recipe.cook_time} min
                 </span>
               </TooltipTrigger>
-              <TooltipContent><p>Cooking time</p></TooltipContent>
+              <TooltipContent>
+                <p>Cooking time</p>
+              </TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>{recipe.calories} cal</span>
               </TooltipTrigger>
-              <TooltipContent><p>Calories per serving</p></TooltipContent>
+              <TooltipContent>
+                <p>Calories per serving</p>
+              </TooltipContent>
             </Tooltip>
           </div>
         </CardContent>
@@ -144,7 +160,11 @@ export function RecipeCard({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button asChild size="sm" className="text-white bg-orange-500 hover:bg-orange-600">
+              <Button
+                asChild
+                size="sm"
+                className="text-white bg-orange-500 hover:bg-orange-600"
+              >
                 <Link to={`/recipe/${recipe.id}`}>View Recipe</Link>
               </Button>
             </TooltipTrigger>
