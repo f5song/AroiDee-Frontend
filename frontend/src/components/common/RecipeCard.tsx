@@ -78,6 +78,7 @@ export function RecipeCard({
       );
 
       console.log("✅ API Response:", response.data);
+
       if (response.data.success) {
         onFavoriteToggle();
       } else {
