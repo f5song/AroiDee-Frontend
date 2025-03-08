@@ -145,6 +145,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
                   favorites={favoriteRecipeIds}
                   onFavoriteToggle={handleFavoriteToggle}
                   isLoggedIn={isLoggedIn}
+
                 />
               </>
             )}

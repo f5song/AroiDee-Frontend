@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Recipe, Category } from "@/components/common/types";
 import RecipeCard from "@/components/common/RecipeCard";
 import axios from "axios";
@@ -19,71 +19,58 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   loading,
   favorites,
   onFavoriteToggle,
-  isLoggedIn,
 }) => {
   const { user } = useAuth();
-  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
-  const [isProcessing, setIsProcessing] = useState<Set<number>>(new Set()); // ✅ ป้องกันกดซ้ำระหว่างรอ API
+  const [favoriteRecipeIds, setFavoriteRecipeIds] =
+    useState<number[]>(favorites);
+  const [isProcessing, setIsProcessing] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     setFavoriteRecipeIds(favorites);
   }, [favorites]);
 
-  const handleFavoriteToggle = useCallback(
-    async (recipeId: number) => {
-      if (isProcessing.has(recipeId)) return; // ✅ ป้องกันกดซ้ำ
-      setIsProcessing((prev) => new Set(prev).add(recipeId)); // ✅ เพิ่ม recipeId เข้าไปใน Set
+  const handleFavoriteToggle = async (recipeId: number) => {
+    if (isProcessing.has(recipeId)) return; // ✅ ป้องกันกดซ้ำ
+    setIsProcessing((prev) => new Set(prev).add(recipeId));
 
-      const isCurrentlyFavorite = favoriteRecipeIds.includes(recipeId);
-      const newState = !isCurrentlyFavorite;
-      setFavoriteRecipeIds((prev) =>
-        newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
+    const isCurrentlyFavorite = favoriteRecipeIds.includes(recipeId);
+    const newState = !isCurrentlyFavorite;
+    setFavoriteRecipeIds((prev) =>
+      newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
+    );
+
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No authentication token found.");
+
+      const url = newState
+        ? `${API_URL}/save-recipe`
+        : `${API_URL}/unsave-recipe`;
+
+      console.log("📌 Sending request to grid:", url);
+      console.log("📌 Payload grid:", { user_id: user?.id, recipe_id: recipeId });
+
+      const response = await axios.post(
+        url,
+        { user_id: user?.id, recipe_id: recipeId },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("No authentication token found.");
-
-        const url = newState
-          ? `${API_URL}/save-recipe`
-          : `${API_URL}/unsave-recipe`;
-
-        console.log("📌 Sending request to grid:", url);
-        console.log("📌 Payload grid:", { user_id: user?.id, recipe_id: recipeId });
-
-        const response = await axios.post(
-          url,
-          { user_id: user?.id, recipe_id: recipeId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        if (response.data.success) {
-          onFavoriteToggle(recipeId, newState); // ✅ ส่งค่าใหม่ไปยัง MyRecipesPage.tsx
-        } else {
-          console.error("❌ API Error:", response.data.message);
-          setFavoriteRecipeIds((prev) =>
-            isCurrentlyFavorite
-              ? [...prev, recipeId]
-              : prev.filter((id) => id !== recipeId)
-          );
-        }
-      } catch (error) {
-        console.error("❌ Error toggling favorite grid:", error);
-        setFavoriteRecipeIds((prev) =>
-          isCurrentlyFavorite
-            ? [...prev, recipeId]
-            : prev.filter((id) => id !== recipeId)
-        );
-      } finally {
-        setIsProcessing((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(recipeId); // ✅ เอา recipeId ออกจาก Set หลัง API เสร็จ
-          return newSet;
-        });
+      if (response.data.success) {
+        onFavoriteToggle(recipeId, newState);
+      } else {
+        console.error("❌ API Error grid:", response.data.message);
       }
-    },
-    [favoriteRecipeIds, onFavoriteToggle, isProcessing]
-  );
+    } catch (error) {
+      console.error("❌ Error toggling favorite grid:", error);
+    } finally {
+      setIsProcessing((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(recipeId);
+        return newSet;
+      });
+    }
+  };
 
   if (loading) return null;
   if (!loading && recipes.length === 0)
@@ -96,7 +83,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           key={recipe.id}
           recipe={{
             ...recipe,
-            description: recipe.description ?? "", // ✅ ป้องกัน undefined
+            description: recipe.description ?? "", // ✅ แก้ปัญหา Type 'string | undefined'
             cook_time: recipe.cook_time ?? 0, // ✅ ป้องกัน undefined
             image_url: recipe.image_url ?? "/placeholder.svg", // ✅ ป้องกันภาพหาย
             categories: Array.isArray(recipe.categories)
@@ -109,7 +96,6 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           }}
           isFavorite={favoriteRecipeIds.includes(recipe.id)}
           onFavoriteToggle={() => handleFavoriteToggle(recipe.id)}
-          isLoggedIn={isLoggedIn}
         />
       ))}
     </div>

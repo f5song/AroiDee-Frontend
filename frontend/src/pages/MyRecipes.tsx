@@ -16,10 +16,11 @@ export default function MyRecipesPage() {
   const [favoriteRecipes, setFavoriteRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<number[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false); // ✅ ป้องกันการกดซ้ำ
 
   // ✅ โหลดสูตรอาหารของผู้ใช้และ Favorites พร้อมกัน
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return; // ✅ ป้องกัน re-render ซ้ำ
 
     const fetchUserData = async () => {
       const token = localStorage.getItem("authToken");
@@ -43,14 +44,20 @@ export default function MyRecipesPage() {
         if (userRecipesRes.data.success) {
           setMyRecipes(userRecipesRes.data.data || []);
         } else {
-          console.error("❌ Error fetching user recipes:", userRecipesRes.data.message);
+          console.error(
+            "❌ Error fetching user recipes:",
+            userRecipesRes.data.message
+          );
         }
 
         if (favoriteRecipesRes.data.success) {
           setFavorites(favoriteRecipesRes.data.savedRecipeIds || []);
           setFavoriteRecipes(favoriteRecipesRes.data.savedRecipes || []);
         } else {
-          console.error("❌ Error fetching saved recipes:", favoriteRecipesRes.data.message);
+          console.error(
+            "❌ Error fetching saved recipes:",
+            favoriteRecipesRes.data.message
+          );
         }
       } catch (error) {
         console.error("❌ Error fetching user data:", error);
@@ -60,11 +67,12 @@ export default function MyRecipesPage() {
     };
 
     fetchUserData();
-  }, [user]);
+  }, [user?.id]); // ✅ ใช้ `user?.id` แทน `user`
 
   // ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร
   const handleFavoriteToggle = async (recipeId: number, newState: boolean) => {
-    if (!user) return;
+    if (!user?.id || isProcessing) return; // ✅ ป้องกันกดซ้ำ
+    setIsProcessing(true); // ✅ ตั้งค่า loading
 
     try {
       const token = localStorage.getItem("authToken");
@@ -77,7 +85,7 @@ export default function MyRecipesPage() {
         ? `${API_URL}/saved-recipes/save-recipe`
         : `${API_URL}/saved-recipes/unsave-recipe`;
 
-      console.log(`📌 Sending request to recipe ${url} for recipe ${recipeId}`);
+      console.log(`📌 Sending request to: ${url} for recipe ${recipeId}`);
 
       const response = await axios.post(
         url,
@@ -92,7 +100,9 @@ export default function MyRecipesPage() {
 
         setFavoriteRecipes((prev) => {
           if (newState) {
-            const newRecipe = myRecipes.find((recipe) => recipe.id === recipeId);
+            const newRecipe = myRecipes.find(
+              (recipe) => recipe.id === recipeId
+            );
             return newRecipe ? [...prev, newRecipe] : prev;
           } else {
             return prev.filter((recipe) => recipe.id !== recipeId);
@@ -103,6 +113,8 @@ export default function MyRecipesPage() {
       }
     } catch (error) {
       console.error("❌ Error toggling favorite myrecipe:", error);
+    } finally {
+      setIsProcessing(false); // ✅ รีเซ็ต loading
     }
   };
 
