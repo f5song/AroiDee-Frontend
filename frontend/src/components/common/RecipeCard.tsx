@@ -14,10 +14,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/components/auth/AuthContext"; // ✅ ใช้ useAuth()
+import { useAuth } from "@/components/auth/AuthContext";
+import axios from "axios";
+
+const API_URL = "https://aroi-dee-backend.vercel.app/api/saved-recipes";
 
 interface Category {
   id: number;
@@ -44,14 +46,13 @@ interface RecipeCardProps {
 
 export function RecipeCard({
   recipe,
-  isFavorite, // ✅ รับค่า isFavorite ที่ถูกส่งมาจาก RecipeGrid
+  isFavorite,
   onFavoriteToggle,
 }: RecipeCardProps) {
   const { user } = useAuth();
-  const { id, title, calories, cook_time, image_url, categories, rating } =
-    recipe;
   const navigate = useNavigate();
 
+  // ✅ ฟังก์ชันบันทึก/ยกเลิก Favorite
   const handleFavoriteToggle = async () => {
     if (!user?.id) {
       navigate("/login");
@@ -59,22 +60,28 @@ export function RecipeCard({
     }
 
     try {
-      const url = isFavorite
-        ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe" // ✅ ต้องตรงกับ backend
-        : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        console.error("❌ No authentication token found.");
+        return;
+      }
 
-      const response = await axios.post(url, {
-        user_id: user.id,
-        recipe_id: id,
-      });
+      const url = isFavorite ? `${API_URL}/unsave-recipe` : `${API_URL}/save-recipe`;
 
-      console.log("✅ API Response:", response.data); // ✅ Debug API Response
-
-      onFavoriteToggle(); // ✅ อัปเดต UI หลังจากบันทึกสำเร็จ
-    } catch (error) {
-      console.error(
-        "❌ Error toggling favorite:",
+      const response = await axios.post(
+        url,
+        { user_id: user.id, recipe_id: recipe.id },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      if (response.data.success) {
+        console.log("✅ API Response:", response.data);
+        onFavoriteToggle();
+      } else {
+        console.error("❌ API Error:", response.data.message);
+      }
+    } catch (error) {
+      console.error("❌ Error toggling favorite:", error);
     }
   };
 
@@ -82,27 +89,17 @@ export function RecipeCard({
     <TooltipProvider>
       <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
         <CardHeader className="p-0 relative">
-          <img
-            src={image_url || "/placeholder.svg"}
-            alt={title}
-            className="w-full h-48 object-cover"
-          />
+          <img src={recipe.image_url || "/placeholder.svg"} alt={recipe.title} className="w-full h-48 object-cover" />
           <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center">
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 mr-1" />
-            <span className="text-sm font-medium">{rating}</span>
+            <span className="text-sm font-medium">{recipe.rating}</span>
           </div>
         </CardHeader>
         <CardContent className="p-4 flex-grow">
-          <CardTitle className="text-lg font-semibold mb-2 line-clamp-2">
-            {title}
-          </CardTitle>
+          <CardTitle className="text-lg font-semibold mb-2">{recipe.title}</CardTitle>
           <div className="flex flex-wrap gap-1 mb-2">
-            {categories?.slice(0, 2).map((category) => (
-              <Badge
-                key={category.id}
-                variant="secondary"
-                className="text-xs bg-green-50"
-              >
+            {recipe.categories.map((category) => (
+              <Badge key={category.id} variant="secondary" className="text-xs bg-green-50">
                 {category.name}
               </Badge>
             ))}
@@ -111,20 +108,16 @@ export function RecipeCard({
             <Tooltip>
               <TooltipTrigger asChild>
                 <span className="flex items-center">
-                  <Clock className="w-4 h-4 mr-1" /> {cook_time} min
+                  <Clock className="w-4 h-4 mr-1" /> {recipe.cook_time} min
                 </span>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>Cooking time</p>
-              </TooltipContent>
+              <TooltipContent><p>Cooking time</p></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span>{calories} cal</span>
+                <span>{recipe.calories} cal</span>
               </TooltipTrigger>
-              <TooltipContent>
-                <p>Calories per serving</p>
-              </TooltipContent>
+              <TooltipContent><p>Calories per serving</p></TooltipContent>
             </Tooltip>
           </div>
         </CardContent>
@@ -151,12 +144,8 @@ export function RecipeCard({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                asChild
-                size="sm"
-                className="text-white bg-orange-500 hover:bg-orange-600"
-              >
-                <Link to={`/recipe/${id}`}>View Recipe</Link>
+              <Button asChild size="sm" className="text-white bg-orange-500 hover:bg-orange-600">
+                <Link to={`/recipe/${recipe.id}`}>View Recipe</Link>
               </Button>
             </TooltipTrigger>
             <TooltipContent>

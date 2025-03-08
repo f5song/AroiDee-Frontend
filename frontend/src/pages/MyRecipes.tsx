@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/auth/AuthContext"; // ✅ ใช้ useAuth() เพื่อตรวจสอบผู้ใช้
-import { Recipe, toggleFavoriteRecipe } from "@/lib/recipes";
+import { Recipe } from "@/lib/recipes/types";
 import RecipeCollection from "@/components/myRecipe/RecipeCollection";
 import PageHeader from "@/components/myRecipe/PageHeader";
 import axios from "axios";
+
+const API_URL = "https://aroi-dee-backend.vercel.app/api";
 
 /**
  * My Recipes page component
@@ -23,7 +25,7 @@ export default function MyRecipesPage() {
       if (!user) return;
 
       const token = localStorage.getItem("authToken");
-      if (!token || token === "null") {
+      if (!token) {
         console.error("❌ No valid token found.");
         return;
       }
@@ -31,7 +33,7 @@ export default function MyRecipesPage() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `https://aroi-dee-backend.vercel.app/api/recipes/user/${user.id}`,
+          `${API_URL}/recipes/user/${user.id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -39,11 +41,9 @@ export default function MyRecipesPage() {
           }
         );
 
-        console.log("📢 API Response:", response.data); // ✅ Debug
         if (!response.data.success) throw new Error(response.data.message);
 
         setMyRecipes(response.data.data);
-        console.log("✅ Updated myRecipes:", response.data.data); // ✅ Debug ค่า myRecipes
       } catch (error) {
         console.error("❌ Error fetching user recipes:", error);
       } finally {
@@ -52,7 +52,34 @@ export default function MyRecipesPage() {
     };
 
     fetchUserRecipes();
-  }, [user]); // ✅ ทำงานใหม่เมื่อ user เปลี่ยน
+  }, [user]);
+
+  // ✅ โหลดสูตรอาหารที่ถูกบันทึก
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchFavoriteRecipes = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+
+        const response = await axios.get(`${API_URL}/saved-recipes/user/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data.success) {
+          setFavorites(response.data.savedRecipeIds);
+          setFavoriteRecipes(response.data.savedRecipes);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching saved recipes:", error);
+      }
+    };
+
+    fetchFavoriteRecipes();
+  }, [user]);
 
   // ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร
   const handleFavoriteToggle = async (recipeId: number) => {
@@ -63,21 +90,26 @@ export default function MyRecipesPage() {
 
     try {
       const isCurrentlyFavorite = favorites.includes(recipeId);
-      const success = await toggleFavoriteRecipe(user.id, recipeId); // ✅ ส่ง user.id ไปด้วย
+      const url = isCurrentlyFavorite
+        ? `${API_URL}/saved-recipes/unsave-recipe`
+        : `${API_URL}/saved-recipes/save-recipe`;
 
-      if (success) {
-        setFavorites(
-          (prev) =>
-            isCurrentlyFavorite
-              ? prev.filter((id) => id !== recipeId) // เอาออกจาก Favorites
-              : [...prev, recipeId] // เพิ่มเข้า Favorites
+      const response = await axios.post(url, {
+        user_id: user.id,
+        recipe_id: recipeId,
+      });
+
+      if (response.data.success) {
+        setFavorites((prev) =>
+          isCurrentlyFavorite
+            ? prev.filter((id) => id !== recipeId)
+            : [...prev, recipeId]
         );
 
-        setFavoriteRecipes(
-          (prev) =>
-            isCurrentlyFavorite
-              ? prev.filter((recipe) => recipe.id !== recipeId) // ลบออกจากรายการ
-              : [...prev, myRecipes.find((recipe) => recipe.id === recipeId)!] // เพิ่มเข้า
+        setFavoriteRecipes((prev) =>
+          isCurrentlyFavorite
+            ? prev.filter((recipe) => recipe.id !== recipeId)
+            : [...prev, myRecipes.find((recipe) => recipe.id === recipeId)!]
         );
       }
     } catch (error) {
@@ -93,7 +125,7 @@ export default function MyRecipesPage() {
           myRecipes={Array.isArray(myRecipes) ? myRecipes : []} // ✅ ป้องกันค่าผิดพลาด
           favoriteRecipes={favoriteRecipes}
           loading={loading}
-          favorites={favorites}
+          favorites={favorites} // ✅ ส่งค่า favorites ไป RecipeCollection
           onFavoriteToggle={handleFavoriteToggle}
           isLoggedIn={!!user}
         />

@@ -4,10 +4,12 @@ import RecipeCard from "@/components/common/RecipeCard";
 import axios from "axios";
 import { useAuth } from "@/components/auth/AuthContext";
 
+const API_URL = "https://aroi-dee-backend.vercel.app/api/saved-recipes";
+
 interface RecipeGridProps {
   recipes: Recipe[];
   loading: boolean;
-  favorites: number[]; // ✅ เพิ่ม favorites ที่หายไป
+  favorites: number[];
   onFavoriteToggle: (id: number) => void;
   isLoggedIn: boolean;
 }
@@ -27,12 +29,23 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
 
     const fetchFavoriteRecipes = async () => {
       try {
-        const response = await axios.get(
-          `https://aroi-dee-backend.vercel.app/api/saved-recipes/user/${user.id}`
-        );
-        setFavoriteRecipeIds(response.data.savedRecipeIds);
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          console.error("❌ No authentication token found.");
+          return;
+        }
+
+        const response = await axios.get(`${API_URL}/user/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (response.data.success) {
+          setFavoriteRecipeIds(response.data.savedRecipeIds);
+        } else {
+          console.error("❌ Failed to fetch saved recipes:", response.data.message);
+        }
       } catch (error) {
-        console.error("Error fetching saved recipes:", error);
+        console.error("❌ Error fetching saved recipes:", error);
       }
     };
 
