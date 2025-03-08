@@ -33,9 +33,9 @@ export const validateRecipe = (recipe: RecipeInput): ValidationErrors => {
   }
   
   // Cooking time validation
-  if (recipe.time <= 0) {
+  if (recipe.cook_time <= 0) {
     errors.cookingTime = "Cooking time must be greater than 0";
-  } else if (recipe.time > MAX_COOKING_TIME) {
+  } else if (recipe.cook_time > MAX_COOKING_TIME) {
     errors.cookingTime = `Cooking time cannot exceed 24 hours (${MAX_COOKING_TIME} minutes)`;
   }
   

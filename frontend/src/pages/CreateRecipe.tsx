@@ -210,14 +210,14 @@ export default function CreateRecipePage() {
                             <Clock className="w-4 h-4 mr-2 text-gray-500" />
                             <Slider
                               id="cookingTime"
-                              value={[recipe.time]}
+                              value={[recipe.cook_time]}
                               min={5}
                               max={180}
                               step={5}
-                              onValueChange={(value) => updateBasicInfo('time', value[0])}
+                              onValueChange={(value) => updateBasicInfo('cook_time', value[0])}
                               className={`${errors.cookingTime ? 'border-red-500' : ''}`}
                             />
-                            <span className="ml-2 min-w-[60px] text-right">{recipe.time} min</span>
+                            <span className="ml-2 min-w-[60px] text-right">{recipe.cook_time} min</span>
                           </div>
                           {errors.cookingTime && (
                             <p className="text-red-500 text-sm mt-1">{formatErrorMessage(errors.cookingTime)}</p>

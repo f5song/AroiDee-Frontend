@@ -26,7 +26,7 @@ export const DEFAULT_INSTRUCTION: InstructionInput = {
 export const DEFAULT_RECIPE_FORM: RecipeInput = {
   title: "",
   description: "",
-  time: 30,
+  cook_time: 30,
   calories: 300,
   difficulty: DIFFICULTY_OPTIONS.MEDIUM,
   servings: 4,

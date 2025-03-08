@@ -26,7 +26,7 @@ export const DEFAULT_INSTRUCTION: InstructionInput = {
 export const DEFAULT_RECIPE: RecipeInput = {
   title: "",
   description: "",
-  time: 30,
+  cook_time: 30,
   calories: 300,
   difficulty: "medium",
   servings: 4,
