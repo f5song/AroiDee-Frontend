@@ -22,8 +22,6 @@ export default function MyRecipesPage() {
     if (!user) return; // ✅ ป้องกัน error ถ้า user ยังไม่ได้ล็อกอิน
 
     const fetchUserRecipes = async () => {
-      if (!user) return;
-
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.error("❌ No valid token found.");
@@ -33,9 +31,7 @@ export default function MyRecipesPage() {
       setLoading(true);
       try {
         const response = await axios.get(`${API_URL}/recipes/user/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!response.data.success) throw new Error(response.data.message);
@@ -51,7 +47,7 @@ export default function MyRecipesPage() {
     fetchUserRecipes();
   }, [user]);
 
-  // ✅ โหลดสูตรอาหารที่ถูกบันทึก
+  // ✅ โหลดสูตรอาหารที่ถูกบันทึก (Favorites)
   useEffect(() => {
     if (!user) return;
 
@@ -62,16 +58,12 @@ export default function MyRecipesPage() {
 
         const response = await axios.get(
           `${API_URL}/saved-recipes/${user.id}/saved-recipes`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
         if (response.data.success) {
-          setFavorites(response.data.savedRecipeIds);
-          setFavoriteRecipes(response.data.savedRecipes);
+          setFavorites(response.data.savedRecipeIds || []);
+          setFavoriteRecipes(response.data.savedRecipes || []);
         }
       } catch (error) {
         console.error("❌ Error fetching saved recipes:", error);
@@ -82,14 +74,13 @@ export default function MyRecipesPage() {
   }, [user]);
 
   // ✅ ฟังก์ชันกดบันทึก/ยกเลิกบันทึกสูตรอาหาร
-  const handleFavoriteToggle = async (recipeId: number) => {
+  const handleFavoriteToggle = async (recipeId: number, newState: boolean) => {
     if (!user) return;
 
     try {
-      const isCurrentlyFavorite = favorites.includes(recipeId);
-      const url = isCurrentlyFavorite
-        ? `${API_URL}/saved-recipes/unsave-recipe`
-        : `${API_URL}/saved-recipes/save-recipe`;
+      const url = newState
+        ? `${API_URL}/saved-recipes/save-recipe`
+        : `${API_URL}/saved-recipes/unsave-recipe`;
 
       const response = await axios.post(url, {
         user_id: user.id,
@@ -98,19 +89,20 @@ export default function MyRecipesPage() {
 
       if (response.data.success) {
         setFavorites((prev) =>
-          isCurrentlyFavorite
-            ? prev.filter((id) => id !== recipeId)
-            : [...prev, recipeId]
+          newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
         );
 
-        setFavoriteRecipes((prev) =>
-          isCurrentlyFavorite
-            ? prev.filter((recipe) => recipe.id !== recipeId)
-            : [...prev, myRecipes.find((recipe) => recipe.id === recipeId)!]
-        );
+        setFavoriteRecipes((prev) => {
+          if (newState) {
+            const newRecipe = myRecipes.find((recipe) => recipe.id === recipeId);
+            return newRecipe ? [...prev, newRecipe] : prev;
+          } else {
+            return prev.filter((recipe) => recipe.id !== recipeId);
+          }
+        });
       }
     } catch (error) {
-      console.error("Error toggling favorite:", error);
+      console.error("❌ Error toggling favorite:", error);
     }
   };
 
@@ -119,7 +111,7 @@ export default function MyRecipesPage() {
       <div className="max-w-7xl mx-auto">
         <PageHeader />
         <RecipeCollection
-          myRecipes={Array.isArray(myRecipes) ? myRecipes : []} // ✅ ป้องกันค่าผิดพลาด
+          myRecipes={myRecipes}
           favoriteRecipes={favoriteRecipes}
           loading={loading}
           favorites={favorites} // ✅ ส่งค่า favorites ไป RecipeCollection

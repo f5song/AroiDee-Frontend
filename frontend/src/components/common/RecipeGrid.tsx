@@ -22,9 +22,8 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   isLoggedIn,
 }) => {
   const { user } = useAuth();
-  const [favoriteRecipeIds, setFavoriteRecipeIds] =
-    useState<number[]>(favorites);
-  const [isProcessing, setIsProcessing] = useState<number | null>(null); // ป้องกันกดซ้ำระหว่างรอ API
+  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
+  const [isProcessing, setIsProcessing] = useState<Set<number>>(new Set()); // ป้องกันกดซ้ำระหว่างรอ API
 
   useEffect(() => {
     setFavoriteRecipeIds(favorites);
@@ -32,11 +31,12 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
 
   const handleFavoriteToggle = useCallback(
     async (recipeId: number) => {
-      if (isProcessing !== null) return; // ป้องกันการกดซ้ำ
-      setIsProcessing(recipeId);
+      if (isProcessing.has(recipeId)) return; // ป้องกันกดซ้ำ
+      setIsProcessing((prev) => new Set(prev).add(recipeId));
 
       const isCurrentlyFavorite = favoriteRecipeIds.includes(recipeId);
       const newState = !isCurrentlyFavorite;
+
       setFavoriteRecipeIds((prev) =>
         newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
       );
@@ -45,9 +45,7 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
         const token = localStorage.getItem("authToken");
         if (!token) throw new Error("No authentication token found.");
 
-        const url = newState
-          ? `${API_URL}/save-recipe`
-          : `${API_URL}/unsave-recipe`;
+        const url = newState ? `${API_URL}/save-recipe` : `${API_URL}/unsave-recipe`;
 
         console.log("📌 Sending request to:", url);
         console.log("📌 Payload:", { user_id: user?.id, recipe_id: recipeId });
@@ -63,20 +61,20 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
         } else {
           console.error("❌ API Error:", response.data.message);
           setFavoriteRecipeIds((prev) =>
-            isCurrentlyFavorite
-              ? [...prev, recipeId]
-              : prev.filter((id) => id !== recipeId)
+            isCurrentlyFavorite ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
           );
         }
       } catch (error) {
         console.error("❌ Error toggling favorite:", error);
         setFavoriteRecipeIds((prev) =>
-          isCurrentlyFavorite
-            ? [...prev, recipeId]
-            : prev.filter((id) => id !== recipeId)
+          isCurrentlyFavorite ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
         );
       } finally {
-        setIsProcessing(null);
+        setIsProcessing((prev) => {
+          const updatedSet = new Set(prev);
+          updatedSet.delete(recipeId);
+          return updatedSet;
+        });
       }
     },
     [favoriteRecipeIds, onFavoriteToggle, isProcessing]

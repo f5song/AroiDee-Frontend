@@ -15,7 +15,7 @@ interface RecipeCollectionProps {
   favoriteRecipes: Recipe[];
   loading: boolean;
   favorites: number[];
-  onFavoriteToggle: (id: number) => void;
+  onFavoriteToggle: (id: number, newState: boolean) => void;
   isLoggedIn: boolean;
 }
 
@@ -45,16 +45,13 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
   const [loading, setLoading] = useState<boolean>(initialLoading);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
 
-  // ✅ อัปเดต `myRecipes` เมื่อ API โหลดข้อมูลเสร็จ
+  // ✅ อัปเดต `myRecipes` และ `favoriteRecipes` เมื่อ API โหลดข้อมูลเสร็จ
   useEffect(() => {
-    if (Array.isArray(initialMyRecipes)) {
-      setMyRecipes(initialMyRecipes);
-    } else {
-      console.error("❌ initialMyRecipes is not an array:", initialMyRecipes);
-      setMyRecipes([]); // ป้องกัน error โดยตั้งค่าให้เป็น array ว่าง
-    }
-  }, [initialMyRecipes]);
+    setMyRecipes(Array.isArray(initialMyRecipes) ? initialMyRecipes : []);
+    setFavoriteRecipeIds(favorites);
+  }, [initialMyRecipes, favorites]);
 
   // ✅ โหลดข้อมูลเมื่อผู้ใช้เปลี่ยนแท็บ / ค้นหา / เปลี่ยนตัวกรอง
   useEffect(() => {
@@ -69,8 +66,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
           page: currentPage,
           cookingTime: cookingTime,
           difficulty: difficulty,
-          category:
-            selectedCategories.length === 1 ? selectedCategories[0] : undefined,
+          category: selectedCategories.length === 1 ? selectedCategories[0] : undefined,
         };
 
         const response = await fetchRecipesBySource(
@@ -82,10 +78,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
         if (Array.isArray(response.recipes)) {
           setFilteredRecipes(response.recipes);
         } else {
-          console.error(
-            "❌ response.recipes is not an array:",
-            response.recipes
-          );
+          console.error("❌ response.recipes is not an array:", response.recipes);
           setFilteredRecipes([]);
         }
 
@@ -113,17 +106,21 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
     selectedCategories,
   ]);
 
+  // ✅ ฟังก์ชันอัปเดต Favorite Recipes (Save/Unsave)
+  const handleFavoriteToggle = (recipeId: number, newState: boolean) => {
+    setFavoriteRecipeIds((prev) =>
+      newState ? [...prev, recipeId] : prev.filter((id) => id !== recipeId)
+    );
+    onFavoriteToggle(recipeId, newState);
+  };
+
   console.log("📢 Render myRecipes:", myRecipes);
   console.log("📢 Render filteredRecipes:", filteredRecipes);
 
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-        <Tabs
-          defaultValue={TAB_VALUES.MY_RECIPES}
-          value={activeTab}
-          onValueChange={setActiveTab}
-        >
+        <Tabs defaultValue={TAB_VALUES.MY_RECIPES} value={activeTab} onValueChange={setActiveTab}>
           <TabsNavigation
             activeTab={activeTab}
             searchQuery={searchQuery}
@@ -139,17 +136,13 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
             ) : (
               <>
                 <div className="text-gray-600 text-sm text-center mb-3">
-                  {totalItems > 0 && (
-                    <div className="text-gray-600 text-sm text-center mb-3">
-                      {`Total Recipes Found: ${totalItems}`}
-                    </div>
-                  )}
+                  {totalItems > 0 && <div className="text-gray-600 text-sm text-center mb-3">{`Total Recipes Found: ${totalItems}`}</div>}
                 </div>
                 <RecipeGrid
-                  recipes={Array.isArray(myRecipes) ? myRecipes : []} // ✅ ป้องกันค่า undefined
+                  recipes={myRecipes}
                   loading={loading}
-                  favorites={favorites}
-                  onFavoriteToggle={onFavoriteToggle}
+                  favorites={favoriteRecipeIds}
+                  onFavoriteToggle={handleFavoriteToggle}
                   isLoggedIn={isLoggedIn}
                 />
               </>
@@ -163,10 +156,10 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
               <NoResultsMessage onReset={() => setSearchQuery("")} />
             ) : (
               <RecipeGrid
-                recipes={Array.isArray(filteredRecipes) ? filteredRecipes : []} // ✅ ป้องกัน error
+                recipes={filteredRecipes}
                 loading={loading}
-                favorites={favorites}
-                onFavoriteToggle={onFavoriteToggle}
+                favorites={favoriteRecipeIds}
+                onFavoriteToggle={handleFavoriteToggle}
                 isLoggedIn={isLoggedIn}
               />
             )}
@@ -175,11 +168,7 @@ const RecipeCollection: React.FC<RecipeCollectionProps> = ({
       </div>
 
       {filteredRecipes.length > 0 && (
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+        <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       )}
     </>
   );

@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthContext";
 import axios from "axios";
+import { useState } from "react";
 
 interface Category {
   id: number;
@@ -38,13 +39,14 @@ interface RecipeCardProps {
     categories: Category[];
   };
   isFavorite: boolean;
-  onFavoriteToggle: () => void;
+  onFavoriteToggle: (recipeId: number) => void;
   isLoggedIn: boolean;
 }
 
 export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // ป้องกันการกดซ้ำ
 
   // ✅ ฟังก์ชันบันทึก/ยกเลิก Favorite
   const handleFavoriteToggle = async () => {
@@ -52,41 +54,44 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
       navigate("/login");
       return;
     }
-  
+
+    if (loading) return; // ป้องกันการกดซ้ำ
+    setLoading(true);
+
     try {
       const token = localStorage.getItem("authToken");
       if (!token) {
         console.error("❌ No authentication token found.");
+        setLoading(false);
         return;
       }
-  
-      // ตรวจสอบค่า `isFavorite` ที่แท้จริงก่อนเรียก API
-      const isCurrentlyFavorite = isFavorite;
-      
-      const url = isCurrentlyFavorite
+
+      // ตรวจสอบค่า `isFavorite` ก่อนเรียก API
+      const url = isFavorite
         ? "https://aroi-dee-backend.vercel.app/api/saved-recipes/unsave-recipe"
         : "https://aroi-dee-backend.vercel.app/api/saved-recipes/save-recipe";
-  
+
       console.log("📌 Sending request to:", url);
       console.log("📌 Payload:", { user_id: user.id, recipe_id: recipe.id });
-  
+
       const response = await axios.post(
         url,
         { user_id: user.id, recipe_id: recipe.id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-  
+
       if (response.data.success) {
         console.log("✅ API Response:", response.data);
-        onFavoriteToggle(); // ต้องแน่ใจว่ามีการอัปเดต state ที่ถูกต้อง
+        onFavoriteToggle(recipe.id); // ส่งค่าไปอัปเดตที่ `RecipeGrid.tsx`
       } else {
         console.error("❌ API Error:", response.data.message);
       }
     } catch (error) {
       console.error("❌ Error toggling favorite:", error);
+    } finally {
+      setLoading(false);
     }
   };
-  
 
   return (
     <TooltipProvider>
@@ -108,11 +113,7 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
           </CardTitle>
           <div className="flex flex-wrap gap-1 mb-2">
             {recipe.categories.map((category) => (
-              <Badge
-                key={category.id}
-                variant="secondary"
-                className="text-xs bg-green-50"
-              >
+              <Badge key={category.id} variant="secondary" className="text-xs bg-green-50">
                 {category.name}
               </Badge>
             ))}
@@ -144,14 +145,11 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
               <Button
                 variant="outline"
                 size="sm"
+                disabled={loading} // ปิดการกดปุ่มระหว่าง API request
                 className={isFavorite ? "bg-red-50" : "hover:bg-red-50"}
                 onClick={handleFavoriteToggle}
               >
-                <Heart
-                  className={`w-4 h-4 mr-2 ${
-                    isFavorite ? "fill-red-500 text-red-500" : "text-red-500"
-                  }`}
-                />
+                <Heart className={`w-4 h-4 mr-2 ${isFavorite ? "fill-red-500 text-red-500" : "text-red-500"}`} />
                 {isFavorite ? "Saved" : "Save"}
               </Button>
             </TooltipTrigger>
@@ -161,11 +159,7 @@ export function RecipeCard({ recipe, isFavorite, onFavoriteToggle }: RecipeCardP
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                asChild
-                size="sm"
-                className="text-white bg-orange-500 hover:bg-orange-600"
-              >
+              <Button asChild size="sm" className="text-white bg-orange-500 hover:bg-orange-600">
                 <Link to={`/recipe/${recipe.id}`}>View Recipe</Link>
               </Button>
             </TooltipTrigger>
