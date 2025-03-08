@@ -22,7 +22,8 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   isLoggedIn,
 }) => {
   const { user } = useAuth();
-  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<number[]>(favorites);
+  const [favoriteRecipeIds, setFavoriteRecipeIds] =
+    useState<number[]>(favorites);
 
   // ✅ โหลดค่า favorite จาก backend (ป้องกัน API call ซ้ำ)
   useEffect(() => {
@@ -36,14 +37,22 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
           return;
         }
 
-        const response = await axios.get(`${API_URL}/${user.id}/saved-recipes`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          `${API_URL}/${user.id}/saved-recipes`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (response.data.success) {
-          setFavoriteRecipeIds(response.data.savedRecipes.map((r: any) => r.recipe_id));
+          setFavoriteRecipeIds(
+            response.data.savedRecipes.map((r: any) => r.recipe_id)
+          );
         } else {
-          console.error("❌ Failed to fetch saved recipes:", response.data.message);
+          console.error(
+            "❌ Failed to fetch saved recipes:",
+            response.data.message
+          );
         }
       } catch (error) {
         console.error("❌ Error fetching saved recipes:", error);
@@ -57,9 +66,11 @@ const RecipeGrid: React.FC<RecipeGridProps> = ({
   const handleFavoriteToggle = useCallback(
     (recipeId: number) => {
       setFavoriteRecipeIds((prev) =>
-        prev.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
+        prev.includes(recipeId)
+          ? prev.filter((id) => id !== recipeId)
+          : [...prev, recipeId]
       );
-      onFavoriteToggle(recipeId); // ✅ ส่งไปอัปเดตที่ `MyRecipesPage.tsx`
+      onFavoriteToggle(recipeId); // ✅ ส่งไปอัปเดตที่ MyRecipesPage.tsx
     },
     [onFavoriteToggle]
   );
