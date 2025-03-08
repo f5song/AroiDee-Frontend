@@ -19,8 +19,8 @@ export const sortRecipes = (recipes: Recipe[], sortOption: string): Recipe[] => 
       return recipesCopy.sort((a, b) => b.title.localeCompare(a.title));
     case "rating":
       return recipesCopy.sort((a, b) => b.rating - a.rating);
-    case "cooking-time":
-      return recipesCopy.sort((a, b) => a.cook_time - b.cook_time);
+      case "cooking-time":
+        return recipesCopy.sort((a, b) => (a.cook_time ?? 0) - (b.cook_time ?? 0));      
     case "calories-low":
       return recipesCopy.sort((a, b) => a.calories - b.calories);
     case "calories-high":
@@ -44,27 +44,29 @@ export const filterRecipes = (
   
   let filtered = [...recipes];
   
-  // กรองตามหมวดหมู่
-  if (categories.length > 0) {
-    filtered = filtered.filter(recipe => 
-      categories.some(category => recipe.categories.includes(category))  // เปลี่ยนจาก recipe.tags เป็น recipe.categories
-    );
-  }
-  
-  // กรองตามคำค้นหา
-  if (search) {
-    const searchLower = search.toLowerCase();
-    filtered = filtered.filter(recipe => 
-      recipe.title.toLowerCase().includes(searchLower) ||
-      recipe.categories.some(tag => tag.toLowerCase().includes(searchLower)) // กรองคำค้นหาจาก categories
-    );
-  }
-  
-  // กรองตามเวลาทำอาหาร
-  if (cookingTime) {
-    filtered = filtered.filter(recipe => recipe.cook_time <= cookingTime);  // เปลี่ยนจาก recipe.time เป็น recipe.cook_time
-  }
-  
+ // กรองตามหมวดหมู่
+if (categories.length > 0) {
+  filtered = filtered.filter(recipe => 
+    categories.some(category => 
+      recipe.categories.map(c => c.name).includes(category) // ✅ แปลง `Category[]` เป็น `string[]`
+    )
+  );
+}
+
+// กรองตามคำค้นหา
+if (search) {
+  const searchLower = search.toLowerCase();
+  filtered = filtered.filter(recipe => 
+    recipe.title.toLowerCase().includes(searchLower) ||
+    recipe.categories.some(cat => cat.name.toLowerCase().includes(searchLower)) // ✅ ใช้ `cat.name.toLowerCase()`
+  );
+}
+
+// กรองตามเวลาทำอาหาร
+if (cookingTime) {
+  filtered = filtered.filter(recipe => (recipe.cook_time ?? 0) <= cookingTime);  // ✅ ใช้ `?? 0` ป้องกัน `undefined`
+}
+
   // กรองตามความยาก
   if (difficulty && difficulty !== 'all') {
     filtered = filtered.filter(recipe => recipe.difficulty.toLowerCase() === difficulty.toLowerCase());
@@ -128,9 +130,10 @@ export const getDifficultyDisplay = (difficulty: string): string => {
  * ดึงแท็กที่ไม่ซ้ำกันจากสูตรอาหาร
  */
 export const extractUniqueTags = (recipes: Recipe[]): string[] => {
-  const allTags = recipes.flatMap(recipe => recipe.categories);
-  return [...new Set(allTags)];
+  const allTags = recipes.flatMap(recipe => recipe.categories.map(c => c.name)); // ✅ ดึง `name` จาก `Category`
+  return [...new Set(allTags)]; // ✅ ใช้ Set กรองค่าที่ไม่ซ้ำ
 };
+
 
 /**
  * ดึงรายการโปรดจาก localStorage

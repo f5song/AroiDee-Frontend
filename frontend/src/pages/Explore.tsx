@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ExploreSidebar } from "@/components/explore/sidebar";
 import PageHeader from "@/components/explore/PageHeader";
-import RecipeGrid from "@/components/explore/RecipeGrid";
+import RecipeGrid from "@/components/common/RecipeGrid";
 import { NoResultsMessage } from "@/components/explore/FeedbackComponents";
 import PaginationControls from "@/components/explore/PaginationControls";
 import {

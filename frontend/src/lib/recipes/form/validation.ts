@@ -33,9 +33,9 @@ export const validateRecipe = (recipe: RecipeInput): ValidationErrors => {
   }
   
   // ตรวจสอบเวลาทำอาหาร
-  if (recipe.time <= 0) {
+  if (recipe.cook_time <= 0) {
     errors.cookingTime = "เวลาทำอาหารต้องมากกว่า 0";
-  } else if (recipe.time > MAX_COOKING_TIME) {
+  } else if (recipe.cook_time > MAX_COOKING_TIME) {
     errors.cookingTime = `เวลาทำอาหารต้องไม่เกิน 24 ชั่วโมง (${MAX_COOKING_TIME} นาที)`;
   }
   

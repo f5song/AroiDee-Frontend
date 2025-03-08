@@ -6,7 +6,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import PaginationControls from "@/components/explore/PaginationControls";
 import NoResultsMessage from "@/components/explore/NoResultsMessage";
 import TabsNavigation from "@/components/myRecipe/TabsNavigation";
-import RecipeGrid from "@/components/myRecipe/RecipeGrid";
+import RecipeGrid from "@/components/common/RecipeGrid";
 import EmptyState from "@/components/myRecipe/EmptyState";
 import { useAuth } from "@/components/auth/AuthContext";
 

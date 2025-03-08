@@ -1,6 +1,6 @@
-// lib/recipes/form/constants.ts
-import { IngredientInput, InstructionInput, RecipeInput, SelectOption } from "./types";
-import { DIFFICULTY_OPTIONS } from "../constants";
+// lib/recipes/create-recipe-constants.ts
+import { IngredientInput, InstructionInput, RecipeInput } from "@/lib/recipes/form/types";
+
 
 /**
  * Default values for ingredient form
@@ -23,12 +23,12 @@ export const DEFAULT_INSTRUCTION: InstructionInput = {
 /**
  * Default values for recipe form
  */
-export const DEFAULT_RECIPE_FORM: RecipeInput = {
+export const DEFAULT_RECIPE: RecipeInput = {
   title: "",
   description: "",
   cook_time: 30,
   calories: 300,
-  difficulty: DIFFICULTY_OPTIONS.MEDIUM,
+  difficulty: "medium",
   servings: 4,
   image_url: null,
   tags: [],
@@ -39,7 +39,7 @@ export const DEFAULT_RECIPE_FORM: RecipeInput = {
 /**
  * Options for ingredient units
  */
-export const UNIT_OPTIONS: SelectOption[] = [
+export const UNIT_OPTIONS = [
   { value: "", label: "None" },
   { value: "g", label: "grams (g)" },
   { value: "kg", label: "kilograms (kg)" },
@@ -55,15 +55,6 @@ export const UNIT_OPTIONS: SelectOption[] = [
   { value: "bunch", label: "bunch" },
   { value: "oz", label: "ounce (oz)" },
   { value: "lb", label: "pound (lb)" }
-];
-
-/**
- * Difficulty options for dropdown
- */
-export const DIFFICULTY_OPTIONS_LIST: SelectOption[] = [
-  { value: DIFFICULTY_OPTIONS.EASY, label: "Easy" },
-  { value: DIFFICULTY_OPTIONS.MEDIUM, label: "Medium" },
-  { value: DIFFICULTY_OPTIONS.HARD, label: "Hard" }
 ];
 
 /**
