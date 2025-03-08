@@ -6,6 +6,7 @@ const API_URL = "https://aroi-dee-backend.vercel.app/api";
 
 interface FavoritesContextProps {
   favorites: number[];
+  isLoadingFavorites: boolean;  // ✅ เช็คว่าข้อมูลยังโหลดอยู่
   isProcessing: Record<number, boolean>;
   toggleFavorite: (recipeId: number) => Promise<void>;
 }
@@ -16,10 +17,12 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { user } = useAuth();
   const [favorites, setFavorites] = useState<number[]>([]);
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
+  const [isLoadingFavorites, setIsLoadingFavorites] = useState(true); // ✅ ใช้สถานะโหลด
 
-  // ✅ ฟังก์ชันโหลดรายการ Favorites
+  // ✅ ฟังก์ชันโหลดรายการ Favorites จาก API
   const fetchFavorites = async () => {
     if (!user) return;
+    setIsLoadingFavorites(true); // ✅ ตั้งค่าสถานะว่า "กำลังโหลด"
     try {
       const token = localStorage.getItem("authToken");
       if (!token) return;
@@ -33,10 +36,12 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
     } catch (error) {
       console.error("❌ Error fetching saved recipes:", error);
+    } finally {
+      setIsLoadingFavorites(false); // ✅ ตั้งค่าสถานะเป็น "โหลดเสร็จแล้ว"
     }
   };
 
-  // ✅ โหลดรายการ Favorites ทันทีเมื่อผู้ใช้เข้าสู่ระบบ หรือ Favorites มีการเปลี่ยนแปลง
+  // ✅ โหลด Favorites เมื่อผู้ใช้เข้าสู่ระบบ
   useEffect(() => {
     fetchFavorites();
   }, [user]);
@@ -56,7 +61,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         ? `${API_URL}/saved-recipes/unsave-recipe`
         : `${API_URL}/saved-recipes/save-recipe`;
 
-      // ✅ อัปเดต UI ทันทีที่กดปุ่ม ก่อนส่ง API
+      // ✅ อัปเดต UI ทันที
       setFavorites((prev) =>
         isFavorite ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
       );
@@ -69,11 +74,11 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (!response.data.success) {
         console.error("❌ API error:", response.data.message);
-        fetchFavorites(); // ✅ รีโหลด Favorites ถ้า API error
+        fetchFavorites(); // ✅ โหลดใหม่ถ้า API error
       }
     } catch (error) {
       console.error("❌ Error toggling favorite:", error);
-      fetchFavorites(); // ✅ รีโหลด Favorites ถ้ามีข้อผิดพลาด
+      fetchFavorites(); // ✅ โหลดใหม่ถ้าพบข้อผิดพลาด
     } finally {
       setTimeout(() => {
         setIsProcessing((prev) => {
@@ -86,7 +91,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, isProcessing, toggleFavorite }}>
+    <FavoritesContext.Provider value={{ favorites, isLoadingFavorites, isProcessing, toggleFavorite }}>
       {children}
     </FavoritesContext.Provider>
   );
