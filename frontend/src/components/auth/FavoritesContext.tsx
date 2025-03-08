@@ -19,10 +19,10 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isProcessing, setIsProcessing] = useState<Record<number, boolean>>({});
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
 
-  // ✅ ฟังก์ชันโหลดรายการ Favorites จาก API (ตรวจสอบจาก database)
+  // ✅ โหลดรายการ Favorites จาก API
   const fetchFavorites = async () => {
     if (!user) return;
-    setIsLoadingFavorites(true); // ✅ ตั้งค่าเป็นกำลังโหลด
+    setIsLoadingFavorites(true);
 
     try {
       const token = localStorage.getItem("authToken");
@@ -33,37 +33,30 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       });
 
       if (response.data.success) {
-        setFavorites(response.data.savedRecipeIds || []); // ✅ อัปเดต Favorites ตาม database
+        setFavorites(response.data.savedRecipeIds || []); // ✅ ใช้ค่าจาก database
       }
     } catch (error) {
       console.error("❌ Error fetching saved recipes:", error);
     } finally {
-      setIsLoadingFavorites(false); // ✅ โหลดเสร็จแล้ว
+      setIsLoadingFavorites(false);
     }
   };
 
-  // ✅ โหลด Favorites เมื่อผู้ใช้ล็อกอิน
   useEffect(() => {
     fetchFavorites();
   }, [user]);
 
   const toggleFavorite = async (recipeId: number) => {
-    if (!user) return;
-    if (isProcessing[recipeId]) return;
+    if (!user || isProcessing[recipeId]) return;
 
     setIsProcessing((prev) => ({ ...prev, [recipeId]: true }));
-
-    // ✅ อัปเดต UI ทันที โดยไม่รอ API
-    setFavorites((prev) =>
-      prev.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]
-    );
 
     try {
       const token = localStorage.getItem("authToken");
       if (!token) return;
 
-      const isFavorite = favorites.includes(recipeId);
-      const url = isFavorite
+      const isCurrentlyFavorite = favorites.includes(recipeId);
+      const url = isCurrentlyFavorite
         ? `${API_URL}/saved-recipes/unsave-recipe`
         : `${API_URL}/saved-recipes/save-recipe`;
 
@@ -73,13 +66,13 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (!response.data.success) {
+      if (response.data.success) {
+        fetchFavorites(); // ✅ โหลดใหม่จาก database ให้แน่ใจว่าค่าถูกต้อง
+      } else {
         console.error("❌ API error:", response.data.message);
-        fetchFavorites(); // ✅ โหลดใหม่ถ้า API error
       }
     } catch (error) {
       console.error("❌ Error toggling favorite:", error);
-      fetchFavorites(); // ✅ โหลดใหม่ถ้าพบข้อผิดพลาด
     } finally {
       setTimeout(() => {
         setIsProcessing((prev) => {
