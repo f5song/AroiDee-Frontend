@@ -61,27 +61,32 @@ export const getSavedRecipes = async (userId: number): Promise<any[]> => {
 };
 
 
-// ✅ บันทึกสูตรอาหารลงฐานข้อมูล
+/**
+ * ✅ บันทึกสูตรอาหารลงฐานข้อมูล
+ */
 export const saveRecipe = async (userId: number, recipeId: number): Promise<{ success: boolean }> => {
   try {
-    await axios.post(`${API_URL}/users/save-recipe`, { user_id: userId, recipe_id: recipeId });
+    await axios.post(`${API_URL}/saved-recipes/save-recipe`, { user_id: userId, recipe_id: recipeId });
     return { success: true };
   } catch (error) {
-    console.error("Error saving recipe:", error);
+    console.error("❌ Error saving recipe:", error);
     return { success: false };
   }
 };
 
-// ✅ ยกเลิกการบันทึกสูตรอาหาร
+/**
+ * ✅ ยกเลิกการบันทึกสูตรอาหาร
+ */
 export const unsaveRecipe = async (userId: number, recipeId: number): Promise<{ success: boolean }> => {
   try {
-    await axios.post(`${API_URL}/users/unsave-recipe`, { user_id: userId, recipe_id: recipeId });
+    await axios.post(`${API_URL}/saved-recipes/unsave-recipe`, { user_id: userId, recipe_id: recipeId });
     return { success: true };
   } catch (error) {
-    console.error("Error unsaving recipe:", error);
+    console.error("❌ Error unsaving recipe:", error);
     return { success: false };
   }
 };
+
 
 // ✅ ดึงหมวดหมู่ทั้งหมด
 export const fetchCategories = async (): Promise<CategoryOption[]> => {
