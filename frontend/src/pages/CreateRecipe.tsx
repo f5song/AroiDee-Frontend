@@ -10,7 +10,7 @@ export default function CreateRecipePage() {
   const { token, user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
+
   // ✅ ใช้ useState เพื่อเก็บค่าหมวดหมู่ที่ดึงมา
   const [categories, setCategories] = useState<{ id: number; name: string; image_url: string }[]>([]);
 
@@ -22,6 +22,17 @@ export default function CreateRecipePage() {
     cook_time: 0,
     category_id: null as number | null,
     ingredients: [{ name: "", amount: "", unit: "" }], 
+    nutrition_facts: {
+      calories: "",
+      total_fat: "",
+      saturated_fat: "",
+      cholesterol: "",
+      sodium: "",
+      potassium: "",
+      total_carbohydrate: "",
+      sugars: "",
+      protein: "",
+    },
   });
 
   // ✅ โหลดหมวดหมู่จาก API ทันทีที่หน้าโหลด
@@ -122,24 +133,38 @@ export default function CreateRecipePage() {
             </select>
           </div>
 
-          {/* Ingredients */}
+          {/* Nutrition Facts */}
           <div>
-            <label className="block text-lg font-semibold">Ingredients</label>
-            {recipe.ingredients.map((ingredient, index) => (
-              <div key={index} className="flex space-x-2 mt-2">
+            <label className="block text-lg font-semibold">Nutrition Facts</label>
+            {Object.keys(recipe.nutrition_facts).map((key) => (
+              <div key={key} className="flex space-x-2 mt-2">
+                <label className="w-32 capitalize">{key.replace("_", " ")}:</label>
                 <input
                   type="text"
-                  value={ingredient.name}
-                  onChange={(e) => {
-                    const newIngredients = [...recipe.ingredients];
-                    newIngredients[index].name = e.target.value;
-                    setRecipe({ ...recipe, ingredients: newIngredients });
-                  }}
-                  placeholder="Ingredient"
+                  value={recipe.nutrition_facts[key as keyof typeof recipe.nutrition_facts]}
+                  onChange={(e) => 
+                    setRecipe({
+                      ...recipe,
+                      nutrition_facts: { ...recipe.nutrition_facts, [key]: e.target.value },
+                    })
+                  }
                   className="flex-1 p-2 border rounded-md"
+                  placeholder="Enter value"
                 />
               </div>
             ))}
+          </div>
+
+          {/* Cook Time */}
+          <div>
+            <label className="block text-lg font-semibold">Cook Time (Minutes)</label>
+            <input
+              type="number"
+              value={recipe.cook_time}
+              onChange={(e) => setRecipe({ ...recipe, cook_time: Number(e.target.value) })}
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter cook time"
+            />
           </div>
 
           {/* Upload Image */}
