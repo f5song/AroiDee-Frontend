@@ -20,6 +20,7 @@ export interface InstructionInput {
   text: string;
 }
 
+
 /**
  * Input data for creating/editing a recipe
  */
@@ -35,6 +36,7 @@ export interface RecipeInput {
   ingredients: IngredientInput[];
   instructions: InstructionInput[];
 }
+
 
 
 /**

@@ -1,113 +1,90 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { RecipeHeader } from "@/components/createRecipe/RecipeHeader";
-import { BasicInfoSection } from "@/components/createRecipe/BasicInfoSection";
-import { IngredientsSection } from "@/components/createRecipe/IngredientsSection";
-import { InstructionsSection } from "@/components/createRecipe/InstructionsSection";
-import { FormActions } from "@/components/createRecipe/FormActions";
-import { createRecipe } from "@/lib/api/recipeApi"; // ✅ Import API Call
+import { createRecipe } from "@/lib/api/recipeApi";
 import { useAuth } from "@/components/auth/AuthContext";
 
 export default function CreateRecipePage() {
   const navigate = useNavigate();
-  const { token, user } = useAuth(); // ✅ ดึง Token และ User ID
+  const { token, user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // ✅ ตั้งค่า Recipe State
+  // ✅ ใช้ useState ในรูปแบบที่เรียบง่ายขึ้น
   const [recipe, setRecipe] = useState({
     title: "",
     description: "",
-    instructions: [{ step: "" }],
+    instructions: [""], // ✅ ใช้เป็น array ของ string
     image_url: "",
     cook_time: 0,
-    category_id: null,
-    recipe_ingredients: [],
+    category_id: null as number | null,
+    ingredients: [{ name: "", amount: "", unit: "" }], // ✅ เรียบง่ายขึ้น
   });
 
-  const [tagInput, setTagInput] = useState("");
-
-  const updateBasicInfo = (field: string, value: any) => {
+  // ✅ อัพเดทค่าของฟอร์ม
+  const updateField = (field: string, value: any) => {
     setRecipe((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleImageChange = (imageUrl: string) => {
-    setRecipe((prev) => ({ ...prev, image_url: imageUrl }));
-  };
+  // ✅ อัพโหลดรูปภาพ
+  // const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (!file) return;
 
-  const handleCategorySelect = (categoryName: string) => {
-    setRecipe((prev) => ({ ...prev, category_id: categoryName }));
-  };
+  //   const reader = new FileReader();
+  //   reader.onload = () => setRecipe((prev) => ({ ...prev, image_url: reader.result as string }));
+  //   reader.readAsDataURL(file);
+  // };
 
-  const addTag = (tag: any) => {
-    setRecipe((prev) => ({
-      ...prev,
-      categories: [...(prev.categories || []), tag],
-    }));
-  };
-
-  const removeTag = (tagName: string) => {
-    setRecipe((prev) => ({
-      ...prev,
-      categories: prev.categories.filter((tag: any) => tag.name !== tagName),
-    }));
-  };
-
+  // ✅ เพิ่มและลบส่วนผสม
   const addIngredient = () => {
     setRecipe((prev) => ({
       ...prev,
-      recipe_ingredients: [...prev.recipe_ingredients, { ingredient_id: "", quantity: "" }],
+      ingredients: [...prev.ingredients, { name: "", amount: "", unit: "" }],
     }));
-  };
-
-  const updateIngredient = (index: number, field: string, value: string) => {
-    const updatedIngredients = [...recipe.recipe_ingredients];
-    updatedIngredients[index] = { ...updatedIngredients[index], [field]: value };
-    setRecipe((prev) => ({ ...prev, recipe_ingredients: updatedIngredients }));
   };
 
   const removeIngredient = (index: number) => {
-    const updatedIngredients = recipe.recipe_ingredients.filter((_, i) => i !== index);
-    setRecipe((prev) => ({ ...prev, recipe_ingredients: updatedIngredients }));
-  };
-
-  const addInstruction = () => {
     setRecipe((prev) => ({
       ...prev,
-      instructions: [...prev.instructions, { step: "" }],
+      ingredients: prev.ingredients.filter((_, i) => i !== index),
     }));
   };
 
-  const updateInstruction = (index: number, value: string) => {
-    const updatedInstructions = [...recipe.instructions];
-    updatedInstructions[index] = { step: value };
-    setRecipe((prev) => ({ ...prev, instructions: updatedInstructions }));
+  // ✅ เพิ่มและลบขั้นตอนการทำอาหาร
+  const addInstruction = () => {
+    setRecipe((prev) => ({
+      ...prev,
+      instructions: [...prev.instructions, ""],
+    }));
   };
 
   const removeInstruction = (index: number) => {
-    const updatedInstructions = recipe.instructions.filter((_, i) => i !== index);
-    setRecipe((prev) => ({ ...prev, instructions: updatedInstructions }));
+    setRecipe((prev) => ({
+      ...prev,
+      instructions: prev.instructions.filter((_, i) => i !== index),
+    }));
   };
 
+  // ✅ ส่งฟอร์มไปยัง backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
     if (!token || !user) {
       alert("You must be logged in to create a recipe");
+      setIsSaving(false);
       return;
     }
 
-    // ✅ แปลง instructions เป็น JSON
     const formattedRecipe = {
       ...recipe,
-      user_id: user.id, // ✅ เพิ่ม user_id
-      instructions: JSON.stringify(recipe.instructions),
+      user_id: user.id,
+      instructions: JSON.stringify(recipe.instructions), // ✅ ส่งเป็น JSON
     };
 
     try {
       const result = await createRecipe(formattedRecipe, token);
-
       if (result.success) {
         navigate("/my-recipes");
       } else {
@@ -122,45 +99,115 @@ export default function CreateRecipePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-white p-6 md:p-8 lg:p-10 shadow-lg rounded-lg">
+      <div className="max-w-3xl mx-auto">
         <RecipeHeader title="Create New Recipe" subtitle="Share your culinary creations with the world" />
 
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-10">
-            <BasicInfoSection
-              recipe={recipe}
-              errors={errors}
-              tagInput={tagInput}
-              setTagInput={setTagInput}
-              updateBasicInfo={updateBasicInfo}
-              addTag={addTag}
-              removeTag={removeTag}
-              handleImageChange={handleImageChange}
-              handleCategorySelect={handleCategorySelect}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Recipe Title */}
+          <div>
+            <label className="block text-lg font-semibold">Title</label>
+            <input
+              type="text"
+              value={recipe.title}
+              onChange={(e) => updateField("title", e.target.value)}
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter recipe title"
             />
-
-            <IngredientsSection
-              ingredients={recipe.recipe_ingredients}
-              errors={errors}
-              addIngredient={addIngredient}
-              updateIngredient={updateIngredient}
-              removeIngredient={removeIngredient}
-            />
-
-            <InstructionsSection
-              instructions={recipe.instructions}
-              errors={errors}
-              addInstruction={addInstruction}
-              updateInstruction={updateInstruction}
-              removeInstruction={removeInstruction}
-            />
-
-            <FormActions isSaving={isSaving} onCancel={() => navigate("/my-recipes")} />
           </div>
-        </form>
 
-        {errors.submit && <p className="text-red-500 text-center mt-4">{errors.submit}</p>}
+          {/* Description */}
+          <div>
+            <label className="block text-lg font-semibold">Description</label>
+            <textarea
+              value={recipe.description}
+              onChange={(e) => updateField("description", e.target.value)}
+              className="w-full p-2 border rounded-md"
+              placeholder="Enter description"
+            />
+          </div>
+
+          {/* Ingredients */}
+          <div>
+            <label className="block text-lg font-semibold">Ingredients</label>
+            {recipe.ingredients.map((ingredient, index) => (
+              <div key={index} className="flex space-x-2 mt-2">
+                <input
+                  type="text"
+                  value={ingredient.name}
+                  onChange={(e) => {
+                    const newIngredients = [...recipe.ingredients];
+                    newIngredients[index].name = e.target.value;
+                    updateField("ingredients", newIngredients);
+                  }}
+                  placeholder="Ingredient"
+                  className="flex-1 p-2 border rounded-md"
+                />
+                <input
+                  type="text"
+                  value={ingredient.amount}
+                  onChange={(e) => {
+                    const newIngredients = [...recipe.ingredients];
+                    newIngredients[index].amount = e.target.value;
+                    updateField("ingredients", newIngredients);
+                  }}
+                  placeholder="Amount"
+                  className="w-20 p-2 border rounded-md"
+                />
+                <input
+                  type="text"
+                  value={ingredient.unit}
+                  onChange={(e) => {
+                    const newIngredients = [...recipe.ingredients];
+                    newIngredients[index].unit = e.target.value;
+                    updateField("ingredients", newIngredients);
+                  }}
+                  placeholder="Unit"
+                  className="w-20 p-2 border rounded-md"
+                />
+                <button type="button" onClick={() => removeIngredient(index)} className="text-red-500">
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addIngredient} className="text-blue-500 mt-2">
+              + Add Ingredient
+            </button>
+          </div>
+
+          {/* Instructions */}
+          <div>
+            <label className="block text-lg font-semibold">Instructions</label>
+            {recipe.instructions.map((step, index) => (
+              <div key={index} className="flex items-center space-x-2 mt-2">
+                <input
+                  type="text"
+                  value={step}
+                  onChange={(e) => {
+                    const newInstructions = [...recipe.instructions];
+                    newInstructions[index] = e.target.value;
+                    updateField("instructions", newInstructions);
+                  }}
+                  className="flex-1 p-2 border rounded-md"
+                  placeholder="Instruction step"
+                />
+                <button type="button" onClick={() => removeInstruction(index)} className="text-red-500">
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addInstruction} className="text-blue-500 mt-2">
+              + Add Step
+            </button>
+          </div>
+
+          {/* Submit Button */}
+          <button type="submit" className="w-full bg-orange-500 text-white p-3 rounded-md font-bold">
+            {isSaving ? "Saving..." : "Save Recipe"}
+          </button>
+
+          {errors.submit && <p className="text-red-500 text-center mt-4">{errors.submit}</p>}
+        </form>
       </div>
     </div>
   );

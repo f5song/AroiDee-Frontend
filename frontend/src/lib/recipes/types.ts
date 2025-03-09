@@ -101,6 +101,15 @@ export interface Recipe {
 
   // src/lib/recipes/types.ts
 
+
+  
+  export interface Category {
+    id: number;
+    name: string;
+    image_url: string; // ✅ ตรวจสอบว่า Category มี image_url
+  }
+  
+
   export interface RecipeInput {
     title: string;
     description: string;
