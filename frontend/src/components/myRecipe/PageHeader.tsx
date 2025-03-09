@@ -1,92 +1,36 @@
-import React, { useEffect } from "react";
-import { Heart, User, Clock, Share2, Star } from "lucide-react";
-import { RecipeHeaderProps } from "../../types/recipe";
-import { isRecipeSaved, saveRecipe, unsaveRecipe } from "../../lib/api/savedRecipeApi";
+// components/myRecipe/PageHeader.tsx
+import React from "react";
+import { PlusCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 
-const RecipeHeader: React.FC<RecipeHeaderProps> = ({
-  title,
-  author,
-  date,
-  rating,
-  comments,
-  image_url,
-  recipeId,
-  userId,
-  saved,
-  setSaved,
-  token, // ✅ รับ token จาก props
-}) => {
-  useEffect(() => {
-    const checkSavedStatus = async () => {
-      if (!userId || !recipeId || !token) return; // ✅ ป้องกัน API call ถ้าข้อมูลไม่ครบ
-      try {
-        const savedStatus = await isRecipeSaved(userId, recipeId, token);
-        setSaved(savedStatus);
-      } catch (error) {
-        console.error("❌ ตรวจสอบการบันทึกสูตรอาหารล้มเหลว:", error);
-      }
-    };
-    checkSavedStatus();
-  }, [recipeId, userId, token]);
+const PageHeader: React.FC = () => {
 
-  const toggleSaveRecipe = async () => {
-    if (!userId || !recipeId || !token) return;
-    try {
-      let success;
-      if (saved) {
-        success = await unsaveRecipe(userId, recipeId, token);
-      } else {
-        success = await saveRecipe(userId, recipeId, token);
-      }
-      if (success) setSaved(!saved);
-    } catch (error) {
-      console.error("❌ ไม่สามารถเปลี่ยนสถานะการบันทึกสูตรอาหาร:", error);
-    }
+  const navigate = useNavigate();
+  
+  const handleClick = () => {
+    navigate('/recipe/create');
   };
 
   return (
-    <div className="relative rounded-xl overflow-hidden">
-      <div className="relative h-[500px]">
-        <img src={image_url} alt={title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">
+          My Recipe Collection
+        </h1>
+        <p className="text-gray-500">
+          Manage your personal recipes and favorites
+        </p>
+      </div>
 
-        <div className="absolute bottom-0 left-0 p-8 w-full">
-          <h1 className="text-5xl font-bold mb-3 text-white">{title}</h1>
-          <div className="flex flex-wrap items-center gap-4 mb-6">
-            <div className="flex items-center bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
-              <User className="mr-2 text-white" size={16} />
-              <span className="text-white">{author}</span>
-            </div>
-            <div className="flex items-center bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full">
-              <Clock className="mr-2 text-white" size={16} />
-              <span className="text-white">{date}</span>
-            </div>
-            <div className="flex items-center bg-orange-500/90 px-4 py-2 rounded-full">
-              <Star className="mr-2 text-white" size={16} fill="white" />
-              <span className="text-white font-medium">
-                {rating} ({comments} reviews)
-              </span>
-            </div>
-          </div>
-
-          <div className="absolute top-6 right-6 flex space-x-3">
-            <button
-              onClick={toggleSaveRecipe}
-              className={`p-3 rounded-full backdrop-blur-md transition-all ${
-                saved ? "bg-red-500 text-white" : "bg-white/20 hover:bg-white/30 text-white"
-              }`}
-            >
-              <Heart size={20} fill={saved ? "currentColor" : "none"} />
-              <span className="ml-2">{saved ? "Unsave" : "Save"}</span>
-            </button>
-            <button className="p-3 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white transition-all">
-              <Share2 size={20} />
-            </button>
-          </div>
-        </div>
+      <div className="mt-4 md:mt-0">
+        <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleClick}>
+          <PlusCircle className="w-4 h-4 mr-2" /> Create New Recipe
+          
+        </Button>
       </div>
     </div>
   );
 };
 
-export default RecipeHeader;
+export default PageHeader;
