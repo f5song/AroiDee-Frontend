@@ -9,6 +9,13 @@ export interface Nutrition {
     
   }
 
+  export interface Category {
+    id: number;
+    name: string;
+    image_url: string; // ✅ ต้องมี image_url
+  }
+  
+
   export interface Ingredient {
     id: number;
     name: string;
