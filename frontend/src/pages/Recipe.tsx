@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getRecipeById } from "../lib/api/recipeApi";
 
-
 // Components
 import RecipeHeader from "../components/recipe/RecipeHeader";
 import ControlBar from "../components/recipe/ControlBar";
@@ -40,9 +39,7 @@ const RecipePage: React.FC = () => {
   // ✅ กำหนดค่าเริ่มต้นของ state ให้ปลอดภัย
   const [liked, setLiked] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
-  const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>(
-    []
-  );
+  const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [commentsList, setCommentsList] = useState<Comment[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ingredients");
@@ -61,6 +58,10 @@ const RecipePage: React.FC = () => {
     if (recipe?.comments) {
       setCommentsList(recipe.comments);
     }
+  }, [recipe]);
+
+  useEffect(() => {
+    console.log("📌 Recipe Data:", recipe);
   }, [recipe]);
 
   if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
@@ -135,7 +136,7 @@ const RecipePage: React.FC = () => {
                 >
                   {activeTab === "ingredients" ? (
                     <IngredientsTab
-                      ingredients={recipe.ingredients || []}
+                      ingredients={recipe?.ingredients || []} // ✅ ป้องกัน undefined
                       checkedIngredients={checkedIngredients}
                       handleIngredientClick={() => {}}
                       getConvertedIngredient={() => ""}
