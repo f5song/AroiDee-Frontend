@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 const PageHeader: React.FC = () => {
 
   const navigate = useNavigate();
-  
+
   const handleClick = () => {
     navigate('/recipe/create');
   };
@@ -26,7 +26,7 @@ const PageHeader: React.FC = () => {
       <div className="mt-4 md:mt-0">
         <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={handleClick}>
           <PlusCircle className="w-4 h-4 mr-2" /> Create New Recipe
-          
+
         </Button>
       </div>
     </div>
