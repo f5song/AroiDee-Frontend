@@ -12,7 +12,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (identifier: string, password: string) => Promise<void>; // ✅ เปลี่ยนจาก email → identifier
   logout: () => void;
 }
 
@@ -43,12 +43,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  // ✅ ใช้ API /api/login เพื่อเข้าสู่ระบบ
-  const login = async (email: string, password: string) => {
+  // ✅ ใช้ API /api/login เพื่อเข้าสู่ระบบ (รองรับทั้ง username และ email)
+  const login = async (identifier: string, password: string) => {
     setIsLoading(true);
     try {
       const response = await axios.post("https://aroi-dee-backend.vercel.app/api/users/login", {
-        email,
+        identifier, // ✅ ใช้ identifier (username หรือ email)
         password,
       });
 
