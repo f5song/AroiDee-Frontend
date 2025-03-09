@@ -5,6 +5,14 @@ export interface Nutrition {
     fat: string;
     carbs: string;
     sugar: string;
+    
+  }
+
+  export interface Ingredient {
+    id: number;
+    name: string;
+    unit: string;
+    quantity: number;
   }
   
   export interface RelatedRecipe {
@@ -64,12 +72,12 @@ export interface Nutrition {
   }
   
   export interface IngredientsTabProps {
-    ingredients: string[];
+    ingredients: Ingredient[]; // ✅ ใช้โครงสร้างที่ถูกต้อง
     checkedIngredients: boolean[];
     handleIngredientClick: (index: number) => void;
-    getConvertedIngredient: (ingredient: string) => string;
+    getConvertedIngredient: (ingredient: Ingredient) => string;
   }
-  
+
   export interface InstructionsTabProps {
     instructions: string[];
     toggleCookingMode: () => void;

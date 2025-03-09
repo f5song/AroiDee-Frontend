@@ -41,7 +41,7 @@ const RecipePage: React.FC = () => {
   const [saved, setSaved] = useState<boolean>(false);
   const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
   const [newComment, setNewComment] = useState<string>("");
-  const [commentsList, setCommentsList] = useState<Comment[]>([]);
+  const [commentsList] = useState<Comment[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ingredients");
   const [cookingMode, setCookingMode] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(0);
@@ -53,10 +53,8 @@ const RecipePage: React.FC = () => {
 
   useEffect(() => {
     if (recipe?.ingredients) {
+      console.log("🔍 Setting checkedIngredients:", recipe.ingredients);
       setCheckedIngredients(Array(recipe.ingredients.length).fill(false));
-    }
-    if (recipe?.comments) {
-      setCommentsList(recipe.comments);
     }
   }, [recipe]);
 
@@ -67,6 +65,7 @@ const RecipePage: React.FC = () => {
   if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
   if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
   if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
+  console.log("✅ Ingredients from API:", recipe?.ingredients);
 
   return (
     <div className="min-h-screen bg-gray-50">
