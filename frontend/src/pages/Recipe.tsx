@@ -3,8 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getRecipeById } from "../lib/api/recipeApi";
 
-// Utils
-import { convertIngredient } from "../utils/unitConverter";
 
 // Components
 import RecipeHeader from "../components/recipe/RecipeHeader";
@@ -25,13 +23,16 @@ const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
 
   // ✅ ใช้ useQuery ดึงข้อมูลจาก API
-  const { data: recipe = null } = useQuery({
+  const {
+    data: recipe,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
     enabled: !!recipeId,
   });
 
-  // ✅ เช็คว่า API ดึงข้อมูลสำเร็จหรือไม่
   useEffect(() => {
     console.log("📌 Recipe Data:", recipe);
   }, [recipe]);
@@ -39,99 +40,32 @@ const RecipePage: React.FC = () => {
   // ✅ กำหนดค่าเริ่มต้นของ state ให้ปลอดภัย
   const [liked, setLiked] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
-  const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
-
-  useEffect(() => {
-    if (recipe?.ingredients) {
-      setCheckedIngredients(Array(recipe.ingredients.length).fill(false));
-    }
-  }, [recipe]);
-
+  const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>(
+    []
+  );
   const [newComment, setNewComment] = useState<string>("");
   const [commentsList, setCommentsList] = useState<Comment[]>([]);
-
-  useEffect(() => {
-    if (recipe?.comments) {
-      setCommentsList(recipe.comments);
-    }
-  }, [recipe]);
-
   const [activeTab, setActiveTab] = useState<string>("ingredients");
   const [cookingMode, setCookingMode] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(false);
   const [showNutritionDetails, setShowNutritionDetails] =
     useState<boolean>(false);
-  const [currentStep, setCurrentStep] = useState<number>(0);
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
-  const [selectedUnit, setSelectedUnit] = useState<string>("metric"); // metric or imperial
+  const [selectedUnit, setSelectedUnit] = useState<string>("metric");
 
-  // ✅ ตรวจสอบค่า recipe.instructions ว่ามีข้อมูลก่อนใช้งาน
-  const nextStep = (): void => {
-    if (recipe.instructions && currentStep < recipe.instructions.length - 1) {
-      setCurrentStep(currentStep + 1);
+  useEffect(() => {
+    if (recipe?.ingredients) {
+      setCheckedIngredients(Array(recipe.ingredients.length).fill(false));
     }
-  };
+    if (recipe?.comments) {
+      setCommentsList(recipe.comments);
+    }
+  }, [recipe]);
 
-  const prevStep = (): void => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  // ✅ ป้องกัน `undefined` ในส่วนของ `renderActiveTabContent`
-  const renderActiveTabContent = () => {
-    switch (activeTab) {
-      case "ingredients":
-        return (
-          <IngredientsTab
-            ingredients={recipe.ingredients || []}
-            checkedIngredients={checkedIngredients}
-            handleIngredientClick={(index) => {
-              setCheckedIngredients((prev) => {
-                const updated = [...prev];
-                updated[index] = !updated[index];
-                return updated;
-              });
-            }}
-            getConvertedIngredient={(ingredient) =>
-              convertIngredient(ingredient, selectedUnit)
-            }
-          />
-        );
-      case "instructions":
-        return (
-          <InstructionsTab
-            instructions={recipe.instructions || []}
-            toggleCookingMode={() => setCookingMode(!cookingMode)}
-            setTimerMinutes={(minutes) => setTimer(minutes * 60)}
-          />
-        );
-      case "comments":
-        return (
-          <CommentsTab
-            commentsList={commentsList}
-            newComment={newComment}
-            setNewComment={setNewComment}
-            handleCommentSubmit={() => {
-              if (newComment.trim()) {
-                setCommentsList((prev) => [
-                  ...prev,
-                  {
-                    user: "Current User",
-                    text: newComment,
-                    date: new Date().toLocaleDateString(),
-                  },
-                ]);
-                setNewComment("");
-              }
-            }}
-          />
-        );
-      default:
-        return <p>🔹 กรุณาเลือกแท็บ</p>;
-    }
-  };
+  if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
+  if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
+  if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -140,9 +74,9 @@ const RecipePage: React.FC = () => {
           <CookingModeView
             recipe={recipe}
             toggleCookingMode={() => setCookingMode(!cookingMode)}
-            currentStep={currentStep}
-            prevStep={prevStep}
-            nextStep={nextStep}
+            currentStep={0}
+            prevStep={() => {}}
+            nextStep={() => {}}
             checkedIngredients={checkedIngredients}
             handleIngredientClick={() => {}}
             getConvertedIngredient={() => ""}
@@ -164,10 +98,10 @@ const RecipePage: React.FC = () => {
                   : "ไม่ระบุวันที่"
               }
               rating={recipe?.rating || 0}
-              comments={0}
+              comments={commentsList.length}
               image_url={recipe?.image_url || "/default-recipe.jpg"}
-              liked={liked} // ✅ เพิ่ม
-              setLiked={setLiked} // ✅ เพิ่ม
+              liked={liked}
+              setLiked={setLiked}
               saved={saved}
               setSaved={setSaved}
             />
@@ -199,21 +133,36 @@ const RecipePage: React.FC = () => {
                   setActiveTab={setActiveTab}
                   commentCount={commentsList.length}
                 >
-                  {renderActiveTabContent()}
+                  {activeTab === "ingredients" ? (
+                    <IngredientsTab
+                      ingredients={recipe.ingredients || []}
+                      checkedIngredients={checkedIngredients}
+                      handleIngredientClick={() => {}}
+                      getConvertedIngredient={() => ""}
+                    />
+                  ) : activeTab === "instructions" ? (
+                    <InstructionsTab
+                      instructions={recipe.instructions || []}
+                      toggleCookingMode={() => setCookingMode(!cookingMode)}
+                      setTimerMinutes={(minutes) => setTimer(minutes * 60)}
+                    />
+                  ) : (
+                    <CommentsTab
+                      commentsList={commentsList}
+                      newComment={newComment}
+                      setNewComment={setNewComment}
+                      handleCommentSubmit={() => {}}
+                    />
+                  )}
                 </TabContainer>
               </div>
-
-              {/* Sidebar */}
               <div className="w-full lg:w-96 flex-shrink-0 order-1 lg:order-2">
                 <div className="lg:sticky lg:top-20 space-y-6">
-                  {/* Nutrition Facts */}
                   <NutritionFacts
                     nutrition={recipe.nutrition_facts || {}}
                     showNutritionDetails={showNutritionDetails}
                     setShowNutritionDetails={setShowNutritionDetails}
                   />
-
-                  {/* Related Recipes */}
                   <RelatedRecipes recipes={recipe.related_recipes || []} />
                 </div>
               </div>
