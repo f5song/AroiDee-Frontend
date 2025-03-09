@@ -37,7 +37,8 @@ export default function CreateRecipePage() {
     },
   });
 
-  const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dct6hlg8b";
+  const cloudinaryCloudName =
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dct6hlg8b";
 
   // ✅ อัพเดทค่าของฟอร์ม
   const updateField = (field: string, value: any) => {
@@ -63,18 +64,17 @@ export default function CreateRecipePage() {
     setIsSaving(true);
 
     try {
-      const signatureResponse = await axios.get("/get-signature");
+      const uploadPreset = "aroidee"; // Upload Preset ที่สร้างใน Cloudinary
+
       const data = new FormData();
       data.append("file", file);
-      data.append("api_key", process.env.CLOUDINARY_API_KEY || "");
-      data.append("signature", signatureResponse.data.signature);
-      data.append("timestamp", signatureResponse.data.timestamp);
+      data.append("upload_preset", uploadPreset); // ❌ ไม่ต้องใส่ cloud_name
 
       const cloudinaryResponse = await axios.post(
-        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/auto/upload`,
+        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/image/upload`,
         data,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data" }, // ✅ แก้ไขตรงนี้
         }
       );
 
