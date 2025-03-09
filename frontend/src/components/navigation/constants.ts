@@ -47,11 +47,11 @@ export const PROFILE_MENU_ITEMS = () => {
       path: "/profile", 
       icon: React.createElement(User, { className: "w-5 h-5" }) 
     },
-    { 
-      name: "Account Settings", 
-      path: "/settings", 
-      icon: React.createElement(Settings, { className: "w-5 h-5" }) 
-    },
+    // { 
+    //   name: "Account Settings", 
+    //   path: "/settings", 
+    //   icon: React.createElement(Settings, { className: "w-5 h-5" }) 
+    // },
     { 
       name: "Logout", 
       onClick: logout, // ✅ เรียก logout() ตรงนี้
