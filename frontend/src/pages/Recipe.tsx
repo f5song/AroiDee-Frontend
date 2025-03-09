@@ -100,7 +100,14 @@ const RecipePage: React.FC = () => {
             checkedIngredients={checkedIngredients}
             handleIngredientClick={handleIngredientClick}
             getConvertedIngredient={(ingredient) => {
-              return `${ingredient.name} - ${ingredient.quantity} ${ingredient.unit}`;
+              if (
+                typeof ingredient === "object" &&
+                ingredient !== null &&
+                "name" in ingredient
+              ) {
+                return `${ingredient.name} - ${ingredient.quantity} ${ingredient.unit}`;
+              }
+              return "ข้อมูลส่วนผสมไม่ถูกต้อง";
             }}
             timer={timer}
             timerActive={timerActive}

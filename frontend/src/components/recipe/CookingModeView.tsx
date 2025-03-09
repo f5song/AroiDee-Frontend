@@ -3,20 +3,20 @@ import { ChefHat, ArrowLeft, ArrowRight, Clock, Camera } from "lucide-react";
 import { CookingModeViewProps } from "../../types/recipe";
 import Timer from "./Timer";
 
-const CookingModeView: React.FC<CookingModeViewProps> = ({ 
-  recipe, 
-  toggleCookingMode, 
-  currentStep, 
-  prevStep, 
-  nextStep, 
-  checkedIngredients, 
-  handleIngredientClick, 
-  getConvertedIngredient, 
-  timer, 
-  timerActive, 
-  toggleTimer, 
-  resetTimer, 
-  setTimerMinutes 
+const CookingModeView: React.FC<CookingModeViewProps> = ({
+  recipe,
+  toggleCookingMode,
+  currentStep,
+  prevStep,
+  nextStep,
+  checkedIngredients,
+  handleIngredientClick,
+  getConvertedIngredient,
+  timer,
+  timerActive,
+  toggleTimer,
+  resetTimer,
+  setTimerMinutes,
 }) => (
   <div className="bg-white rounded-xl shadow-lg p-6 max-w-7xl mx-auto">
     <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
@@ -56,7 +56,9 @@ const CookingModeView: React.FC<CookingModeViewProps> = ({
                       : "text-gray-700"
                   }
                 >
-                  {getConvertedIngredient(item)}
+                  {typeof item === "object" && item !== null && "name" in item
+                    ? getConvertedIngredient(item)
+                    : "ข้อมูลไม่ถูกต้อง"}
                 </span>
               </li>
             ))}
@@ -64,7 +66,7 @@ const CookingModeView: React.FC<CookingModeViewProps> = ({
         </div>
 
         {/* Timer Component */}
-        <Timer 
+        <Timer
           timer={timer}
           timerActive={timerActive}
           toggleTimer={toggleTimer}
@@ -127,7 +129,7 @@ const CookingModeView: React.FC<CookingModeViewProps> = ({
           </h2>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <button 
+            <button
               onClick={() => setTimerMinutes(5)}
               className="px-4 py-2 bg-orange-100 text-orange-600 hover:bg-orange-200 rounded-lg flex items-center transition-colors"
             >
@@ -140,16 +142,21 @@ const CookingModeView: React.FC<CookingModeViewProps> = ({
             </button>
           </div>
         </div>
-        
+
         {/* Step Progress Bar */}
         <div className="mt-6 bg-gray-100 h-2 rounded-full overflow-hidden">
-          <div 
+          <div
             className="bg-orange-500 h-full rounded-full"
-            style={{ width: `${((currentStep + 1) / recipe.instructions.length) * 100}%` }}
+            style={{
+              width: `${
+                ((currentStep + 1) / recipe.instructions.length) * 100
+              }%`,
+            }}
           ></div>
         </div>
         <div className="mt-2 text-right text-sm text-gray-500">
-          ความคืบหน้า {Math.round(((currentStep + 1) / recipe.instructions.length) * 100)}%
+          ความคืบหน้า{" "}
+          {Math.round(((currentStep + 1) / recipe.instructions.length) * 100)}%
         </div>
       </div>
     </div>
