@@ -37,6 +37,8 @@ export default function CreateRecipePage() {
     },
   });
 
+  const cloudinaryCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "dct6hlg8b";
+
   // ✅ อัพเดทค่าของฟอร์ม
   const updateField = (field: string, value: any) => {
     setRecipe((prev) => ({ ...prev, [field]: value }));
@@ -52,7 +54,9 @@ export default function CreateRecipePage() {
   }, []);
 
   // ✅ อัพโหลดรูปภาพ
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -65,17 +69,20 @@ export default function CreateRecipePage() {
       data.append("api_key", process.env.CLOUDINARY_API_KEY || "");
       data.append("signature", signatureResponse.data.signature);
       data.append("timestamp", signatureResponse.data.timestamp);
-      
+
       const cloudinaryResponse = await axios.post(
-        `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/auto/upload`,
+        `https://api.cloudinary.com/v1_1/${cloudinaryCloudName}/auto/upload`,
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
-      
+
       if (cloudinaryResponse.data.secure_url) {
-        setRecipe((prev) => ({ ...prev, image_url: cloudinaryResponse.data.secure_url }));
+        setRecipe((prev) => ({
+          ...prev,
+          image_url: cloudinaryResponse.data.secure_url,
+        }));
       }
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -83,8 +90,6 @@ export default function CreateRecipePage() {
       setIsSaving(false);
     }
   };
-
-
 
   // ✅ เพิ่มและลบส่วนผสม
   const addIngredient = () => {
