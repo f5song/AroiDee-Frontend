@@ -95,24 +95,28 @@ const RecipePage: React.FC = () => {
       title: string;
       image_url?: string;
       cook_time?: number;
-      rating?: number | null;
+      rating?: string | number; // ✅ รับค่าเป็น string หรือ number
     }[],
     currentRecipeId: string | number,
     count: number = 5
-  ) => {
+  ): {
+    id: number;
+    title: string;
+    image_url?: string;
+    cook_time?: number;
+    rating?: number; // ✅ ทำให้ rating เป็น number
+  }[] => {
     if (!allRecipes.length) return [];
 
     const filteredRecipes = allRecipes.filter(
       (r) => r.id !== Number(currentRecipeId)
     );
 
-    const shuffled = filteredRecipes
-      .sort(() => 0.5 - Math.random())
-      .slice(0, count);
+    const shuffled = filteredRecipes.sort(() => 0.5 - Math.random());
 
-    return shuffled.map((recipe) => ({
+    return shuffled.slice(0, count).map((recipe) => ({
       ...recipe,
-      rating: typeof recipe.rating === "number" ? recipe.rating : 0, // ✅ แปลง rating เป็นตัวเลขเสมอ
+      rating: recipe.rating ? Number(recipe.rating) : 0, // ✅ แปลงเป็น number
     }));
   };
 

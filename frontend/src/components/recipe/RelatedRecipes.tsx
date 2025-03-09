@@ -47,10 +47,8 @@ const RelatedRecipes: React.FC<RelatedRecipesProps> = ({ recipes }) => {
                     fill="currentColor"
                   />
                   <span>
-                    {typeof item.rating === "number"
-                      ? item.rating.toFixed(1) // ✅ ใช้ได้ทันทีถ้าเป็น number
-                      : typeof item.rating === "string" && !isNaN(Number(item.rating))
-                      ? parseFloat(item.rating).toFixed(1) // ✅ แปลง string → number
+                    {item.rating && !isNaN(Number(item.rating))
+                      ? Number(item.rating).toFixed(1) // ✅ แปลงเป็น number ก่อนใช้ toFixed(1)
                       : "N/A"}
                   </span>
                 </div>
