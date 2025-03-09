@@ -1,10 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { User, Mail, MapPin} from "lucide-react";
+import { User, Mail, MapPin } from "lucide-react";
 import { Profile } from "./ProfileTypes";
 import AvatarUpload from "./AvatarUpload";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 
 interface ProfileFormProps {
   profile: Profile;
@@ -16,12 +15,35 @@ interface ProfileFormProps {
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({
-  profile
+  profile,
+  onProfileChange,
 }) => {
-  const handleAvatarChange = (file: File) => {
+  const handleAvatarChange = async (file: File) => {
     console.log("Avatar file:", file);
-    // Here you would typically upload the file to your server
-    // and update the profile with the new avatar URL
+
+    // ✅ Upload image to backend (you need to implement this API)
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    try {
+      const response = await fetch(
+        "https://aroi-dee-backend.vercel.app/api/users/upload-avatar",
+        {
+          method: "POST",
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // ✅ ดึง Token จาก LocalStorage
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (data.success) {
+        onProfileChange({ ...profile, image_url: data.imageUrl }); // ✅ อัปเดตค่า `image_url`
+      }
+    } catch (error) {
+      console.error("Failed to upload avatar", error);
+    }
   };
 
   return (
@@ -32,62 +54,54 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       transition={{ duration: 0.5 }}
     >
       <Card className="shadow-sm border overflow-hidden bg-white">
-        {/* Simple Header */}
-        <div className="h-20 sm:h-24 bg-gray-50 border-b relative">
-          {/* Profile Stats - Removed Recipes badge and Join date */}
-          <div className="absolute bottom-0 right-0 p-2 sm:p-4 flex gap-2 sm:gap-3 flex-wrap justify-end">
-            {/* Badges removed as requested */}
-          </div>
-        </div>
-        
+        {/* Header */}
+        <div className="h-20 sm:h-24 bg-gray-50 border-b relative"></div>
+
         <div className="px-4 sm:px-6 pb-6">
-          {/* Avatar and Name section - Center everything */}
+          {/* Avatar and Name */}
           <div className="flex flex-col items-center -mt-12 mb-6">
             <div className="z-10">
-              <AvatarUpload 
-                username={profile.username} 
-                currentAvatar={profile.avatar} 
+              <AvatarUpload
+                username={profile.username}
+                currentAvatar={profile.image_url || "/default-avatar.png"} // ✅ ใช้ image_url จาก Profile type ที่แก้ไขแล้ว
                 onAvatarChange={handleAvatarChange}
               />
             </div>
             <div className="mt-4 space-y-1 text-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{profile.fullName}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
+                {profile.username}
+              </h1>
               <p className="text-gray-500 flex items-center justify-center">
-                <MapPin className="h-3 w-3 mr-1" /> 
+                <MapPin className="h-3 w-3 mr-1" />{" "}
+                {/* สามารถเพิ่ม location ได้ถ้ามีข้อมูล */}
               </p>
             </div>
           </div>
 
-          {/* Main content */}
-          <div className="space-y-6">
-            {/* Personal Info */}
-            <Card className="border bg-white shadow-sm">
-              <CardHeader className="pb-2 pt-4 px-4 sm:px-6">
-                <CardTitle className="text-md sm:text-lg flex items-center justify-center">
-                  <User className="h-4 w-4 mr-2 text-gray-500" /> Personal Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 sm:px-6">
-                <div className="grid grid-cols-1 gap-y-4 gap-x-6">
-                  <ProfileField 
-                    icon={<Mail className="text-gray-500" />} 
-                    label="Email" 
-                    value={profile.email} 
-                    centered={true}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Personal Info */}
+          <Card className="border bg-white shadow-sm">
+            <CardHeader className="pb-2 pt-4 px-4 sm:px-6">
+              <CardTitle className="text-md sm:text-lg flex items-center justify-center">
+                <User className="h-4 w-4 mr-2 text-gray-500" /> Personal
+                Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-6">
+              <ProfileField
+                icon={<Mail className="text-gray-500" />}
+                label="Email"
+                value={profile.email}
+                centered
+              />
+            </CardContent>
+          </Card>
         </div>
       </Card>
     </motion.div>
   );
 };
 
-
-
-// Profile field component - Updated to support centered layout
+// Profile Field Component
 interface ProfileFieldProps {
   icon: React.ReactNode;
   label: string;
@@ -95,12 +109,25 @@ interface ProfileFieldProps {
   centered?: boolean;
 }
 
-const ProfileField: React.FC<ProfileFieldProps> = ({ icon, label, value, centered = false }) => (
-  <div className={`flex flex-col space-y-1 ${centered ? 'items-center text-center' : ''}`}>
+const ProfileField: React.FC<ProfileFieldProps> = ({
+  icon,
+  label,
+  value,
+  centered = false,
+}) => (
+  <div
+    className={`flex flex-col space-y-1 ${
+      centered ? "items-center text-center" : ""
+    }`}
+  >
     <span className="text-sm text-gray-500">{label}</span>
     <div className="flex items-center gap-2">
-      {React.cloneElement(icon as React.ReactElement, { className: "h-4 w-4 text-gray-500" })}
-      <span className="text-sm sm:text-base text-gray-800 break-words">{value}</span>
+      {React.cloneElement(icon as React.ReactElement, {
+        className: "h-4 w-4 text-gray-500",
+      })}
+      <span className="text-sm sm:text-base text-gray-800 break-words">
+        {value}
+      </span>
     </div>
   </div>
 );

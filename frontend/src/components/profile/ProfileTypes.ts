@@ -15,4 +15,5 @@ export interface Profile {
     pushNotifications?: boolean;
     newsletterSubscribed?: boolean;
   };
+  image_url?: string;
 }
