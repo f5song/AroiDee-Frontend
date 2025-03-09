@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { RecipeHeader } from "@/components/createRecipe/RecipeHeader";
 import { createRecipe } from "@/lib/api/recipeApi";
 import { useAuth } from "@/components/auth/AuthContext";
-import { fetchCategories, uploadImageToCloudinary } from "@/lib/api/utils";
+import { fetchCategories } from "@/lib/api/utils";
+import axios from "axios";
 
 export default function CreateRecipePage() {
   const navigate = useNavigate();
@@ -51,19 +52,39 @@ export default function CreateRecipePage() {
   }, []);
 
   // ✅ อัพโหลดรูปภาพ
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsSaving(true);
-    const imageUrl = await uploadImageToCloudinary(file, "profile"); // ✅ ใช้โฟลเดอร์ `profile`
-    if (imageUrl) {
-      setRecipe((prev) => ({ ...prev, image_url: imageUrl }));
+
+    try {
+      const signatureResponse = await axios.get("/get-signature");
+      const data = new FormData();
+      data.append("file", file);
+      data.append("api_key", process.env.CLOUDINARY_API_KEY || "");
+      data.append("signature", signatureResponse.data.signature);
+      data.append("timestamp", signatureResponse.data.timestamp);
+      
+      const cloudinaryResponse = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/auto/upload`,
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      
+      if (cloudinaryResponse.data.secure_url) {
+        setRecipe((prev) => ({ ...prev, image_url: cloudinaryResponse.data.secure_url }));
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setIsSaving(false);
     }
-    setIsSaving(false);
   };
+
+
 
   // ✅ เพิ่มและลบส่วนผสม
   const addIngredient = () => {
