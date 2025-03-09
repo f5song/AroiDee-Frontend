@@ -7,29 +7,26 @@ import {
 } from "@/components/ui/collapsible";
 import { SidebarCollapsibleProps } from "@/components/explore/sidebar/types";
 
-
 export function SidebarCollapsible({
   isOpen,
   setIsOpen,
   isMobile,
-
+  sidebarHeight,
+  selectedCategory,
   activeFiltersCount,
   searchQuery,
   children,
 }: SidebarCollapsibleProps) {
   // Total active filters count
-  const totalActiveCount = 
+  const totalActiveCount = (searchQuery ? 1 : 0) + activeFiltersCount;
 
-    (searchQuery ? 1 : 0) + 
-    activeFiltersCount;
-  
   return (
     <>
       {/* Mobile toggle button when sidebar is closed - แสดงเฉพาะเมื่อเป็นมือถือและ sidebar ปิดอยู่ */}
       {isMobile && !isOpen && (
-        <Button 
-          variant="outline" 
-          size="sm" 
+        <Button
+          variant="outline"
+          size="sm"
           className="fixed left-4 top-20 z-50 rounded-full shadow-md p-3 transition-all duration-300 hover:bg-primary hover:text-white"
           onClick={() => setIsOpen(true)}
         >
@@ -41,29 +38,35 @@ export function SidebarCollapsible({
           )}
         </Button>
       )}
-      
+
       <Collapsible
         open={isOpen}
         onOpenChange={setIsOpen}
-        className={`bg-background ${isMobile ? 'fixed left-0 top-0 bottom-0 z-40' : 'border-r sticky top-[var(--navbar-height,0px)] z-10'}`}
-        style={{ 
-          height: isMobile ? '100%' : 'auto',
-          minHeight: isMobile ? '100%' : 'calc(100vh - var(--navbar-height, 0px))',
-          width: isMobile && isOpen ? '100%' : 'auto',
-          transform: isMobile ? (isOpen ? 'translateX(0)' : 'translateX(-100%)') : 'none',
-          transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          display: isMobile ? 'block' : 'block', // แสดงตลอดแต่ใช้ transform เลื่อนแทน
-          boxShadow: isMobile && isOpen ? '0 4px 24px rgba(0, 0, 0, 0.2)' : 'none' // เพิ่มเงาเมื่อเปิด sidebar บนมือถือ
+        className={`bg-background ${
+          isMobile
+            ? "fixed left-0 top-0 bottom-0 z-40"
+            : "border-r sticky top-[var(--navbar-height,0px)] z-10"
+        }`}
+        style={{
+          height: isMobile ? "100%" : "auto",
+          minHeight: isMobile
+            ? "100%"
+            : "calc(100vh - var(--navbar-height, 0px))",
+          width: isMobile && isOpen ? "100%" : isOpen ? "280px" : "64px", // ปรับความกว้างให้มากขึ้น
+          transform: isMobile
+            ? isOpen
+              ? "translateX(0)"
+              : "translateX(-100%)"
+            : "none",
+          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+          overflow: "hidden",
         }}
       >
-        <div
-          className={`transition-all duration-300 ${
-            isOpen ? (isMobile ? "w-full" : "w-ๅ/") : (isMobile ? "w-full" : "w-12")
-          } flex flex-col h-full bg-white shadow-sm`}
-        >
+        <div className="flex flex-col h-full bg-white shadow-sm w-full">
           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className={`font-semibold ${!isOpen && "sr-only"}`}>Recipe Explorer</h2>
-            {/* ถ้าเป็นมือถือ ซ่อนปุ่มเลื่อน sidebar ทางด้านข้าง แสดงเฉพาะปุ่มปิด */}
+            <h2 className={`font-semibold ${!isOpen && "sr-only"}`}>
+              Recipe Explorer
+            </h2>
             <CollapsibleTrigger asChild>
               <Button
                 variant="ghost"
@@ -71,7 +74,11 @@ export function SidebarCollapsible({
                 className="rounded-full w-8 h-8 p-0"
               >
                 {isOpen ? (
-                  <X className="h-4 w-4" />
+                  isMobile ? (
+                    <X className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 rotate-180" />
+                  )
                 ) : (
                   !isMobile && <ChevronRight className="h-4 w-4" />
                 )}
@@ -79,17 +86,16 @@ export function SidebarCollapsible({
             </CollapsibleTrigger>
           </div>
 
-          {/* Collapsed sidebar view with category icons */}
-          {!isOpen && (
-            <div className="flex flex-col items-center py-4 space-y-4">
-              {/* For the mini sidebar when collapsed */}
-              {/* This will be implemented by the main sidebar component */}
-            </div>
+          {isOpen ? (
+            <CollapsibleContent
+              className="flex-grow overflow-hidden flex flex-col"
+              forceMount
+            >
+              {children}
+            </CollapsibleContent>
+          ) : (
+            <div className="py-4 overflow-hidden">{children}</div>
           )}
-
-          <CollapsibleContent className="flex-grow overflow-hidden flex flex-col">
-            {children}
-          </CollapsibleContent>
         </div>
       </Collapsible>
     </>
