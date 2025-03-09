@@ -18,11 +18,22 @@ export default function CreateRecipePage() {
   const [recipe, setRecipe] = useState({
     title: "",
     description: "",
-    instructions: [""], // ✅ ใช้เป็น array ของ string
+    instructions: [""],
     image_url: "",
     cook_time: 0,
     category_id: null as number | null,
-    ingredients: [{ name: "", amount: "", unit: "" }], // ✅ เรียบง่ายขึ้น
+    ingredients: [{ name: "", amount: "", unit: "" }],
+    nutrition_facts: {
+      calories: "",
+      total_fat: "",
+      saturated_fat: "",
+      cholesterol: "",
+      sodium: "",
+      potassium: "",
+      total_carbohydrate: "",
+      sugars: "",
+      protein: "",
+    },
   });
 
   // ✅ อัพเดทค่าของฟอร์ม
@@ -269,6 +280,36 @@ export default function CreateRecipePage() {
             >
               + Add Step
             </button>
+          </div>
+
+          {/* Nutrition Facts */}
+          <div>
+            <label className="block text-lg font-semibold">
+              Nutrition Facts
+            </label>
+            <div className="grid grid-cols-2 gap-4">
+              {Object.keys(recipe.nutrition_facts).map((key) => (
+                <div key={key}>
+                  <label className="block text-sm capitalize">
+                    {key.replace("_", " ")}
+                  </label>
+                  <input
+                    type="number"
+                    value={(recipe.nutrition_facts as any)[key]}
+                    onChange={(e) =>
+                      setRecipe((prev) => ({
+                        ...prev,
+                        nutrition_facts: {
+                          ...prev.nutrition_facts,
+                          [key]: e.target.value,
+                        },
+                      }))
+                    }
+                    className="w-full p-2 border rounded-md"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Upload Image */}
