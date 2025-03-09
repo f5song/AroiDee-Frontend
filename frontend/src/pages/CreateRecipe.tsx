@@ -150,7 +150,7 @@ export default function CreateRecipePage() {
 
           {/* Description */}
           <div>
-            <label className="block text-lg font-semibold">Description</label>
+            <label className="block text-lg font-semibold">Descriptionฟหกาฟาหกย</label>
             <textarea
               value={recipe.description}
               onChange={(e) => updateField("description", e.target.value)}
