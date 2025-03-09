@@ -68,9 +68,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
               />
             </div>
             <div className="mt-4 space-y-1 text-center">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
-                {profile.username}
-              </h1>
               <p className="text-gray-500 flex items-center justify-center">
                 <MapPin className="h-3 w-3 mr-1" />{" "}
                 {/* สามารถเพิ่ม location ได้ถ้ามีข้อมูล */}
