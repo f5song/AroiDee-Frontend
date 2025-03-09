@@ -115,7 +115,7 @@ export default function CreateRecipePage() {
     try {
       const result = await createRecipe(formattedRecipe, token);
       if (result.success) {
-        navigate("/my-recipes");
+        navigate("/recipes/my-recipes");
       } else {
         setErrors({ submit: result.error || "Failed to create recipe" });
       }
@@ -150,7 +150,7 @@ export default function CreateRecipePage() {
 
           {/* Description */}
           <div>
-            <label className="block text-lg font-semibold">Descriptionฟหกาฟาหกย</label>
+            <label className="block text-lg font-semibold">Description</label>
             <textarea
               value={recipe.description}
               onChange={(e) => updateField("description", e.target.value)}
