@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Heart, User, Clock, Share2, Star } from "lucide-react";
 import { RecipeHeaderProps } from "../../types/recipe";
 import { isRecipeSaved, saveRecipe, unsaveRecipe } from "../../lib/api/savedRecipeApi";
@@ -12,18 +12,21 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   image_url,
   recipeId,
   userId,
-  saved,
-  setSaved,
-  token, // ✅ เพิ่ม token
+  token,
 }) => {
+  const [saved, setSaved] = useState(false); // ✅ ใช้ state ในการอัปเดต UI
+
   useEffect(() => {
     const checkSavedStatus = async () => {
-      if (!userId || !recipeId || !token) return; // ✅ ตรวจสอบค่าให้ครบก่อนเรียก API
+      if (!userId || !recipeId || !token) {
+        console.warn("❌ Missing required params in checkSavedStatus");
+        return;
+      }
       try {
+        console.log(`🔍 Checking if recipe ${recipeId} is saved for user ${userId}`);
         const savedStatus = await isRecipeSaved(userId, recipeId, token);
-        if (typeof setSaved === "function") {
-          setSaved(savedStatus);
-        }
+        console.log(`✅ Recipe ${recipeId} saved status:`, savedStatus);
+        setSaved(savedStatus);
       } catch (error) {
         console.error("❌ ตรวจสอบการบันทึกล้มเหลว:", error);
       }
@@ -34,11 +37,21 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   const toggleSaveRecipe = async () => {
     if (!userId || !recipeId || !token) return;
     try {
-      const success = saved
-        ? await unsaveRecipe(userId, recipeId, token)
-        : await saveRecipe(userId, recipeId, token);
-      if (success && typeof setSaved === "function") {
+      console.log(`🔄 Toggling save status for recipe ${recipeId}`);
+      let success;
+      if (saved) {
+        console.log(`❌ Unsaving recipe ${recipeId} for user ${userId}`);
+        success = await unsaveRecipe(userId, recipeId, token);
+      } else {
+        console.log(`✅ Saving recipe ${recipeId} for user ${userId}`);
+        success = await saveRecipe(userId, recipeId, token);
+      }
+
+      if (success) {
+        console.log(`🎉 Successfully toggled save state for recipe ${recipeId}`);
         setSaved(!saved);
+      } else {
+        console.error(`❌ Failed to toggle save state for recipe ${recipeId}`);
       }
     } catch (error) {
       console.error("❌ ไม่สามารถเปลี่ยนสถานะการบันทึกสูตรอาหาร:", error);
