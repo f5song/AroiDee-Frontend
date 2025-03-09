@@ -176,30 +176,27 @@ export function ExploreSidebar({
 
   // Render collapsed sidebar icons
   const renderCollapsedIcons = () => {
-    if (!isOpen) {
-      return (
-        <div className="flex flex-col items-center py-4 space-y-4">
-          {categories.map((category) => (
-            <Tooltip key={category.slug} content={category.name}>
-              <Button
-                variant={
-                  selectedCategory === category.slug || 
-                  (findParentCategory(selectedCategory) === category.slug) 
-                    ? "secondary" 
-                    : "ghost"
-                }
-                size="icon"
-                className="w-8 h-8"
-                onClick={() => handleCategoryClick(category.slug)}
-              >
-                <span>{category.icon}</span>
-              </Button>
-            </Tooltip>
-          ))}
-        </div>
-      );
-    }
-    return null;
+    return (
+      <div className="flex flex-col items-center gap-5 max-h-screen">
+        {categories.slice(0, 8).map((category) => ( // จำกัดจำนวนหมวดหมู่ที่แสดงหากมีมากเกินไป
+          <Tooltip key={category.slug} content={category.name}>
+            <Button
+              variant={
+                selectedCategory === category.slug || 
+                (findParentCategory(selectedCategory) === category.slug) 
+                  ? "secondary" 
+                  : "ghost"
+              }
+              size="icon"
+              className="w-10 h-10 flex items-center justify-center"
+              onClick={() => handleCategoryClick(category.slug)}
+            >
+              <span className="text-lg">{category.icon}</span>
+            </Button>
+          </Tooltip>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -212,89 +209,86 @@ export function ExploreSidebar({
       activeFiltersCount={activeFiltersCount}
       searchQuery={searchQuery}
     >
-      {/* This is rendered in the collapsed state */}
-      {renderCollapsedIcons()}
-      
-      {/* Search bar */}
-      <SearchBar 
-        searchQuery={searchQuery} 
-        setSearchQuery={setSearchQuery} 
-        handleSearch={handleSearch} 
-      />
-      
-      {/* Main content area */}
-      <div className="p-4 overflow-y-auto flex-grow">
-        {/* Active filters */}
-        <ActiveFilters 
-          selectedCategory={selectedCategory}
-          searchQuery={searchQuery}
-          cookingTime={cookingTime}
-          difficulty={difficulty}
-          calorieRange={calorieRange}
-          ingredientsList={ingredientsList}
-          resetFilters={resetFilters}
-          setSelectedCategory={setSelectedCategory}
-          setSearchQuery={setSearchQuery}
-          setCookingTime={setCookingTime}
-          setDifficulty={setDifficulty}
-          setCalorieRange={setCalorieRange}
-          removeIngredient={removeIngredient}
-          onCategoryChange={onCategoryChange}
-          onSearch={onSearch}
-          activeFiltersCount={activeFiltersCount}
-        />
-        
-        {/* Tabs for categories and filters */}
-        <Tabs defaultValue="categories" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="w-full grid grid-cols-2 mb-4">
-            <TabsTrigger value="categories" className="flex items-center gap-1">
-              <ChefHat className="h-4 w-4" />
-              Categories
-            </TabsTrigger>
-            <TabsTrigger value="filters" className="flex items-center gap-1">
-              <Filter className="h-4 w-4" />
-              Filters
-              {activeFiltersCount > 0 && (
-                <span className="bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center ml-1">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </TabsTrigger>
-          </TabsList>
+      {!isOpen ? (
+        // เมื่อ sidebar ถูกย่อ แสดงเฉพาะไอคอน
+        renderCollapsedIcons()
+      ) : (
+        // เมื่อ sidebar ถูกขยาย แสดงเนื้อหาปกติ
+        <>
+          <SearchBar 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery} 
+            handleSearch={handleSearch} 
+          />
           
-          {/* Categories tab content */}
-          <TabsContent value="categories" className="m-0">
-            <CategoryList 
-              categories={categories}
+          <div className="p-4 overflow-y-auto flex-grow">
+            <ActiveFilters 
               selectedCategory={selectedCategory}
-              expandedCategories={expandedCategories}
-              setExpandedCategories={setExpandedCategories}
-              handleCategoryClick={handleCategoryClick}
-            />
-          </TabsContent>
-          
-          {/* Filters tab content */}
-          <TabsContent value="filters" className="space-y-6 m-0">
-            <AdvancedFilters 
+              searchQuery={searchQuery}
               cookingTime={cookingTime}
-              setCookingTime={setCookingTime}
               difficulty={difficulty}
-              setDifficulty={setDifficulty}
-              ingredients={ingredients}
-              setIngredients={setIngredients}
-              ingredientsList={ingredientsList}
               calorieRange={calorieRange}
+              ingredientsList={ingredientsList}
+              resetFilters={resetFilters}
+              setSelectedCategory={setSelectedCategory}
+              setSearchQuery={setSearchQuery}
+              setCookingTime={setCookingTime}
+              setDifficulty={setDifficulty}
               setCalorieRange={setCalorieRange}
-              handleAddIngredient={handleAddIngredient}
               removeIngredient={removeIngredient}
-              applyAdvancedFilters={applyAdvancedFilters}
+              onCategoryChange={onCategoryChange}
+              onSearch={onSearch}
               activeFiltersCount={activeFiltersCount}
             />
-          </TabsContent>
-        </Tabs>
-      </div>
+            
+            <Tabs defaultValue="categories" value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="w-full grid grid-cols-2 mb-4">
+                <TabsTrigger value="categories" className="flex items-center gap-1">
+                  <ChefHat className="h-4 w-4" />
+                  Categories
+                </TabsTrigger>
+                <TabsTrigger value="filters" className="flex items-center gap-1">
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <span className="bg-primary text-white text-xs rounded-full h-4 w-4 flex items-center justify-center ml-1">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="categories" className="m-0">
+                <CategoryList 
+                  categories={categories}
+                  selectedCategory={selectedCategory}
+                  expandedCategories={expandedCategories}
+                  setExpandedCategories={setExpandedCategories}
+                  handleCategoryClick={handleCategoryClick}
+                />
+              </TabsContent>
+              
+              <TabsContent value="filters" className="space-y-6 m-0">
+                <AdvancedFilters 
+                  cookingTime={cookingTime}
+                  setCookingTime={setCookingTime}
+                  difficulty={difficulty}
+                  setDifficulty={setDifficulty}
+                  ingredients={ingredients}
+                  setIngredients={setIngredients}
+                  ingredientsList={ingredientsList}
+                  calorieRange={calorieRange}
+                  setCalorieRange={setCalorieRange}
+                  handleAddIngredient={handleAddIngredient}
+                  removeIngredient={removeIngredient}
+                  applyAdvancedFilters={applyAdvancedFilters}
+                  activeFiltersCount={activeFiltersCount}
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
+        </>
+      )}
     </SidebarCollapsible>
   );
 }
-
-export default ExploreSidebar;

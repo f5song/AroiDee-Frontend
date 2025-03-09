@@ -2,7 +2,7 @@ import React from "react";
 import { NutritionFactsProps } from "../../types/recipe";
 
 const NutritionFacts: React.FC<NutritionFactsProps> = ({ nutrition }) => {
-  // ✅ กำหนดค่าสูงสุดสำหรับแต่ละสารอาหาร (สามารถปรับค่าได้)
+  // Set maximum values for each nutrient (can be adjusted as needed)
   const maxValues: { [key: string]: number } = {
     calories: 500,
     total_fat: 30,
@@ -15,7 +15,7 @@ const NutritionFacts: React.FC<NutritionFactsProps> = ({ nutrition }) => {
     protein: 50
   };
 
-  // ✅ สีเฉพาะของแต่ละสารอาหาร
+  // Colors for each nutrient
   const colorMap: { [key: string]: string } = {
     calories: "bg-orange-500",
     total_fat: "bg-red-500",
@@ -24,21 +24,21 @@ const NutritionFacts: React.FC<NutritionFactsProps> = ({ nutrition }) => {
     sodium: "bg-yellow-500",
     potassium: "bg-green-500",
     total_carbohydrate: "bg-blue-500",
-    sugars: "bg-yellow-800", // ถ้าไม่มี Tailwind ให้ใช้ bg-yellow-800 แทน
+    sugars: "bg-yellow-800",
     protein: "bg-indigo-500"
   };
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-5 mb-6 border border-gray-100">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">คุณค่าทางโภชนาการ</h2>
+        <h2 className="text-xl font-bold text-gray-800">Nutrition Facts</h2>
       </div>
 
       <div className="space-y-4">
         {Object.entries(nutrition).map(([key, value]) => {
-          const max = maxValues[key] || 100; // ✅ กำหนดค่า max ถ้าไม่มี
-          const percentage = Math.min(100, (value / max) * 100); // ✅ ป้องกันค่าที่เกิน 100%
-          const barColor = colorMap[key] || "bg-gray-400"; // ✅ สีเริ่มต้นคือเทาถ้าไม่เจอใน colorMap
+          const max = maxValues[key] || 100; // Set max value if not found
+          const percentage = Math.min(100, (value / max) * 100); // Prevent values over 100%
+          const barColor = colorMap[key] || "bg-gray-400"; // Default to gray if not in colorMap
 
           return (
             <div key={key} className="space-y-1">

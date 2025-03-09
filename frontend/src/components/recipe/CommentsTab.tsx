@@ -9,13 +9,13 @@ const CommentsTab: React.FC<CommentsTabProps> = ({
   handleCommentSubmit 
 }) => (
   <div>
-    <h2 className="text-2xl font-bold text-gray-800 mb-5">รีวิวและความคิดเห็น</h2>
+    <h2 className="text-2xl font-bold text-gray-800 mb-5">Reviews and Comments</h2>
     <div className="mb-8 bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-      <h3 className="text-lg font-medium mb-3">แชร์ความคิดเห็นของคุณ</h3>
+      <h3 className="text-lg font-medium mb-3">Share Your Opinion</h3>
       <textarea
         value={newComment}
         onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setNewComment(e.target.value)}
-        placeholder="แบ่งปันความคิดเห็นของคุณเกี่ยวกับสูตรนี้..."
+        placeholder="Share your thoughts about this recipe..."
         className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-gray-50 h-24"
       />
       <div className="flex flex-wrap justify-between mt-3">
@@ -37,7 +37,7 @@ const CommentsTab: React.FC<CommentsTabProps> = ({
           onClick={handleCommentSubmit}
           className="px-5 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
         >
-          โพสต์ความคิดเห็น
+          Post Comment
         </button>
       </div>
     </div>
@@ -45,7 +45,7 @@ const CommentsTab: React.FC<CommentsTabProps> = ({
     <div className="space-y-4">
       {commentsList.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          ยังไม่มีความคิดเห็น เป็นคนแรกที่แสดงความคิดเห็นเกี่ยวกับสูตรนี้
+          No comments yet. Be the first to comment on this recipe.
         </div>
       ) : (
         commentsList.map((comment, index) => (
@@ -75,13 +75,13 @@ const CommentsTab: React.FC<CommentsTabProps> = ({
             <p className="text-gray-700">{comment.text}</p>
             <div className="mt-3 flex space-x-4 text-sm">
               <button className="text-gray-500 hover:text-orange-500 transition-colors">
-                ชอบ
+                Like
               </button>
               <button className="text-gray-500 hover:text-orange-500 transition-colors">
-                ตอบกลับ
+                Reply
               </button>
               <button className="text-gray-500 hover:text-orange-500 transition-colors">
-                แชร์
+                Share
               </button>
             </div>
           </div>

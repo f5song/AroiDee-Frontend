@@ -463,7 +463,7 @@ const CalendarMealPlanner: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold">📅 Daily Meal Planner</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Daily Meal Planner</h1>
         
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium hidden md:inline">Calorie Goal:</span>
