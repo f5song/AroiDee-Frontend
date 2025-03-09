@@ -147,16 +147,6 @@ const ProfilePage: React.FC = () => {
           </div>
         ) : profile ? (
           <>
-            {/* ✅ แสดงรูปโปรไฟล์ */}
-            {previewImage && (
-              <div className="flex justify-center mb-6">
-                <img
-                  src={previewImage}
-                  alt="User Profile"
-                  className="w-32 h-32 rounded-full border-4 border-gray-300 shadow-md"
-                />
-              </div>
-            )}
 
             {/* ✅ ฟอร์มแก้ไขข้อมูล */}
             <ProfileForm
