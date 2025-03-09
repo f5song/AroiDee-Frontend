@@ -16,9 +16,14 @@ export interface Nutrition {
   }
   
   export interface RelatedRecipe {
+    id: number;
     title: string;
-    image: string;
+    image?: string; // ✅ ใช้ image ตาม API
+    image_url?: string; // ✅ รองรับกรณีมี image_url
+    cook_time?: number;
+    rating?: number;
   }
+  
   
   export interface Comment {
     user: string;
