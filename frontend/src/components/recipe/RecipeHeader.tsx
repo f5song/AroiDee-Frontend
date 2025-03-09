@@ -12,36 +12,35 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   comments,
   image_url,
   recipeId,
-  userId,
-  token, // ✅ รับค่า token เพื่อใช้ใน API
+  userId, // ✅ รับ userId เพื่อเช็คว่าเข้าสู่ระบบหรือยัง
 }) => {
-  const { favorites, isProcessing, toggleFavorite } = useFavorites(); // ✅ ใช้ FavoritesContext
+  const { favorites, isProcessing, toggleFavorite } = useFavorites(); // ✅ ใช้ Context
   const navigate = useNavigate();
+
+  // ✅ ดึง token จาก localStorage โดยอัตโนมัติ
+  const token = localStorage.getItem("authToken");
 
   // ✅ ตรวจสอบว่าสูตรอาหารนี้ถูก save หรือยัง
   const isFavorite = favorites.includes(recipeId);
   const isDisabled = isProcessing[recipeId] ?? false;
 
   console.log(
-    `📌 Recipe ID: ${recipeId}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}`
+    `📌 Recipe ID: ${recipeId}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}, token: ${token}`
   );
 
   // ✅ ฟังก์ชัน Toggle Save/Unsave โดยใช้ FavoritesContext
   const handleFavoriteToggle = async (event: React.MouseEvent) => {
     event.preventDefault();
 
-    const token = localStorage.getItem("authToken"); // ✅ ดึง token
     if (!userId || !token) {
       console.warn("❌ ผู้ใช้ไม่ได้ล็อกอินหรือไม่มี token", { userId, token });
-      navigate("/login");
+      navigate("/login"); // นำไปสู่หน้า Login ถ้าไม่ได้ล็อกอิน
       return;
     }
 
     if (isDisabled) return; // ป้องกันกดซ้ำ
 
-    console.log(
-      `📌 Toggling favorite for recipe ID: ${recipeId} with token: ${token}`
-    );
+    console.log(`📌 Toggling favorite for recipe ID: ${recipeId}`);
     await toggleFavorite(recipeId);
   };
 
@@ -78,7 +77,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
             {/* ✅ ปุ่ม Save/Unsave ใช้ FavoritesContext */}
             <button
               onClick={handleFavoriteToggle}
-              disabled={isDisabled}
+              disabled={isDisabled || !token} // ❌ ปิดปุ่มถ้าไม่มี token
               className={`p-3 rounded-full backdrop-blur-md transition-all ${
                 isFavorite
                   ? "bg-red-500 text-white"
