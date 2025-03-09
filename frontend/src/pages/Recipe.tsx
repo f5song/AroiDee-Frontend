@@ -45,14 +45,28 @@ const RecipePage: React.FC = () => {
   const [commentsList] = useState<Comment[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ingredients");
   const [cookingMode, setCookingMode] = useState<boolean>(false);
-  const [timer, setTimer] = useState<number>(0);
-  const [timerActive, setTimerActive] = useState<boolean>(false);
   const [showNutritionDetails, setShowNutritionDetails] =
     useState<boolean>(false);
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
   const [selectedUnit, setSelectedUnit] = useState<string>("metric");
   const [currentStep, setCurrentStep] = useState<number>(0);
 
+  const [timer, setTimer] = useState<number>(0);
+  const [timerActive, setTimerActive] = useState<boolean>(false);
+
+  // ✅ ฟังก์ชันควบคุมการทำงานของ Timer
+  const setTimerMinutes = (minutes: number) => {
+    setTimer(minutes); // ✅ กำหนดค่า timer เป็นวินาที
+  };
+
+  const toggleTimer = () => {
+    setTimerActive((prev) => !prev);
+  };
+
+  const resetTimer = () => {
+    setTimer(0);
+    setTimerActive(false);
+  };
   // ✅ ตั้งค่า checkedIngredients เมื่อโหลดข้อมูล
   useEffect(() => {
     if (Array.isArray(recipe?.ingredients) && recipe.ingredients.length > 0) {
@@ -115,10 +129,11 @@ const RecipePage: React.FC = () => {
               return "ข้อมูลส่วนผสมไม่ถูกต้อง";
             }}
             timer={timer}
+            setTimer={setTimer} // ✅ ส่ง setTimer ไปให้ CookingModeView
             timerActive={timerActive}
-            toggleTimer={() => setTimerActive(!timerActive)}
-            resetTimer={() => setTimer(0)}
-            setTimerMinutes={(minutes) => setTimer(minutes * 60)}
+            toggleTimer={toggleTimer}
+            resetTimer={resetTimer}
+            setTimerMinutes={setTimerMinutes}
           />
         ) : (
           <>

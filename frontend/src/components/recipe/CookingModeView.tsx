@@ -13,6 +13,7 @@ const CookingModeView: React.FC<CookingModeViewProps> = ({
   handleIngredientClick,
   getConvertedIngredient,
   timer,
+  setTimer, // ✅ เพิ่ม setTimer
   timerActive,
   toggleTimer,
   resetTimer,
@@ -68,6 +69,7 @@ const CookingModeView: React.FC<CookingModeViewProps> = ({
         {/* Timer Component */}
         <Timer
           timer={timer}
+          setTimer={setTimer} // ✅ ส่ง setTimer ให้ Timer.tsx
           timerActive={timerActive}
           toggleTimer={toggleTimer}
           resetTimer={resetTimer}

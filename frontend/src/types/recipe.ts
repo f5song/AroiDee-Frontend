@@ -119,11 +119,13 @@ export interface Nutrition {
     handleIngredientClick: (index: number) => void;
     getConvertedIngredient: (ingredient: { name: string; quantity: number; unit: string }) => string;
     timer: number;
+    setTimer: React.Dispatch<React.SetStateAction<number>>; // ✅ เพิ่ม setTimer ให้ TypeScript รับรู้
     timerActive: boolean;
     toggleTimer: () => void;
     resetTimer: () => void;
     setTimerMinutes: (minutes: number) => void;
-}
+  }
+  
 
   
   export interface TabContainerProps {
@@ -132,3 +134,13 @@ export interface Nutrition {
     commentCount: number;
     children: React.ReactNode;
   }
+
+  export interface TimerProps {
+    timer: number;
+    setTimer: React.Dispatch<React.SetStateAction<number>>; // ✅ เพิ่ม setTimer
+    timerActive: boolean;
+    toggleTimer: () => void;
+    resetTimer: () => void;
+    setTimerMinutes: (minutes: number) => void;
+  }
+  
