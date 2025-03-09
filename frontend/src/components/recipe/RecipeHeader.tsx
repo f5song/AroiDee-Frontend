@@ -14,12 +14,13 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   userId,
   saved,
   setSaved,
+  token, // ✅ เพิ่ม token
 }) => {
   useEffect(() => {
     const checkSavedStatus = async () => {
-      if (!userId || !recipeId) return; // ✅ ตรวจสอบว่า userId และ recipeId มีค่าก่อนเรียก API
+      if (!userId || !recipeId || !token) return; // ✅ ตรวจสอบค่าให้ครบก่อนเรียก API
       try {
-        const savedStatus = await isRecipeSaved(userId, recipeId);
+        const savedStatus = await isRecipeSaved(userId, recipeId, token);
         if (typeof setSaved === "function") {
           setSaved(savedStatus);
         }
@@ -28,14 +29,14 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
       }
     };
     checkSavedStatus();
-  }, [recipeId, userId]);
+  }, [recipeId, userId, token]);
 
   const toggleSaveRecipe = async () => {
-    if (!userId || !recipeId) return; // ✅ ป้องกันการเรียก API ถ้าไม่มีค่า userId หรือ recipeId
+    if (!userId || !recipeId || !token) return;
     try {
       const success = saved
-        ? await unsaveRecipe(userId, recipeId)
-        : await saveRecipe(userId, recipeId);
+        ? await unsaveRecipe(userId, recipeId, token)
+        : await saveRecipe(userId, recipeId, token);
       if (success && typeof setSaved === "function") {
         setSaved(!saved);
       }

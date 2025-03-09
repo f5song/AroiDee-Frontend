@@ -58,12 +58,13 @@ export interface Nutrition {
     rating: number;
     comments: number;
     image_url: string;
-    liked: boolean;
+    recipeId: number;
+    userId: number;
     saved: boolean;
-    setLiked: React.Dispatch<React.SetStateAction<boolean>>;
     setSaved: React.Dispatch<React.SetStateAction<boolean>>;
-    token: string; // ✅ เพิ่ม token เพื่อให้สามารถส่งค่าไปใช้ใน API
-}
+    token: string; // ✅ เพิ่ม token
+  }
+  
 
   
   export interface ControlBarProps {
