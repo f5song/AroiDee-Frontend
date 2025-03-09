@@ -1,17 +1,16 @@
 const BASE_URL = "https://aroi-dee-backend.vercel.app/api/saved-recipes";
-const USER_RECIPES_URL = "https://aroi-dee-backend.vercel.app/api/recipes/user";
 
 /**
- * ตรวจสอบว่าสูตรอาหารถูกบันทึกไว้หรือยัง
+ * ตรวจสอบว่าสูตรอาหารถูกบันทึกไว้หรือไม่
  */
-export const isRecipeSaved = async (userId: number, recipeId: number): Promise<boolean> => {
+export const isRecipeSaved = async (userId: number, recipeId: number, token: string): Promise<boolean> => {
   try {
-    const response = await fetch(`${USER_RECIPES_URL}/${userId}`);
+    const response = await fetch(`${BASE_URL}/${userId}/saved-recipes`, {
+      headers: { Authorization: `Bearer ${token}` }, // ✅ ส่ง Token
+    });
     const data = await response.json();
 
-    if (!data.success || !data.savedRecipes) {
-      return false;
-    }
+    if (!data.success || !data.savedRecipes) return false;
 
     return data.savedRecipes.some((recipe: { recipe_id: number }) => recipe.recipe_id === recipeId);
   } catch (error) {
@@ -23,11 +22,14 @@ export const isRecipeSaved = async (userId: number, recipeId: number): Promise<b
 /**
  * บันทึกสูตรอาหารลงฐานข้อมูล
  */
-export const saveRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+export const saveRecipe = async (userId: number, recipeId: number, token: string): Promise<boolean> => {
   try {
     const response = await fetch(`${BASE_URL}/save-recipe`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ ส่ง Token
+      },
       body: JSON.stringify({ user_id: userId, recipe_id: recipeId }),
     });
 
@@ -47,11 +49,14 @@ export const saveRecipe = async (userId: number, recipeId: number): Promise<bool
 /**
  * ยกเลิกการบันทึกสูตรอาหาร
  */
-export const unsaveRecipe = async (userId: number, recipeId: number): Promise<boolean> => {
+export const unsaveRecipe = async (userId: number, recipeId: number, token: string): Promise<boolean> => {
   try {
     const response = await fetch(`${BASE_URL}/unsave-recipe`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ ส่ง Token
+      },
       body: JSON.stringify({ user_id: userId, recipe_id: recipeId }),
     });
 

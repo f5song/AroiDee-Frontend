@@ -41,7 +41,8 @@ const RecipePage: React.FC = () => {
   const [commentsList] = useState<Comment[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ingredients");
   const [cookingMode, setCookingMode] = useState<boolean>(false);
-  const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
+  const [showNutritionDetails, setShowNutritionDetails] =
+    useState<boolean>(false);
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
   const [selectedUnit, setSelectedUnit] = useState<string>("metric");
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -76,7 +77,9 @@ const RecipePage: React.FC = () => {
   >({
     queryKey: ["allRecipes"],
     queryFn: async () => {
-      const res = await fetch("https://aroi-dee-backend.vercel.app/api/recipes");
+      const res = await fetch(
+        "https://aroi-dee-backend.vercel.app/api/recipes"
+      );
       const data = await res.json();
       return data.data || [];
     },
@@ -145,7 +148,10 @@ const RecipePage: React.FC = () => {
   };
 
   const nextStep = () => {
-    if (recipe?.instructions?.length && currentStep < recipe.instructions.length - 1) {
+    if (
+      recipe?.instructions?.length &&
+      currentStep < recipe.instructions.length - 1
+    ) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -207,12 +213,15 @@ const RecipePage: React.FC = () => {
               setSaved={setSaved}
               liked={liked}
               setLiked={setLiked}
+              token={user?.token || ""} // ✅ เพิ่ม token
             />
 
             {/* Control Bar */}
             <ControlBar
               toggleUnit={() =>
-                setSelectedUnit(selectedUnit === "metric" ? "imperial" : "metric")
+                setSelectedUnit(
+                  selectedUnit === "metric" ? "imperial" : "metric"
+                )
               }
               selectedUnit={selectedUnit}
               setShowAllergies={setShowAllergies}
