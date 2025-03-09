@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Heart, User, Clock, Share2, Star } from "lucide-react";
 import { RecipeHeaderProps } from "../../types/recipe";
-import { isRecipeSaved, saveRecipe, unsaveRecipe } from "../../lib/api/savedRecipeApi";
+import { useFavorites } from "../auth/FavoritesContext"; // ✅ ใช้ FavoritesContext
+import { useNavigate } from "react-router-dom";
 
 const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   title,
@@ -11,57 +12,46 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   comments,
   image_url,
   recipeId,
-  userId,
-  token,
+  userId, // ✅ รับ userId เพื่อเช็คว่าเข้าสู่ระบบหรือยัง
 }) => {
-  const [saved, setSaved] = useState(false); // ✅ ใช้ state ในการอัปเดต UI
+  const { favorites, isProcessing, toggleFavorite } = useFavorites(); // ✅ ใช้ Context
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const checkSavedStatus = async () => {
-      if (!userId || !recipeId || !token) {
-        console.warn("❌ Missing required params in checkSavedStatus");
-        return;
-      }
-      try {
-        console.log(`🔍 Checking if recipe ${recipeId} is saved for user ${userId}`);
-        const savedStatus = await isRecipeSaved(userId, recipeId, token);
-        console.log(`✅ Recipe ${recipeId} saved status:`, savedStatus);
-        setSaved(savedStatus);
-      } catch (error) {
-        console.error("❌ ตรวจสอบการบันทึกล้มเหลว:", error);
-      }
-    };
-    checkSavedStatus();
-  }, [recipeId, userId, token]);
+  // ✅ ดึง token จาก localStorage โดยอัตโนมัติ
+  const token = localStorage.getItem("authToken");
 
-  const toggleSaveRecipe = async () => {
-    if (!userId || !recipeId || !token) return;
-    try {
-      console.log(`🔄 Toggling save status for recipe ${recipeId}`);
-      let success;
-      if (saved) {
-        console.log(`❌ Unsaving recipe ${recipeId} for user ${userId}`);
-        success = await unsaveRecipe(userId, recipeId, token);
-      } else {
-        console.log(`✅ Saving recipe ${recipeId} for user ${userId}`);
-        success = await saveRecipe(userId, recipeId, token);
-      }
+  // ✅ ตรวจสอบว่าสูตรอาหารนี้ถูก save หรือยัง
+  const isFavorite = favorites.includes(recipeId);
+  const isDisabled = isProcessing[recipeId] ?? false;
 
-      if (success) {
-        console.log(`🎉 Successfully toggled save state for recipe ${recipeId}`);
-        setSaved(!saved);
-      } else {
-        console.error(`❌ Failed to toggle save state for recipe ${recipeId}`);
-      }
-    } catch (error) {
-      console.error("❌ ไม่สามารถเปลี่ยนสถานะการบันทึกสูตรอาหาร:", error);
+  console.log(
+    `📌 Recipe ID: ${recipeId}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}, token: ${token}`
+  );
+
+  // ✅ ฟังก์ชัน Toggle Save/Unsave โดยใช้ FavoritesContext
+  const handleFavoriteToggle = async (event: React.MouseEvent) => {
+    event.preventDefault();
+
+    if (!userId || !token) {
+      console.warn("❌ ผู้ใช้ไม่ได้ล็อกอินหรือไม่มี token", { userId, token });
+      navigate("/login"); // นำไปสู่หน้า Login ถ้าไม่ได้ล็อกอิน
+      return;
     }
+
+    if (isDisabled) return; // ป้องกันกดซ้ำ
+
+    console.log(`📌 Toggling favorite for recipe ID: ${recipeId}`);
+    await toggleFavorite(recipeId);
   };
 
   return (
     <div className="relative rounded-xl overflow-hidden">
       <div className="relative h-[500px]">
-        <img src={image_url} alt={title} className="w-full h-full object-cover" />
+        <img
+          src={image_url}
+          alt={title}
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
         <div className="absolute bottom-0 left-0 p-8 w-full">
@@ -84,14 +74,18 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
           </div>
 
           <div className="absolute top-6 right-6 flex space-x-3">
+            {/* ✅ ปุ่ม Save/Unsave ใช้ FavoritesContext */}
             <button
-              onClick={toggleSaveRecipe}
+              onClick={handleFavoriteToggle}
+              disabled={isDisabled || !token} // ❌ ปิดปุ่มถ้าไม่มี token
               className={`p-3 rounded-full backdrop-blur-md transition-all ${
-                saved ? "bg-red-500 text-white" : "bg-white/20 hover:bg-white/30 text-white"
+                isFavorite
+                  ? "bg-red-500 text-white"
+                  : "bg-white/20 hover:bg-white/30 text-white"
               }`}
             >
-              <Heart size={20} fill={saved ? "currentColor" : "none"} />
-              <span className="ml-2">{saved ? "Unsave" : "Save"}</span>
+              <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+              <span className="ml-2">{isFavorite ? "Saved" : "Save"}</span>
             </button>
             <button className="p-3 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white transition-all">
               <Share2 size={20} />
