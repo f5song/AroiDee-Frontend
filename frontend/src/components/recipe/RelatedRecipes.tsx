@@ -34,10 +34,20 @@ const RelatedRecipes: React.FC<RelatedRecipesProps> = ({ recipes }) => {
               </h3>
               <div className="flex items-center mt-1 text-sm text-gray-500">
                 <Clock size={14} className="mr-1" />
-                <span>{item.cook_time ? `${item.cook_time} นาที` : "ไม่ระบุเวลา"}</span>
+                <span>
+                  {item.cook_time ? `${item.cook_time} นาที` : "ไม่ระบุเวลา"}
+                </span>
                 <span className="mx-2">•</span>
-                <Star size={14} className="mr-1 text-yellow-400" fill="currentColor" />
-                <span>{item.rating ? item.rating.toFixed(1) : "N/A"}</span>
+                <Star
+                  size={14}
+                  className="mr-1 text-yellow-400"
+                  fill="currentColor"
+                />
+                <span>
+                  {typeof item.rating === "number"
+                    ? item.rating.toFixed(1)
+                    : "N/A"}
+                </span>
               </div>
             </div>
           </div>

@@ -95,27 +95,25 @@ const RecipePage: React.FC = () => {
       title: string;
       image_url?: string;
       cook_time?: number;
-      rating?: number;
+      rating?: number | null;
     }[],
     currentRecipeId: string | number,
     count: number = 5
-  ): {
-    id: number;
-    title: string;
-    image_url?: string;
-    cook_time?: number;
-    rating?: number;
-  }[] => {
+  ) => {
     if (!allRecipes.length) return [];
 
-    // ✅ กรองสูตรที่ไม่ตรงกับ recipeId ปัจจุบัน
     const filteredRecipes = allRecipes.filter(
       (r) => r.id !== Number(currentRecipeId)
     );
 
-    // ✅ สุ่ม 5 รายการ (หรือทั้งหมดถ้าน้อยกว่า 5)
-    const shuffled = filteredRecipes.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
+    const shuffled = filteredRecipes
+      .sort(() => 0.5 - Math.random())
+      .slice(0, count);
+
+    return shuffled.map((recipe) => ({
+      ...recipe,
+      rating: typeof recipe.rating === "number" ? recipe.rating : 0, // ✅ แปลง rating เป็นตัวเลขเสมอ
+    }));
   };
 
   // ✅ แปลง recipeId เป็นตัวเลขและกำหนดค่าเริ่มต้นเป็น 0 ถ้า undefined
