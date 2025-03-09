@@ -1,9 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Clock, Star } from "lucide-react";
 import { RelatedRecipesProps } from "../../types/recipe";
 
 const RelatedRecipes: React.FC<RelatedRecipesProps> = ({ recipes }) => {
-  console.log("📌 Related Recipes:", recipes); // ✅ ตรวจสอบข้อมูลใน Console
+  const navigate = useNavigate(); // ✅ ใช้ navigate เพื่อนำทางไปยังหน้าใหม่
+
+  console.log("📌 Related Recipes:", recipes);
 
   if (!recipes || recipes.length === 0) {
     return (
@@ -19,11 +22,12 @@ const RelatedRecipes: React.FC<RelatedRecipesProps> = ({ recipes }) => {
       <h2 className="text-xl font-bold text-gray-800 mb-4">คุณอาจจะชอบ</h2>
       <div className="space-y-4">
         {recipes.map((item, index) => {
-          console.log("📌 Recipe Rating:", item.rating); // ✅ ย้ายมาข้างใน map
+          console.log("📌 Recipe Rating:", item.rating);
 
           return (
             <div
               key={index}
+              onClick={() => navigate(`/recipe/${item.id}`)} // ✅ คลิกแล้วไปที่หน้า `/recipe/{id}`
               className="flex items-center space-x-4 group cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <img
@@ -48,7 +52,7 @@ const RelatedRecipes: React.FC<RelatedRecipesProps> = ({ recipes }) => {
                   />
                   <span>
                     {item.rating && !isNaN(Number(item.rating))
-                      ? Number(item.rating).toFixed(1) // ✅ แปลงเป็น number ก่อนใช้ toFixed(1)
+                      ? Number(item.rating).toFixed(1)
                       : "N/A"}
                   </span>
                 </div>
