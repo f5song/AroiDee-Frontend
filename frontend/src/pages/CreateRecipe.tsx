@@ -1,111 +1,130 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// Refactored components
 import { RecipeHeader } from "@/components/createRecipe/RecipeHeader";
 import { BasicInfoSection } from "@/components/createRecipe/BasicInfoSection";
 import { IngredientsSection } from "@/components/createRecipe/IngredientsSection";
 import { InstructionsSection } from "@/components/createRecipe/InstructionsSection";
 import { FormActions } from "@/components/createRecipe/FormActions";
+import { createRecipe } from "@/lib/api/recipeApi"; // ✅ Import API Call
+import { useAuth } from "@/components/auth/AuthContext";
 
-import { Category } from "../lib/recipes/types"; // ✅ เพิ่ม Category
-
-
-// Import from refactored files
-import { useRecipeForm } from "@/lib/recipes/form";
-import { createRecipe } from "@/lib/recipes/form/api";
-
-/**
- * Create New Recipe page component
- */
-export default function CreateRecipeSinglePage() {
+export default function CreateRecipePage() {
   const navigate = useNavigate();
+  const { token, user } = useAuth(); // ✅ ดึง Token และ User ID
+  const [isSaving, setIsSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   
-  // Use the recipe form hook
-  const {
-    recipe,
-    errors,
-    isSaving,
-    setIsSaving,
-    tagInput,
-    setTagInput,
-    updateBasicInfo,
-    addTag,
-    removeTag,
-    addIngredient,
-    updateIngredient,
-    removeIngredient,
-    addInstruction,
-    updateInstruction,
-    removeInstruction,
-    moveInstruction,
-    handleImageChange,
-    removeImage,
-    validateForm
-  } = useRecipeForm();
-  
-  // Handle form submission
+  // ✅ ตั้งค่า Recipe State
+  const [recipe, setRecipe] = useState({
+    title: "",
+    description: "",
+    instructions: [{ step: "" }],
+    image_url: "",
+    cook_time: 0,
+    category_id: null,
+    recipe_ingredients: [],
+  });
+
+  const [tagInput, setTagInput] = useState("");
+
+  const updateBasicInfo = (field: string, value: any) => {
+    setRecipe((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageChange = (imageUrl: string) => {
+    setRecipe((prev) => ({ ...prev, image_url: imageUrl }));
+  };
+
+  const handleCategorySelect = (categoryName: string) => {
+    setRecipe((prev) => ({ ...prev, category_id: categoryName }));
+  };
+
+  const addTag = (tag: any) => {
+    setRecipe((prev) => ({
+      ...prev,
+      categories: [...(prev.categories || []), tag],
+    }));
+  };
+
+  const removeTag = (tagName: string) => {
+    setRecipe((prev) => ({
+      ...prev,
+      categories: prev.categories.filter((tag: any) => tag.name !== tagName),
+    }));
+  };
+
+  const addIngredient = () => {
+    setRecipe((prev) => ({
+      ...prev,
+      recipe_ingredients: [...prev.recipe_ingredients, { ingredient_id: "", quantity: "" }],
+    }));
+  };
+
+  const updateIngredient = (index: number, field: string, value: string) => {
+    const updatedIngredients = [...recipe.recipe_ingredients];
+    updatedIngredients[index] = { ...updatedIngredients[index], [field]: value };
+    setRecipe((prev) => ({ ...prev, recipe_ingredients: updatedIngredients }));
+  };
+
+  const removeIngredient = (index: number) => {
+    const updatedIngredients = recipe.recipe_ingredients.filter((_, i) => i !== index);
+    setRecipe((prev) => ({ ...prev, recipe_ingredients: updatedIngredients }));
+  };
+
+  const addInstruction = () => {
+    setRecipe((prev) => ({
+      ...prev,
+      instructions: [...prev.instructions, { step: "" }],
+    }));
+  };
+
+  const updateInstruction = (index: number, value: string) => {
+    const updatedInstructions = [...recipe.instructions];
+    updatedInstructions[index] = { step: value };
+    setRecipe((prev) => ({ ...prev, instructions: updatedInstructions }));
+  };
+
+  const removeInstruction = (index: number) => {
+    const updatedInstructions = recipe.instructions.filter((_, i) => i !== index);
+    setRecipe((prev) => ({ ...prev, instructions: updatedInstructions }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate form
-    if (!validateForm()) {
+    setIsSaving(true);
+
+    if (!token || !user) {
+      alert("You must be logged in to create a recipe");
       return;
     }
-    
-    // Start saving process
-    setIsSaving(true);
-    
+
+    // ✅ แปลง instructions เป็น JSON
+    const formattedRecipe = {
+      ...recipe,
+      user_id: user.id, // ✅ เพิ่ม user_id
+      instructions: JSON.stringify(recipe.instructions),
+    };
+
     try {
-      // Save recipe using the updated API
-      const result = await createRecipe(recipe);
-      
+      const result = await createRecipe(formattedRecipe, token);
+
       if (result.success) {
-        // Navigate to the recipe page or my recipes page
         navigate("/my-recipes");
       } else {
-        // Show error
-        updateBasicInfo('submit' as any, result.error || "Failed to save recipe");
+        setErrors({ submit: result.error || "Failed to create recipe" });
       }
     } catch (error) {
-      console.error("Error saving recipe create recipe:", error);
-      updateBasicInfo('submit' as any, "An unexpected error occurred. Please try again.");
+      console.error("Error creating recipe:", error);
+      setErrors({ submit: "An unexpected error occurred. Please try again." });
     } finally {
       setIsSaving(false);
     }
   };
 
-  
-  
-  const handleCategorySelect = (categoryName: string) => {
-    // ตรวจสอบว่าหมวดหมู่ที่เลือกมีอยู่แล้วหรือไม่
-    const categoryExists = recipe.categories.some(cat => cat.name === categoryName);
-  
-    if (!categoryExists && categoryName !== "all") {
-      addTag({ id: 0, name: categoryName, image_url: "" }); // ✅ ส่ง Category object แทน string
-    }
-  };
-  
-  
-  const handleTagKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (tagInput.trim()) {
-        const newCategory: Category = { id: 0, name: tagInput.trim(), image_url: "" }; // ✅ แปลงเป็น Category
-        addTag(newCategory); // ✅ ส่ง Category object แทน string
-        setTagInput(""); // ✅ เคลียร์ input หลังเพิ่ม
-      }
-    }
-  };
-  
-
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
       <div className="max-w-4xl mx-auto">
-        <RecipeHeader 
-          title="Create New Recipe" 
-          subtitle="Share your culinary creations with the world" 
-        />
+        <RecipeHeader title="Create New Recipe" subtitle="Share your culinary creations with the world" />
 
         <form onSubmit={handleSubmit}>
           <div className="space-y-10">
@@ -118,13 +137,11 @@ export default function CreateRecipeSinglePage() {
               addTag={addTag}
               removeTag={removeTag}
               handleImageChange={handleImageChange}
-              removeImage={removeImage}
               handleCategorySelect={handleCategorySelect}
-              handleTagKeyDown={handleTagKeyDown}
             />
 
-            <IngredientsSection 
-              ingredients={recipe.ingredients}
+            <IngredientsSection
+              ingredients={recipe.recipe_ingredients}
               errors={errors}
               addIngredient={addIngredient}
               updateIngredient={updateIngredient}
@@ -137,16 +154,13 @@ export default function CreateRecipeSinglePage() {
               addInstruction={addInstruction}
               updateInstruction={updateInstruction}
               removeInstruction={removeInstruction}
-              moveInstruction={moveInstruction}
             />
 
-            <FormActions 
-              errors={errors}
-              isSaving={isSaving}
-              onCancel={() => navigate("/my-recipes")}
-            />
+            <FormActions isSaving={isSaving} onCancel={() => navigate("/my-recipes")} />
           </div>
         </form>
+
+        {errors.submit && <p className="text-red-500 text-center mt-4">{errors.submit}</p>}
       </div>
     </div>
   );
