@@ -22,11 +22,7 @@ const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
 
   // ✅ ดึงข้อมูลสูตรอาหารที่กำลังเปิดอยู่
-  const {
-    data: recipe,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: recipe } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
     enabled: !!recipeId,
@@ -38,8 +34,8 @@ const RecipePage: React.FC = () => {
   }, [recipe]);
 
   // ✅ State สำหรับการทำงานในหน้า
-  const [liked, setLiked] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
+  const [liked, setLiked] = useState<boolean>(false);
   const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [commentsList] = useState<Comment[]>([]);
@@ -53,6 +49,9 @@ const RecipePage: React.FC = () => {
 
   const [timer, setTimer] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(false);
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+
 
   // ✅ ฟังก์ชันควบคุมการทำงานของ Timer
   const setTimerMinutes = (minutes: number) => {
@@ -150,10 +149,6 @@ const RecipePage: React.FC = () => {
     });
   };
 
-  if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
-  if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
-  if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
-
   const nextStep = () => {
     if (
       recipe?.instructions?.length &&
@@ -214,10 +209,12 @@ const RecipePage: React.FC = () => {
               rating={recipe?.rating || 0}
               comments={commentsList.length}
               image_url={recipe?.image_url || "/default-recipe.jpg"}
-              liked={liked}
-              setLiked={setLiked}
+              recipeId={recipe?.id || 0} // ✅ แก้ไขให้เป็นตัวเลข
+              userId={user?.id || 0} // ✅ ตรวจสอบว่ามี `user` หรือไม่
               saved={saved}
               setSaved={setSaved}
+              liked={liked} // ✅ เพิ่ม liked
+              setLiked={setLiked} // ✅ เพิ่ม setLiked
             />
 
             {/* Control Bar */}

@@ -1,4 +1,5 @@
 // Types for Recipe Data
+import { Dispatch, SetStateAction } from "react";
 export interface Nutrition {
     calories: string;
     protein: string;
@@ -148,6 +149,22 @@ export interface Nutrition {
     resetTimer: () => void;
     setTimerMinutes: (minutes: number) => void;
   }
+  
+  export interface RecipeHeaderProps {
+    title: string;
+    author: string;
+    date: string;
+    rating: number;
+    comments: number;
+    image_url: string;
+    recipeId: number;
+    userId: number;
+    saved: boolean;
+    setSaved: Dispatch<SetStateAction<boolean>>; // ✅ ใช้ Dispatch<SetStateAction<boolean>>
+    liked: boolean;
+    setLiked: Dispatch<SetStateAction<boolean>>; // ✅ ใช้ Dispatch<SetStateAction<boolean>>
+  }
+  
   
   
 
