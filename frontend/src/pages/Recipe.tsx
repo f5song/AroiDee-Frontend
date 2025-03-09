@@ -51,20 +51,22 @@ const RecipePage: React.FC = () => {
     useState<boolean>(false);
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
   const [selectedUnit, setSelectedUnit] = useState<string>("metric");
+  const [currentStep, setCurrentStep] = useState<number>(0);
 
   // ✅ ตั้งค่า checkedIngredients เมื่อโหลดข้อมูล
   useEffect(() => {
-    if (recipe?.ingredients?.length) {
+    if (Array.isArray(recipe?.ingredients) && recipe.ingredients.length > 0) {
       setCheckedIngredients(Array(recipe.ingredients.length).fill(false));
     }
-  }, [recipe?.ingredients]); // ✅ ลด re-render ไม่จำเป็น
+  }, [recipe?.ingredients]);
 
   // ✅ ฟังก์ชันสลับค่า Checkbox
   const handleIngredientClick = (index: number): void => {
-    setCheckedIngredients((prev) => {
+    setCheckedIngredients((prev = []) => {
       const updated = [...prev];
-      updated[index] = !updated[index];
-      console.log("🔄 Updated checkedIngredients:", updated);
+      if (index >= 0 && index < updated.length) {
+        updated[index] = !updated[index];
+      }
       return updated;
     });
   };
@@ -72,8 +74,6 @@ const RecipePage: React.FC = () => {
   if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
   if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
   if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
-
-  const [currentStep, setCurrentStep] = useState<number>(0);
 
   const nextStep = () => {
     if (
