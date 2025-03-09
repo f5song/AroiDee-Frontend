@@ -25,14 +25,10 @@ const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
 
   // ✅ ใช้ useQuery ดึงข้อมูลจาก API
-  const {
-    data: recipe,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data: recipe = null } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
-    enabled: !!recipeId, // โหลดข้อมูลเมื่อ recipeId มีค่า
+    enabled: !!recipeId,
   });
 
   // ✅ เช็คว่า API ดึงข้อมูลสำเร็จหรือไม่
@@ -40,21 +36,26 @@ const RecipePage: React.FC = () => {
     console.log("📌 Recipe Data:", recipe);
   }, [recipe]);
 
-  // ✅ แสดงข้อความโหลดข้อมูลหรือ error
-  if (isLoading) return <p>🔄 กำลังโหลดข้อมูลสูตรอาหาร...</p>;
-  if (error) return <p>❌ เกิดข้อผิดพลาด: {error.message}</p>;
-  if (!recipe) return <p>⚠️ ไม่พบสูตรอาหาร</p>;
-
   // ✅ กำหนดค่าเริ่มต้นของ state ให้ปลอดภัย
   const [liked, setLiked] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
-  const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>(
-    Array(recipe.ingredients?.length || 0).fill(false)
-  );
+  const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    if (recipe?.ingredients) {
+      setCheckedIngredients(Array(recipe.ingredients.length).fill(false));
+    }
+  }, [recipe]);
+
   const [newComment, setNewComment] = useState<string>("");
-  const [commentsList, setCommentsList] = useState<Comment[]>(
-    recipe.comments || []
-  );
+  const [commentsList, setCommentsList] = useState<Comment[]>([]);
+
+  useEffect(() => {
+    if (recipe?.comments) {
+      setCommentsList(recipe.comments);
+    }
+  }, [recipe]);
+
   const [activeTab, setActiveTab] = useState<string>("ingredients");
   const [cookingMode, setCookingMode] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(0);
