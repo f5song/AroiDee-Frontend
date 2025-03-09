@@ -35,6 +35,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
+      console.log("📌 Fetching favorites with token:", token);
+
       console.log("📌 Fetching favorites...");
 
       const response = await axios.get(

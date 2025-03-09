@@ -22,28 +22,37 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   const isFavorite = favorites.includes(recipeId);
   const isDisabled = isProcessing[recipeId] ?? false;
 
-  console.log(`📌 Recipe ID: ${recipeId}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}`);
+  console.log(
+    `📌 Recipe ID: ${recipeId}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}`
+  );
 
   // ✅ ฟังก์ชัน Toggle Save/Unsave โดยใช้ FavoritesContext
   const handleFavoriteToggle = async (event: React.MouseEvent) => {
     event.preventDefault();
 
+    const token = localStorage.getItem("authToken"); // ✅ ดึง token
     if (!userId || !token) {
-      console.warn("❌ ผู้ใช้ไม่ได้ล็อกอินหรือไม่มี token");
+      console.warn("❌ ผู้ใช้ไม่ได้ล็อกอินหรือไม่มี token", { userId, token });
       navigate("/login");
       return;
     }
 
     if (isDisabled) return; // ป้องกันกดซ้ำ
 
-    console.log(`📌 กำลังเปลี่ยนสถานะ Favorite ของ Recipe ID: ${recipeId}`);
+    console.log(
+      `📌 Toggling favorite for recipe ID: ${recipeId} with token: ${token}`
+    );
     await toggleFavorite(recipeId);
   };
 
   return (
     <div className="relative rounded-xl overflow-hidden">
       <div className="relative h-[500px]">
-        <img src={image_url} alt={title} className="w-full h-full object-cover" />
+        <img
+          src={image_url}
+          alt={title}
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
         <div className="absolute bottom-0 left-0 p-8 w-full">
@@ -71,7 +80,9 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
               onClick={handleFavoriteToggle}
               disabled={isDisabled}
               className={`p-3 rounded-full backdrop-blur-md transition-all ${
-                isFavorite ? "bg-red-500 text-white" : "bg-white/20 hover:bg-white/30 text-white"
+                isFavorite
+                  ? "bg-red-500 text-white"
+                  : "bg-white/20 hover:bg-white/30 text-white"
               }`}
             >
               <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
