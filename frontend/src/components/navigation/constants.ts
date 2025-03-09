@@ -2,7 +2,6 @@ import React from 'react';
 import { useAuth } from '@/components/auth/AuthContext'; // ✅ ดึง useAuth()
 import { 
   User, 
-  Settings, 
   LogOut, 
   Calendar, 
   Utensils, 

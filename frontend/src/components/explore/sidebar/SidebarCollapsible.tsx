@@ -11,8 +11,6 @@ export function SidebarCollapsible({
   isOpen,
   setIsOpen,
   isMobile,
-  sidebarHeight,
-  selectedCategory,
   activeFiltersCount,
   searchQuery,
   children,
