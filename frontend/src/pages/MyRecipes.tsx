@@ -38,7 +38,10 @@ export default function MyRecipesPage() {
         if (response.data.success) {
           setMyRecipes(response.data.data || []);
         } else {
-          console.error("❌ Error fetching user recipes:", response.data.message);
+          console.error(
+            "❌ Error fetching user recipes:",
+            response.data.message
+          );
         }
       } catch (error) {
         console.error("❌ Error fetching user recipes:", error);
@@ -53,7 +56,22 @@ export default function MyRecipesPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
       <div className="max-w-7xl mx-auto">
-        <PageHeader />
+        <PageHeader
+          title="Delicious Pancakes"
+          author="John Doe"
+          date={new Date().toLocaleDateString()}
+          rating={4.5}
+          comments={10}
+          image_url="/pancakes.jpg"
+          recipeId={1}
+          userId={2}
+          saved={true}
+          setSaved={() => {}}
+          liked={false}
+          setLiked={() => {}}
+          token="your-auth-token"
+        />
+
         <RecipeCollection
           myRecipes={myRecipes}
           favoriteRecipes={myRecipes.filter((r) => favorites.includes(r.id))} // ✅ ใช้ FavoritesContext
