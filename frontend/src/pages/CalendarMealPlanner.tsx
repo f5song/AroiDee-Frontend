@@ -230,7 +230,7 @@ const CalendarMealPlanner: React.FC = () => {
     
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 rounded-lg"></div>);
+      days.push(<div key={`empty-${i}`} className="h-16 md:h-24 bg-gray-50 rounded-lg"></div>);
     }
     
     // Add days of the month
@@ -245,16 +245,16 @@ const CalendarMealPlanner: React.FC = () => {
       days.push(
         <div 
           key={day}
-          className={`h-24 p-1 rounded-lg border ${isToday ? 'border-orange-300' : 'border-gray-200'} 
+          className={`h-16 md:h-24 p-1 rounded-lg border ${isToday ? 'border-orange-300' : 'border-gray-200'} 
                     ${isSelected ? 'bg-orange-50' : 'bg-white'} hover:bg-orange-50 cursor-pointer transition-colors`}
           onClick={() => selectDate(day)}
         >
-          <div className="flex justify-between">
-            <span className={`inline-block rounded-full w-6 h-6 text-center ${isToday ? 'bg-orange-500 text-white' : ''}`}>
+          <div className="flex justify-between items-start">
+            <span className={`inline-block rounded-full w-6 h-6 text-center leading-6 ${isToday ? 'bg-orange-500 text-white' : ''}`}>
               {day}
             </span>
             {totalCalories > 0 && (
-              <span className="text-xs font-medium text-gray-500">
+              <span className="text-xs font-medium text-gray-500 hidden sm:inline">
                 {totalCalories} kcal
               </span>
             )}
@@ -272,19 +272,22 @@ const CalendarMealPlanner: React.FC = () => {
                 ></div>
               </div>
               <div className="mt-1 flex flex-wrap gap-1">
-                {dayMeals.slice(0, 2).map((meal: Meal) => (
+                {(window.innerWidth < 640 ? dayMeals.slice(0, 1) : dayMeals.slice(0, 2)).map((meal: Meal) => (
                   <Badge 
                     key={meal.id} 
                     variant="outline" 
-                    className="text-xs truncate max-w-[90px]"
+                    className="text-xs truncate max-w-[90px] hidden sm:inline-flex"
                   >
                     {meal.recipe.title}
                   </Badge>
                 ))}
-                {dayMeals.length > 2 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{dayMeals.length - 2}
+                {dayMeals.length > (window.innerWidth < 640 ? 1 : 2) && (
+                  <Badge variant="outline" className="text-xs hidden sm:inline-flex">
+                    +{dayMeals.length - (window.innerWidth < 640 ? 1 : 2)}
                   </Badge>
+                )}
+                {dayMeals.length > 0 && window.innerWidth < 640 && (
+                  <div className="w-2 h-2 bg-orange-500 rounded-full mt-1"></div>
                 )}
               </div>
             </div>
@@ -294,28 +297,28 @@ const CalendarMealPlanner: React.FC = () => {
     }
     
     return (
-      <div className="bg-white rounded-lg shadow-sm p-4">
+      <div className="bg-white rounded-lg shadow-sm p-2 md:p-4">
         <div className="flex justify-between items-center mb-4">
-          <Button variant="ghost" size="sm" onClick={prevMonth}>
+          <Button variant="ghost" size="sm" onClick={prevMonth} className="p-1 md:p-2">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-lg md:text-xl font-semibold">
             {monthName} {year}
           </h2>
-          <Button variant="ghost" size="sm" onClick={nextMonth}>
+          <Button variant="ghost" size="sm" onClick={nextMonth} className="p-1 md:p-2">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
         
-        <div className="grid grid-cols-7 gap-2 mb-2">
+        <div className="grid grid-cols-7 gap-1 md:gap-2 mb-1 md:mb-2">
           {['Su', 'M', 'Tu', 'W', 'Th', 'F', 'Sa'].map(day => (
-            <div key={day} className="text-center font-medium text-gray-500">
+            <div key={day} className="text-center font-medium text-gray-500 text-xs md:text-sm">
               {day}
             </div>
           ))}
         </div>
         
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-7 gap-1 md:gap-2">
           {days}
         </div>
       </div>
@@ -344,25 +347,28 @@ const CalendarMealPlanner: React.FC = () => {
     
     return (
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Button variant="outline" onClick={() => setView('calendar')}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+          <Button variant="outline" onClick={() => setView('calendar')} className="w-full sm:w-auto">
             <ChevronLeft className="h-4 w-4 mr-1" /> Back to Calendar
           </Button>
-          <h2 className="text-lg font-medium">{formattedDate}</h2>
+          <h2 className="text-base sm:text-lg font-medium text-center w-full sm:w-auto">{formattedDate}</h2>
         </div>
         
         {/* Calorie progress */}
-        <Card>
+        <Card className="overflow-hidden">
           <CardContent className="p-4">
-            <div className="flex justify-between items-center mb-2">
+            <div className="flex flex-col md:flex-row justify-between md:items-center mb-2 gap-1">
               <span className="font-medium flex items-center">
-                <Flame className="w-5 h-5 mr-2 text-orange-500" /> Total Calories
+                <Flame className="w-5 h-5 mr-2 text-orange-500 flex-shrink-0" /> Total Calories
               </span>
               <span className="text-lg font-bold">
                 {totalCalories} / {calorieGoal} kcal
               </span>
             </div>
             <Progress value={caloriePercent} className="h-2" />
+            <p className="text-sm text-gray-500 mt-2 text-right">
+              {caloriePercent > 100 ? 'Over limit!' : caloriePercent > 80 ? 'Getting close' : 'Within limit'}
+            </p>
           </CardContent>
         </Card>
         
@@ -375,25 +381,25 @@ const CalendarMealPlanner: React.FC = () => {
             [MEAL_TYPES.SNACK]: 'Snack'
           }).map(([type, title]) => (
             <div key={type} className="relative">
-              <div className="absolute top-0 left-6 w-0.5 h-full bg-gray-200 -z-10"></div>
-              <div className="ml-12">
+              <div className="absolute top-0 left-3 md:left-6 w-0.5 h-full bg-gray-200 -z-10"></div>
+              <div className="ml-6 md:ml-12">
                 <div className="flex items-center mb-2">
-                  <div className="absolute left-0 w-12 h-12 rounded-full flex items-center justify-center bg-white border-2 border-gray-200">
-                    <span className="text-lg font-bold">
+                  <div className="absolute left-0 w-6 h-6 md:w-12 md:h-12 rounded-full flex items-center justify-center bg-white border-2 border-gray-200">
+                    <span className="text-xs md:text-lg font-bold">
                       {type === MEAL_TYPES.BREAKFAST ? '07' : 
                        type === MEAL_TYPES.LUNCH ? '12' : 
                        type === MEAL_TYPES.DINNER ? '18' : '15'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center w-full">
-                    <h3 className="text-lg font-medium">{title}</h3>
+                    <h3 className="text-base md:text-lg font-medium">{title}</h3>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => openRecipeDialog(type)}
-                      className="ml-auto"
+                      className="ml-auto text-xs md:text-sm px-2 md:px-3"
                     >
-                      <Plus className="h-4 w-4 mr-1" /> Add Menu
+                      <Plus className="h-3 w-3 md:h-4 md:w-4 mr-1" /> <span className="hidden xs:inline">Add Menu</span>
                     </Button>
                   </div>
                 </div>
@@ -402,33 +408,36 @@ const CalendarMealPlanner: React.FC = () => {
                   {mealsByType[type].length > 0 ? (
                     <div className="space-y-2">
                       {mealsByType[type].map((meal: Meal) => (
-                        <Card key={meal.id} className="overflow-hidden">
-                          <div className="flex">
+                        <Card key={meal.id} className="overflow-hidden border border-gray-200 hover:border-orange-200 transition-colors">
+                          <div className="flex flex-col xs:flex-row">
                             <img
                               src={meal.recipe.image}
                               alt={meal.recipe.title}
-                              className="w-24 h-24 object-cover"
+                              className="w-full xs:w-24 h-32 xs:h-24 object-cover"
                             />
                             <div className="p-3 flex-grow">
                               <div className="flex justify-between">
-                                <h4 className="font-medium">{meal.recipe.title}</h4>
+                                <h4 className="font-medium truncate">{meal.recipe.title}</h4>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => removeMeal(meal.id)}
-                                  className="h-8 w-8 p-0 text-gray-500 rounded-full"
+                                  className="h-8 w-8 p-0 text-gray-500 rounded-full -mr-2 -mt-2"
                                 >
                                   <X className="h-4 w-4" />
                                 </Button>
                               </div>
-                              <div className="flex items-center text-sm text-gray-500 mt-1">
-                                <Flame className="w-3 h-3 mr-1" />
-                                <span>{meal.recipe.calories} kcal</span>
-                                <span className="mx-2">•</span>
-                                <Clock className="w-3 h-3 mr-1" />
-                                <span>{meal.recipe.time} minutes</span>
+                              <div className="flex items-center text-sm text-gray-500 mt-1 flex-wrap gap-y-1">
+                                <span className="flex items-center mr-2">
+                                  <Flame className="w-3 h-3 mr-1" />
+                                  {meal.recipe.calories} kcal
+                                </span>
+                                <span className="flex items-center">
+                                  <Clock className="w-3 h-3 mr-1" />
+                                  {meal.recipe.time} minutes
+                                </span>
                               </div>
-                              <div className="mt-1 flex flex-wrap gap-1">
+                              <div className="mt-2 flex flex-wrap gap-1">
                                 {meal.recipe.tags.map(tag => (
                                   <Badge key={tag} variant="secondary" className="text-xs">
                                     {tag}
@@ -445,9 +454,11 @@ const CalendarMealPlanner: React.FC = () => {
                       <Button
                         variant="ghost"
                         onClick={() => openRecipeDialog(type)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="text-gray-400 hover:text-gray-600 text-xs md:text-sm"
                       >
-                        <PlusCircle className="h-6 w-6 mr-2" /> Add food to this meal
+                        <PlusCircle className="h-4 w-4 md:h-6 md:w-6 mr-1 md:mr-2" /> 
+                        <span className="hidden xs:inline">Add food to this meal</span>
+                        <span className="xs:hidden">Add food</span>
                       </Button>
                     </Card>
                   )}
@@ -461,22 +472,22 @@ const CalendarMealPlanner: React.FC = () => {
   };
   
   return (
-    <div className="max-w-6xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold">Daily Meal Planner</h1>
+    <div className="max-w-6xl mx-auto p-2 md:p-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-0">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">Daily Meal Planner</h1>
         
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium hidden md:inline">Calorie Goal:</span>
+        <div className="flex items-center gap-2 self-end sm:self-auto">
+          <span className="text-xs sm:text-sm font-medium hidden md:inline">Calorie Goal:</span>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="flex items-center bg-gray-100 px-3 py-1.5 rounded-md">
-                  <span className="font-medium">{calorieGoal.toLocaleString()} kcal</span>
-                  <Info className="h-4 w-4 ml-2 text-gray-500" />
+                <div className="flex items-center bg-gray-100 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md">
+                  <span className="text-sm sm:font-medium">{calorieGoal.toLocaleString()} kcal</span>
+                  <Info className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2 text-gray-500" />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Calorie goal is synced with your profile settings</p>
+                <p className="text-xs sm:text-sm">Calorie goal is synced with your profile settings</p>
                 <Button 
                   variant="link" 
                   className="p-0 h-auto text-xs text-blue-500" 
@@ -490,11 +501,11 @@ const CalendarMealPlanner: React.FC = () => {
         </div>
       </div>
       
-      <Tabs defaultValue="planner" className="mb-6">
-        <TabsList className="mb-4">
-          <TabsTrigger value="planner">Meal Plan</TabsTrigger>
-          <TabsTrigger value="statistics">Calorie Statistics</TabsTrigger>
-          <TabsTrigger value="recommendations">Recommended Menus</TabsTrigger>
+      <Tabs defaultValue="planner" className="mb-4 sm:mb-6">
+        <TabsList className="mb-2 sm:mb-4 w-full h-auto">
+          <TabsTrigger value="planner" className="text-xs sm:text-sm py-1.5 flex-1">Meal Plan</TabsTrigger>
+          <TabsTrigger value="statistics" className="text-xs sm:text-sm py-1.5 flex-1">Calorie Stats</TabsTrigger>
+          <TabsTrigger value="recommendations" className="text-xs sm:text-sm py-1.5 flex-1">Recommendations</TabsTrigger>
         </TabsList>
         
         <TabsContent value="planner">
@@ -502,18 +513,18 @@ const CalendarMealPlanner: React.FC = () => {
         </TabsContent>
         
         <TabsContent value="statistics">
-          <Card className="p-6">
-            <h3 className="text-xl font-medium mb-4">Calorie Statistics for the Last 7 Days</h3>
-            <p className="text-center text-gray-500 py-8">
+          <Card className="p-3 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Calorie Statistics for the Last 7 Days</h3>
+            <p className="text-center text-gray-500 py-6 sm:py-8">
               Calorie statistics chart will be displayed here
             </p>
           </Card>
         </TabsContent>
         
         <TabsContent value="recommendations">
-          <Card className="p-6">
-            <h3 className="text-xl font-medium mb-4">Recommended Menus for You</h3>
-            <p className="text-center text-gray-500 py-8">
+          <Card className="p-3 sm:p-6">
+            <h3 className="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Recommended Menus for You</h3>
+            <p className="text-center text-gray-500 py-6 sm:py-8">
               Recommended menus will be displayed here
             </p>
           </Card>
@@ -522,7 +533,7 @@ const CalendarMealPlanner: React.FC = () => {
       
       {/* Recipe selection dialog */}
       <Dialog open={showRecipeDialog} onOpenChange={setShowRecipeDialog}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-w-[95vw] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Select Menu</DialogTitle>
             <DialogDescription>
@@ -544,14 +555,14 @@ const CalendarMealPlanner: React.FC = () => {
             />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[400px] overflow-y-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[300px] sm:max-h-[400px] overflow-y-auto p-1">
             {filteredRecipes.map((recipe: Recipe) => (
               <Card 
                 key={recipe.id}
                 className="cursor-pointer hover:border-orange-300 transition-colors"
                 onClick={() => addRecipeToMealPlan(recipe)}
               >
-                <div className="relative h-24 overflow-hidden">
+                <div className="relative h-20 sm:h-24 overflow-hidden">
                   <img 
                     src={recipe.image} 
                     alt={recipe.title}
@@ -559,7 +570,7 @@ const CalendarMealPlanner: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   <div className="absolute bottom-2 left-2 right-2">
-                    <h4 className="text-white font-medium truncate">{recipe.title}</h4>
+                    <h4 className="text-white font-medium truncate text-sm sm:text-base">{recipe.title}</h4>
                   </div>
                 </div>
                 <CardFooter className="p-2">
@@ -570,7 +581,7 @@ const CalendarMealPlanner: React.FC = () => {
                     </span>
                     <span className="flex items-center">
                       <Clock className="h-3 w-3 mr-1 text-blue-500" />
-                      {recipe.time} minutes
+                      {recipe.time} min
                     </span>
                   </div>
                 </CardFooter>
@@ -578,8 +589,8 @@ const CalendarMealPlanner: React.FC = () => {
             ))}
           </div>
           
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRecipeDialog(false)}>
+          <DialogFooter className="gap-2 sm:gap-0 flex flex-col sm:flex-row sm:justify-end mt-2">
+            <Button variant="outline" onClick={() => setShowRecipeDialog(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
           </DialogFooter>
