@@ -1,11 +1,10 @@
 import React from "react";
-import { ChefHat, Camera, Clock } from "lucide-react";
+import { ChefHat } from "lucide-react";
 import { InstructionsTabProps } from "../../types/recipe";
 
 const InstructionsTab: React.FC<InstructionsTabProps> = ({ 
   instructions, 
   toggleCookingMode, 
-  setTimerMinutes 
 }) => (
   <div>
     <div className="flex justify-between items-center mb-5">

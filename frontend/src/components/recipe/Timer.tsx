@@ -8,7 +8,6 @@ const Timer: React.FC<TimerProps> = ({
   timerActive,
   toggleTimer,
   resetTimer,
-  setTimerMinutes,
 }) => {
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [showNotification, setShowNotification] = useState<boolean>(false);
