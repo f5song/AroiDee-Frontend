@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { ExploreSidebar } from "@/components/explore/sidebar";
 import PageHeader from "@/components/explore/PageHeader";
 import RecipeGrid from "@/components/common/RecipeGrid";
-import { NoResultsMessage } from "@/components/explore/FeedbackComponents";
 import PaginationControls from "@/components/explore/PaginationControls";
 import { FilterOptions, Recipe, fetchRecipes } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext";
@@ -46,6 +45,18 @@ export default function ExplorePage() {
     fetchData();
   }, [user, filterOptions]);
 
+  // กำหนดว่ามีการใช้ filters หรือไม่
+  const hasFilters = !!filterOptions.search || !!filterOptions.category;
+  
+  // ฟังก์ชันล้าง filters
+  const clearFilters = () => {
+    setFilterOptions({
+      search: "",
+      sort: "rating",
+      page: 1,
+    });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <div className="flex flex-1">
@@ -75,19 +86,9 @@ export default function ExplorePage() {
               onFavoriteToggle={toggleFavorite} // ✅ ใช้ฟังก์ชันจาก Context
               isProcessing={isProcessing}
               isLoggedIn={!!user}
+              hasFilters={hasFilters}
+              onClearFilters={clearFilters}
             />
-
-            {recipes.length === 0 && !loading && (
-              <NoResultsMessage
-                onReset={() =>
-                  setFilterOptions({
-                    search: "",
-                    sort: "rating",
-                    page: 1,
-                  })
-                }
-              />
-            )}
 
             {!loading && recipes.length > 0 && (
               <PaginationControls

@@ -1,5 +1,14 @@
+import React from "react";
+import { 
+  Search, 
+  RefreshCw, 
+  Filter, 
+  PlusCircle, 
+  ChefHat, 
+  Heart 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -13,15 +22,24 @@ import { Skeleton } from "@/components/ui/skeleton";
  */
 export function NoResultsMessage({ onReset }: { onReset: () => void }) {
   return (
-    <div className="text-center py-12">
-      <div className="text-5xl mb-4">😕</div>
+    <div className="text-center py-12 px-4 bg-white rounded-lg shadow-sm">
+      <div className="inline-flex justify-center items-center w-16 h-16 bg-orange-100 rounded-full mb-4">
+        <Search className="w-8 h-8 text-orange-500" />
+      </div>
+      
       <h3 className="text-xl font-medium mb-2">
         No recipes match your search
       </h3>
-      <p className="text-gray-500 mb-4">
+      
+      <p className="text-gray-500 mb-6 max-w-md mx-auto">
         Try changing your search terms or category to see other results
       </p>
-      <Button onClick={onReset}>
+      
+      <Button 
+        onClick={onReset}
+        className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2"
+      >
+        <RefreshCw className="w-4 h-4" />
         View all recipes
       </Button>
     </div>
@@ -34,35 +52,51 @@ export function NoResultsMessage({ onReset }: { onReset: () => void }) {
 export function EmptyState({ type }: { type: "my-recipes" | "favorites" }) {
   if (type === "my-recipes") {
     return (
-      <div className="text-center py-12">
-        <div className="text-5xl mb-4">👨‍🍳</div>
+      <div className="text-center py-12 px-4 bg-white rounded-lg shadow-sm">
+        <div className="inline-flex justify-center items-center w-16 h-16 bg-orange-100 rounded-full mb-4">
+          <ChefHat className="w-8 h-8 text-orange-500" />
+        </div>
+        
         <h3 className="text-xl font-medium mb-2">
           You haven't created any recipes yet
         </h3>
-        <p className="text-gray-500 mb-4">
+        
+        <p className="text-gray-500 mb-6 max-w-md mx-auto">
           Start building your collection by creating your first recipe
         </p>
-        <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-          <PlusCircle className="w-4 h-4 mr-2" /> Create First Recipe
+        
+        <Button 
+          className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2"
+        >
+          <PlusCircle className="w-4 h-4" /> 
+          Create First Recipe
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="text-center py-12">
-      <div className="text-5xl mb-4">🔖</div>
+    <div className="text-center py-12 px-4 bg-white rounded-lg shadow-sm">
+      <div className="inline-flex justify-center items-center w-16 h-16 bg-orange-100 rounded-full mb-4">
+        <Heart className="w-8 h-8 text-orange-500" />
+      </div>
+      
       <h3 className="text-xl font-medium mb-2">
         You haven't saved any favorite recipes yet
       </h3>
-      <p className="text-gray-500 mb-4">
+      
+      <p className="text-gray-500 mb-6 max-w-md mx-auto">
         Explore recipes and click the heart icon to save your favorites
       </p>
+      
       <Button
-        className="bg-orange-500 hover:bg-orange-600 text-white"
+        className="bg-orange-500 hover:bg-orange-600 text-white flex items-center gap-2"
         asChild
       >
-        <a href="/explore">Explore Recipes</a>
+        <Link to="/explore">
+          <Search className="w-4 h-4" />
+          Explore Recipes
+        </Link>
       </Button>
     </div>
   );
@@ -98,12 +132,12 @@ export function RecipeCardSkeleton() {
  */
 export function RecipeSkeletons({ count = 8 }: { count: number }) {
   return (
-    <>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {Array(count)
         .fill(0)
         .map((_, i) => (
           <RecipeCardSkeleton key={i} />
         ))}
-    </>
+    </div>
   );
 }
