@@ -149,6 +149,7 @@ export default function CreateRecipePage() {
           </div>
 
           {/* Categories Dropdown */}
+          <label className="block text-lg font-semibold">Categories</label>
           <select
             value={recipe.category_id ?? ""}
             onChange={(e) =>
@@ -284,14 +285,6 @@ export default function CreateRecipePage() {
               className="mt-2 w-32 h-32 object-cover rounded-md"
             />
           )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-orange-500 text-white p-3 rounded-md font-bold"
-          >
-            {isSaving ? "Saving..." : "Save Recipe"}
-          </button>
 
           {/* Submit Button */}
           <button
