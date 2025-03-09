@@ -37,8 +37,8 @@ interface RecipeCardProps {
     difficulty: string;
     categories: Category[];
   };
-  isFavorite: boolean; // ✅ เพิ่ม isFavorite ที่นี่
-  isProcessing: boolean; // ✅ เพิ่ม isProcessing ที่นี่
+  isFavorite: boolean;
+  isProcessing: boolean;
   onFavoriteToggle: () => void;
 }
 
@@ -56,6 +56,8 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
 
   const handleFavoriteToggle = async (event: React.MouseEvent) => {
     event.preventDefault();
+    event.stopPropagation(); // Prevent the card click event from triggering
+    
     if (!user?.id) {
       navigate("/login");
       return;
@@ -68,9 +70,16 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
     await toggleFavorite(recipe.id);
   };
 
+  const handleCardClick = () => {
+    navigate(`/recipe/${recipe.id}`);
+  };
+
   return (
     <TooltipProvider>
-      <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+      <Card 
+        className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+        onClick={handleCardClick}
+      >
         <CardHeader className="p-0 relative">
           <img
             src={recipe.image_url || "/placeholder.svg"}
@@ -124,7 +133,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
               <Button
                 variant="outline"
                 size="sm"
-                disabled={isDisabled} // ✅ ป้องกันกดปุ่มซ้ำระหว่าง API request
+                disabled={isDisabled}
                 className={isFavorite ? "bg-red-50" : "hover:bg-red-50"}
                 onClick={handleFavoriteToggle}
               >
@@ -143,11 +152,15 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                asChild
                 size="sm"
                 className="text-white bg-orange-500 hover:bg-orange-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigate(`/recipe/${recipe.id}`);
+                }}
               >
-                <Link to={`/recipe/${recipe.id}`}>View Recipe</Link>
+                View Recipe
               </Button>
             </TooltipTrigger>
             <TooltipContent>
