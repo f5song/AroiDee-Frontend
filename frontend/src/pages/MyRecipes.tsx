@@ -3,7 +3,6 @@ import { useAuth } from "@/components/auth/AuthContext";
 import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ FavoritesContext
 import { Recipe } from "@/lib/recipes/types";
 import RecipeCollection from "@/components/myRecipe/RecipeCollection";
-import PageHeader from "@/components/myRecipe/PageHeader";
 import axios from "axios";
 
 const API_URL = "https://aroi-dee-backend.vercel.app/api";
@@ -56,21 +55,7 @@ export default function MyRecipesPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
       <div className="max-w-7xl mx-auto">
-        <PageHeader
-          title="Delicious Pancakes"
-          author="John Doe"
-          date={new Date().toLocaleDateString()}
-          rating={4.5}
-          comments={10}
-          image_url="/pancakes.jpg"
-          recipeId={1}
-          userId={2}
-          saved={true}
-          setSaved={() => {}}
-          liked={false}
-          setLiked={() => {}}
-          token="your-auth-token"
-        />
+
 
         <RecipeCollection
           myRecipes={myRecipes}
