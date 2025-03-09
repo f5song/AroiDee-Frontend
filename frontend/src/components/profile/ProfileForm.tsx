@@ -41,8 +41,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         </div>
         
         <div className="px-4 sm:px-6 pb-6">
-          {/* Avatar and Name section */}
-          <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-12 mb-6">
+          {/* Avatar and Name section - Center everything */}
+          <div className="flex flex-col items-center -mt-12 mb-6">
             <div className="z-10">
               <AvatarUpload 
                 username={profile.username} 
@@ -50,9 +50,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
                 onAvatarChange={handleAvatarChange}
               />
             </div>
-            <div className="mt-4 sm:mt-0 sm:ml-4 space-y-1 text-center sm:text-left">
+            <div className="mt-4 space-y-1 text-center">
               <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{profile.fullName}</h1>
-              <p className="text-gray-500 flex items-center justify-center sm:justify-start">
+              <p className="text-gray-500 flex items-center justify-center">
                 <MapPin className="h-3 w-3 mr-1" /> 
               </p>
             </div>
@@ -63,19 +63,18 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             {/* Personal Info */}
             <Card className="border bg-white shadow-sm">
               <CardHeader className="pb-2 pt-4 px-4 sm:px-6">
-                <CardTitle className="text-md sm:text-lg flex items-center">
+                <CardTitle className="text-md sm:text-lg flex items-center justify-center">
                   <User className="h-4 w-4 mr-2 text-gray-500" /> Personal Information
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 sm:px-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6">
+                <div className="grid grid-cols-1 gap-y-4 gap-x-6">
                   <ProfileField 
                     icon={<Mail className="text-gray-500" />} 
                     label="Email" 
                     value={profile.email} 
+                    centered={true}
                   />
-
-
                 </div>
               </CardContent>
             </Card>
@@ -88,15 +87,16 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
 
 
-// Profile field component
+// Profile field component - Updated to support centered layout
 interface ProfileFieldProps {
   icon: React.ReactNode;
   label: string;
   value: string;
+  centered?: boolean;
 }
 
-const ProfileField: React.FC<ProfileFieldProps> = ({ icon, label, value }) => (
-  <div className="flex flex-col space-y-1">
+const ProfileField: React.FC<ProfileFieldProps> = ({ icon, label, value, centered = false }) => (
+  <div className={`flex flex-col space-y-1 ${centered ? 'items-center text-center' : ''}`}>
     <span className="text-sm text-gray-500">{label}</span>
     <div className="flex items-center gap-2">
       {React.cloneElement(icon as React.ReactElement, { className: "h-4 w-4 text-gray-500" })}
