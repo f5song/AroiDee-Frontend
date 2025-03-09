@@ -21,7 +21,7 @@ import { Comment } from "../types/recipe";
 const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
 
-  // ✅ ใช้ useQuery ดึงข้อมูลจาก API
+  // ✅ ดึงข้อมูลสูตรอาหารที่กำลังเปิดอยู่
   const {
     data: recipe,
     isLoading,
@@ -56,7 +56,7 @@ const RecipePage: React.FC = () => {
 
   // ✅ ฟังก์ชันควบคุมการทำงานของ Timer
   const setTimerMinutes = (minutes: number) => {
-    setTimer(minutes); // ✅ กำหนดค่า timer เป็นวินาที
+    setTimer(minutes);
   };
 
   const toggleTimer = () => {
@@ -67,6 +67,69 @@ const RecipePage: React.FC = () => {
     setTimer(0);
     setTimerActive(false);
   };
+
+  // ✅ ดึงรายการสูตรอาหารทั้งหมดจาก API
+  const { data: allRecipes = [] } = useQuery<
+    {
+      id: number;
+      title: string;
+      image_url?: string;
+      cook_time?: number;
+      rating?: number;
+    }[]
+  >({
+    queryKey: ["allRecipes"],
+    queryFn: async () => {
+      const res = await fetch(
+        "https://aroi-dee-backend.vercel.app/api/recipes"
+      );
+      const data = await res.json();
+      return data.data || [];
+    },
+  });
+
+  // ✅ ฟังก์ชันสุ่มรายการอาหารที่ไม่ซ้ำกับ recipeId ปัจจุบัน
+  const getRandomRecipes = (
+    allRecipes: {
+      id: number;
+      title: string;
+      image_url?: string;
+      cook_time?: number;
+      rating?: number;
+    }[],
+    currentRecipeId: string | number,
+    count: number = 5
+  ): {
+    id: number;
+    title: string;
+    image_url?: string;
+    cook_time?: number;
+    rating?: number;
+  }[] => {
+    if (!allRecipes.length) return [];
+
+    // ✅ กรองสูตรที่ไม่ตรงกับ recipeId ปัจจุบัน
+    const filteredRecipes = allRecipes.filter(
+      (r) => r.id !== Number(currentRecipeId)
+    );
+
+    // ✅ สุ่ม 5 รายการ (หรือทั้งหมดถ้าน้อยกว่า 5)
+    const shuffled = filteredRecipes.sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  };
+
+  // ✅ แปลง recipeId เป็นตัวเลขและกำหนดค่าเริ่มต้นเป็น 0 ถ้า undefined
+  const parsedRecipeId = Number(recipeId ?? 0);
+
+  // ✅ ใช้ฟังก์ชันเพื่อสุ่ม 5 รายการ
+  const relatedRecipes: {
+    id: number;
+    title: string;
+    image_url?: string;
+    cook_time?: number;
+    rating?: number;
+  }[] = getRandomRecipes(allRecipes, parsedRecipeId, 5);
+
   // ✅ ตั้งค่า checkedIngredients เมื่อโหลดข้อมูล
   useEffect(() => {
     if (Array.isArray(recipe?.ingredients) && recipe.ingredients.length > 0) {
@@ -212,7 +275,7 @@ const RecipePage: React.FC = () => {
                     showNutritionDetails={showNutritionDetails}
                     setShowNutritionDetails={setShowNutritionDetails}
                   />
-                  <RelatedRecipes recipes={recipe.related_recipes || []} />
+                  <RelatedRecipes recipes={relatedRecipes} />
                 </div>
               </div>
             </div>
