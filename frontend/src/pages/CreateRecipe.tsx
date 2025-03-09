@@ -14,23 +14,29 @@ export default function CreateRecipePage() {
     { id: number; name: string; image_url: string }[]
   >([]);
 
-  // ✅ ใช้ useState ในรูปแบบที่เรียบง่ายขึ้น
+  // ✅ ตั้งค่า Recipe State
   const [recipe, setRecipe] = useState({
     title: "",
     description: "",
-    instructions: [""], // ✅ ใช้เป็น array ของ string
+    instructions: [""], 
     image_url: "",
     cook_time: 0,
     category_id: null as number | null,
-    ingredients: [{ name: "", amount: "", unit: "" }], // ✅ เรียบง่ายขึ้น
+    ingredients: [{ name: "", amount: "", unit: "" }],
+    nutrition_facts: {
+      calories: 0,
+      total_fat: 0,
+      saturated_fat: 0,
+      cholesterol: 0,
+      sodium: 0,
+      potassium: 0,
+      total_carbohydrate: 0,
+      sugars: 0,
+      protein: 0,
+    },
   });
 
-  // ✅ อัพเดทค่าของฟอร์ม
-  const updateField = (field: string, value: any) => {
-    setRecipe((prev) => ({ ...prev, [field]: value }));
-  };
-
-  // ✅ โหลดหมวดหมู่จาก API ทันทีที่หน้าโหลด
+  // ✅ โหลดหมวดหมู่จาก API
   useEffect(() => {
     async function loadCategories() {
       const data = await fetchCategories();
@@ -39,19 +45,22 @@ export default function CreateRecipePage() {
     loadCategories();
   }, []);
 
-  // ✅ อัพโหลดรูปภาพ
-  const handleImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  // ✅ อัพโหลดรูปภาพไปยัง Cloudinary
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsSaving(true);
-    const imageUrl = await uploadImageToCloudinary(file, "profile"); // ✅ ใช้โฟลเดอร์ `profile`
+    const imageUrl = await uploadImageToCloudinary(file, "recipes"); 
     if (imageUrl) {
       setRecipe((prev) => ({ ...prev, image_url: imageUrl }));
     }
     setIsSaving(false);
+  };
+
+  // ✅ อัพเดทค่าของฟอร์ม
+  const updateField = (field: string, value: any) => {
+    setRecipe((prev) => ({ ...prev, [field]: value }));
   };
 
   // ✅ เพิ่มและลบส่วนผสม
@@ -62,12 +71,12 @@ export default function CreateRecipePage() {
     }));
   };
 
-  const removeIngredient = (index: number) => {
-    setRecipe((prev) => ({
-      ...prev,
-      ingredients: prev.ingredients.filter((_, i) => i !== index),
-    }));
-  };
+  // const removeIngredient = (index: number) => {
+  //   setRecipe((prev) => ({
+  //     ...prev,
+  //     ingredients: prev.ingredients.filter((_, i) => i !== index),
+  //   }));
+  // };
 
   // ✅ เพิ่มและลบขั้นตอนการทำอาหาร
   const addInstruction = () => {
@@ -77,14 +86,14 @@ export default function CreateRecipePage() {
     }));
   };
 
-  const removeInstruction = (index: number) => {
-    setRecipe((prev) => ({
-      ...prev,
-      instructions: prev.instructions.filter((_, i) => i !== index),
-    }));
-  };
+  // const removeInstruction = (index: number) => {
+  //   setRecipe((prev) => ({
+  //     ...prev,
+  //     instructions: prev.instructions.filter((_, i) => i !== index),
+  //   }));
+  // };
 
-  // ✅ ส่งฟอร์มไปยัง backend
+  // ✅ บันทึกสูตรอาหารลงฐานข้อมูล
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
@@ -98,7 +107,7 @@ export default function CreateRecipePage() {
     const formattedRecipe = {
       ...recipe,
       user_id: user.id,
-      instructions: JSON.stringify(recipe.instructions), // ✅ ส่งเป็น JSON
+      instructions: JSON.stringify(recipe.instructions), 
     };
 
     try {
@@ -119,184 +128,54 @@ export default function CreateRecipePage() {
   return (
     <div className="min-h-screen bg-white p-6 md:p-8 lg:p-10 shadow-lg rounded-lg">
       <div className="max-w-3xl mx-auto">
-        <RecipeHeader
-          title="Create New Recipe"
-          subtitle="Share your culinary creations with the world"
-        />
+        <RecipeHeader title="Create New Recipe" subtitle="Share your culinary creations with the world" />
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Recipe Title */}
-          <div>
-            <label className="block text-lg font-semibold">Title</label>
-            <input
-              type="text"
-              value={recipe.title}
-              onChange={(e) => updateField("title", e.target.value)}
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter recipe title"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-lg font-semibold">Description</label>
-            <textarea
-              value={recipe.description}
-              onChange={(e) => updateField("description", e.target.value)}
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter description"
-            />
-          </div>
+          <input type="text" value={recipe.title} onChange={(e) => updateField("title", e.target.value)} placeholder="Title" />
+          <textarea value={recipe.description} onChange={(e) => updateField("description", e.target.value)} placeholder="Description" />
 
           {/* Categories Dropdown */}
-          <label className="block text-lg font-semibold">Categories</label>
-          <select
-            value={recipe.category_id ?? ""}
-            onChange={(e) =>
-              setRecipe({ ...recipe, category_id: Number(e.target.value) })
-            }
-            className="w-full p-2 border rounded-md"
-          >
+          <select value={recipe.category_id ?? ""} onChange={(e) => updateField("category_id", Number(e.target.value))}>
             <option value="">Select a category</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
 
           {/* Cook Time */}
-          <div>
-            <label className="block text-lg font-semibold">
-              Cook Time (Minutes)
-            </label>
-            <input
-              type="number"
-              value={recipe.cook_time}
-              onChange={(e) =>
-                setRecipe({ ...recipe, cook_time: Number(e.target.value) })
-              }
-              className="w-full p-2 border rounded-md"
-              placeholder="Enter cook time"
-            />
-          </div>
+          <input type="number" value={recipe.cook_time} onChange={(e) => updateField("cook_time", Number(e.target.value))} placeholder="Cook Time" />
 
           {/* Ingredients */}
-          <div>
-            <label className="block text-lg font-semibold">Ingredients</label>
-            {recipe.ingredients.map((ingredient, index) => (
-              <div key={index} className="flex space-x-2 mt-2">
-                <input
-                  type="text"
-                  value={ingredient.name}
-                  onChange={(e) => {
-                    const newIngredients = [...recipe.ingredients];
-                    newIngredients[index].name = e.target.value;
-                    updateField("ingredients", newIngredients);
-                  }}
-                  placeholder="Ingredient"
-                  className="flex-1 p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  value={ingredient.amount}
-                  onChange={(e) => {
-                    const newIngredients = [...recipe.ingredients];
-                    newIngredients[index].amount = e.target.value;
-                    updateField("ingredients", newIngredients);
-                  }}
-                  placeholder="Amount"
-                  className="w-20 p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  value={ingredient.unit}
-                  onChange={(e) => {
-                    const newIngredients = [...recipe.ingredients];
-                    newIngredients[index].unit = e.target.value;
-                    updateField("ingredients", newIngredients);
-                  }}
-                  placeholder="Unit"
-                  className="w-20 p-2 border rounded-md"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeIngredient(index)}
-                  className="text-red-500"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addIngredient}
-              className="text-blue-500 mt-2"
-            >
-              + Add Ingredient
-            </button>
-          </div>
+          {recipe.ingredients.map((ingredient, index) => (
+            <div key={index}>
+              <input type="text" value={ingredient.name} onChange={(e) => {
+                const newIngredients = [...recipe.ingredients];
+                newIngredients[index].name = e.target.value;
+                updateField("ingredients", newIngredients);
+              }} placeholder="Ingredient" />
+            </div>
+          ))}
+          <button type="button" onClick={addIngredient}>+ Add Ingredient</button>
 
           {/* Instructions */}
-          <div>
-            <label className="block text-lg font-semibold">Instructions</label>
-            {recipe.instructions.map((step, index) => (
-              <div key={index} className="flex items-center space-x-2 mt-2">
-                <input
-                  type="text"
-                  value={step}
-                  onChange={(e) => {
-                    const newInstructions = [...recipe.instructions];
-                    newInstructions[index] = e.target.value;
-                    updateField("instructions", newInstructions);
-                  }}
-                  className="flex-1 p-2 border rounded-md"
-                  placeholder="Instruction step"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeInstruction(index)}
-                  className="text-red-500"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addInstruction}
-              className="text-blue-500 mt-2"
-            >
-              + Add Step
-            </button>
-          </div>
+          {recipe.instructions.map((step, index) => (
+            <div key={index}>
+              <input type="text" value={step} onChange={(e) => {
+                const newInstructions = [...recipe.instructions];
+                newInstructions[index] = e.target.value;
+                updateField("instructions", newInstructions);
+              }} placeholder="Instruction step" />
+            </div>
+          ))}
+          <button type="button" onClick={addInstruction}>+ Add Step</button>
 
           {/* Upload Image */}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mt-2"
-          />
-          {recipe.image_url && (
-            <img
-              src={recipe.image_url}
-              alt="Preview"
-              className="mt-2 w-32 h-32 object-cover rounded-md"
-            />
-          )}
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          {recipe.image_url && <img src={recipe.image_url} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-md" />}
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-orange-500 text-white p-3 rounded-md font-bold"
-          >
-            {isSaving ? "Saving..." : "Save Recipe"}
-          </button>
-
-          {errors.submit && (
-            <p className="text-red-500 text-center mt-4">{errors.submit}</p>
-          )}
+          <button type="submit">{isSaving ? "Saving..." : "Save Recipe"}</button>
+          {errors.submit && <p className="text-red-500">{errors.submit}</p>}
         </form>
       </div>
     </div>
