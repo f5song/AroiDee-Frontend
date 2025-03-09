@@ -6,7 +6,6 @@ import {
   PlusCircle, 
   ChefHat, 
   Heart,
-  Bookmark,
   CookingPot
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ interface EmptyStateProps {
 
 const EmptyState: React.FC<EmptyStateProps> = ({ 
   type,
-  hasFilters = false,
   onClearFilters,
   customMessage,
   customTitle

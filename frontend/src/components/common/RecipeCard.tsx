@@ -15,7 +15,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useFavorites } from "../auth/FavoritesContext";
 

@@ -20,12 +20,10 @@ interface RecipeGridProps {
 const RecipeGrid: React.FC<RecipeGridProps> = ({
   recipes,
   loading,
-  hasFilters = false,
   onClearFilters,
   favorites = [],
   isProcessing = {},
   onFavoriteToggle,
-  isLoggedIn = false,
 }) => {
   const { isLoadingFavorites } = useFavorites();
 
