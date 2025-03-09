@@ -19,12 +19,13 @@ const IngredientsTab: React.FC<IngredientsTabProps> = ({
             console.log("🛠 Ingredient Item:", item); // ✅ Debug
             return (
               <li
-                key={item.id || index} // ✅ ใช้ `item.id` ถ้ามี ไม่งั้น fallback เป็น index
-                className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                key={item.id || index}
+                className="flex items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                onClick={() => handleIngredientClick(index)} // ✅ เพิ่ม `onClick` ที่ <li>
               >
                 <input
                   type="checkbox"
-                  checked={checkedIngredients[index]}
+                  checked={checkedIngredients[index] ?? false} // ✅ ป้องกัน `undefined`
                   onChange={() => handleIngredientClick(index)}
                   className="w-5 h-5 rounded-full cursor-pointer accent-orange-500 mr-4"
                 />

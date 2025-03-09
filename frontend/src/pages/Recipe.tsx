@@ -32,11 +32,12 @@ const RecipePage: React.FC = () => {
     enabled: !!recipeId,
   });
 
+  // ✅ Debug ข้อมูลที่ได้จาก API
   useEffect(() => {
     console.log("📌 Recipe Data:", recipe);
   }, [recipe]);
 
-  // ✅ กำหนดค่าเริ่มต้นของ state ให้ปลอดภัย
+  // ✅ State สำหรับการทำงานในหน้า
   const [liked, setLiked] = useState<boolean>(false);
   const [saved, setSaved] = useState<boolean>(false);
   const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
@@ -46,26 +47,30 @@ const RecipePage: React.FC = () => {
   const [cookingMode, setCookingMode] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(false);
-  const [showNutritionDetails, setShowNutritionDetails] =
-    useState<boolean>(false);
+  const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
   const [selectedUnit, setSelectedUnit] = useState<string>("metric");
 
+  // ✅ ตั้งค่า checkedIngredients เมื่อโหลดข้อมูล
   useEffect(() => {
     if (recipe?.ingredients) {
-      console.log("🔍 Setting checkedIngredients:", recipe.ingredients);
       setCheckedIngredients(Array(recipe.ingredients.length).fill(false));
     }
   }, [recipe]);
 
-  useEffect(() => {
-    console.log("📌 Recipe Data:", recipe);
-  }, [recipe]);
+  // ✅ ฟังก์ชันสลับค่า Checkbox
+  const handleIngredientClick = (index: number): void => {
+    setCheckedIngredients((prev) => {
+      const updated = [...prev];
+      updated[index] = !updated[index];
+      console.log("🔄 Updated checkedIngredients:", updated);
+      return updated;
+    });
+  };
 
   if (isLoading) return <p>กำลังโหลดข้อมูลสูตรอาหาร...</p>;
   if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
   if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
-  console.log("✅ Ingredients from API:", recipe?.ingredients);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -78,7 +83,7 @@ const RecipePage: React.FC = () => {
             prevStep={() => {}}
             nextStep={() => {}}
             checkedIngredients={checkedIngredients}
-            handleIngredientClick={() => {}}
+            handleIngredientClick={handleIngredientClick}
             getConvertedIngredient={() => ""}
             timer={timer}
             timerActive={timerActive}
@@ -109,9 +114,7 @@ const RecipePage: React.FC = () => {
             {/* Control Bar */}
             <ControlBar
               toggleUnit={() =>
-                setSelectedUnit(
-                  selectedUnit === "metric" ? "imperial" : "metric"
-                )
+                setSelectedUnit(selectedUnit === "metric" ? "imperial" : "metric")
               }
               selectedUnit={selectedUnit}
               setShowAllergies={setShowAllergies}
@@ -120,25 +123,18 @@ const RecipePage: React.FC = () => {
             />
 
             {/* Allergy Information */}
-            <AllergyInfo
-              showAllergies={showAllergies}
-              setShowAllergies={setShowAllergies}
-            />
+            <AllergyInfo showAllergies={showAllergies} setShowAllergies={setShowAllergies} />
 
             {/* Main Content */}
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-grow order-2 lg:order-1">
-                <TabContainer
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                  commentCount={commentsList.length}
-                >
+                <TabContainer activeTab={activeTab} setActiveTab={setActiveTab} commentCount={commentsList.length}>
                   {activeTab === "ingredients" ? (
                     <IngredientsTab
-                      ingredients={recipe?.ingredients || []} // ✅ ป้องกัน undefined
+                      ingredients={recipe?.ingredients || []}
                       checkedIngredients={checkedIngredients}
-                      handleIngredientClick={() => {}}
-                      getConvertedIngredient={() => ""}
+                      handleIngredientClick={handleIngredientClick}
+                      getConvertedIngredient={(ingredient) => ingredient.name}
                     />
                   ) : activeTab === "instructions" ? (
                     <InstructionsTab
@@ -147,22 +143,13 @@ const RecipePage: React.FC = () => {
                       setTimerMinutes={(minutes) => setTimer(minutes * 60)}
                     />
                   ) : (
-                    <CommentsTab
-                      commentsList={commentsList}
-                      newComment={newComment}
-                      setNewComment={setNewComment}
-                      handleCommentSubmit={() => {}}
-                    />
+                    <CommentsTab commentsList={commentsList} newComment={newComment} setNewComment={setNewComment} handleCommentSubmit={() => {}} />
                   )}
                 </TabContainer>
               </div>
               <div className="w-full lg:w-96 flex-shrink-0 order-1 lg:order-2">
                 <div className="lg:sticky lg:top-20 space-y-6">
-                  <NutritionFacts
-                    nutrition={recipe.nutrition_facts || {}}
-                    showNutritionDetails={showNutritionDetails}
-                    setShowNutritionDetails={setShowNutritionDetails}
-                  />
+                  <NutritionFacts nutrition={recipe.nutrition_facts || {}} showNutritionDetails={showNutritionDetails} setShowNutritionDetails={setShowNutritionDetails} />
                   <RelatedRecipes recipes={recipe.related_recipes || []} />
                 </div>
               </div>
