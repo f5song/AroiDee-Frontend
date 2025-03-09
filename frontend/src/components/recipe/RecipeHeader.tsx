@@ -17,15 +17,31 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
 }) => {
   useEffect(() => {
     const checkSavedStatus = async () => {
-      const savedStatus = await isRecipeSaved(userId, recipeId);
-      setSaved(savedStatus);
+      if (!userId || !recipeId) return; // ✅ ตรวจสอบว่า userId และ recipeId มีค่าก่อนเรียก API
+      try {
+        const savedStatus = await isRecipeSaved(userId, recipeId);
+        if (typeof setSaved === "function") {
+          setSaved(savedStatus);
+        }
+      } catch (error) {
+        console.error("❌ ตรวจสอบการบันทึกล้มเหลว:", error);
+      }
     };
     checkSavedStatus();
   }, [recipeId, userId]);
 
   const toggleSaveRecipe = async () => {
-    const success = saved ? await unsaveRecipe(userId, recipeId) : await saveRecipe(userId, recipeId);
-    if (success) setSaved(!saved);
+    if (!userId || !recipeId) return; // ✅ ป้องกันการเรียก API ถ้าไม่มีค่า userId หรือ recipeId
+    try {
+      const success = saved
+        ? await unsaveRecipe(userId, recipeId)
+        : await saveRecipe(userId, recipeId);
+      if (success && typeof setSaved === "function") {
+        setSaved(!saved);
+      }
+    } catch (error) {
+      console.error("❌ ไม่สามารถเปลี่ยนสถานะการบันทึกสูตรอาหาร:", error);
+    }
   };
 
   return (
