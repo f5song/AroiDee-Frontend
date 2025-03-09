@@ -21,7 +21,7 @@ export default function PageHeader({ totalItems, sort, onSortChange }: PageHeade
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">🍽️ Discover New Recipes</h1>
+        <h1 className="text-3xl font-bold mb-2">Discover New Recipes</h1>
         <p className="text-gray-500">
           {totalItems > 0
             ? `Found ${totalItems} interesting recipes`

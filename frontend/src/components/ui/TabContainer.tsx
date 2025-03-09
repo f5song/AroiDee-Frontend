@@ -19,7 +19,7 @@ const TabContainer: React.FC<TabContainerProps> = ({
               : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
           }`}
         >
-          ส่วนผสม
+          Ingredients
         </button>
         <button
           onClick={() => setActiveTab("instructions")}
@@ -29,7 +29,7 @@ const TabContainer: React.FC<TabContainerProps> = ({
               : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
           }`}
         >
-          วิธีทำ
+          Instructions
         </button>
         <button
           onClick={() => setActiveTab("comments")}
@@ -40,7 +40,7 @@ const TabContainer: React.FC<TabContainerProps> = ({
           }`}
         >
           <MessageCircle size={16} className="inline mr-1" />
-          รีวิว ({commentCount})
+          Reviews ({commentCount})
         </button>
       </div>
 

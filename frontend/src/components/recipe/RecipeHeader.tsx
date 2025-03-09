@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Heart, User, Clock, Share2, Star } from "lucide-react";
 import { RecipeHeaderProps } from "../../types/recipe";
-import { isRecipeSaved, saveRecipe, unsaveRecipe } from "../../lib/api/savedRecipeApi"; // ✅ นำเข้า API
+import { isRecipeSaved, saveRecipe, unsaveRecipe } from "../../lib/api/savedRecipeApi";
 
 const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   title,
@@ -48,7 +48,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
             <div className="flex items-center bg-orange-500/90 px-4 py-2 rounded-full">
               <Star className="mr-2 text-white" size={16} fill="white" />
               <span className="text-white font-medium">
-                {rating} ({comments} รีวิว)
+                {rating} ({comments} reviews)
               </span>
             </div>
           </div>

@@ -16,7 +16,7 @@ const PageHeader: React.FC = () => {
     <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">
-          👨‍🍳 My Recipe Collection
+          My Recipe Collection
         </h1>
         <p className="text-gray-500">
           Manage your personal recipes and favorites

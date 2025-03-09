@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getRecipeById } from "../lib/api/recipeApi";
@@ -21,19 +21,19 @@ import { Comment } from "../types/recipe";
 const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
 
-  // ✅ ดึงข้อมูลสูตรอาหารที่กำลังเปิดอยู่
-  const { data: recipe } = useQuery({
+  // Fetch the current recipe
+  const { data: recipe = {} } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
     enabled: !!recipeId,
   });
 
-  // ✅ Debug ข้อมูลที่ได้จาก API
+  // Debug data from API
   useEffect(() => {
     console.log("📌 Recipe Data:", recipe);
   }, [recipe]);
 
-  // ✅ State สำหรับการทำงานในหน้า
+  // State for page functionality
   const [saved, setSaved] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
   const [checkedIngredients, setCheckedIngredients] = useState<boolean[]>([]);
@@ -41,8 +41,7 @@ const RecipePage: React.FC = () => {
   const [commentsList] = useState<Comment[]>([]);
   const [activeTab, setActiveTab] = useState<string>("ingredients");
   const [cookingMode, setCookingMode] = useState<boolean>(false);
-  const [showNutritionDetails, setShowNutritionDetails] =
-    useState<boolean>(false);
+  const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
   const [selectedUnit, setSelectedUnit] = useState<string>("metric");
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -51,9 +50,7 @@ const RecipePage: React.FC = () => {
   const [timerActive, setTimerActive] = useState<boolean>(false);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-
-
-  // ✅ ฟังก์ชันควบคุมการทำงานของ Timer
+  // Timer control functions
   const setTimerMinutes = (minutes: number) => {
     setTimer(minutes);
   };
@@ -67,7 +64,7 @@ const RecipePage: React.FC = () => {
     setTimerActive(false);
   };
 
-  // ✅ ดึงรายการสูตรอาหารทั้งหมดจาก API
+  // Fetch all recipes from API
   const { data: allRecipes = [] } = useQuery<
     {
       id: number;
@@ -79,22 +76,20 @@ const RecipePage: React.FC = () => {
   >({
     queryKey: ["allRecipes"],
     queryFn: async () => {
-      const res = await fetch(
-        "https://aroi-dee-backend.vercel.app/api/recipes"
-      );
+      const res = await fetch("https://aroi-dee-backend.vercel.app/api/recipes");
       const data = await res.json();
       return data.data || [];
     },
   });
 
-  // ✅ ฟังก์ชันสุ่มรายการอาหารที่ไม่ซ้ำกับ recipeId ปัจจุบัน
+  // Function to get random recipes that are different from the current recipe
   const getRandomRecipes = (
     allRecipes: {
       id: number;
       title: string;
       image_url?: string;
       cook_time?: number;
-      rating?: string | number; // ✅ รับค่าเป็น string หรือ number
+      rating?: string | number;
     }[],
     currentRecipeId: string | number,
     count: number = 5
@@ -103,7 +98,7 @@ const RecipePage: React.FC = () => {
     title: string;
     image_url?: string;
     cook_time?: number;
-    rating?: number; // ✅ ทำให้ rating เป็น number
+    rating?: number;
   }[] => {
     if (!allRecipes.length) return [];
 
@@ -115,14 +110,14 @@ const RecipePage: React.FC = () => {
 
     return shuffled.slice(0, count).map((recipe) => ({
       ...recipe,
-      rating: recipe.rating ? Number(recipe.rating) : 0, // ✅ แปลงเป็น number
+      rating: recipe.rating ? Number(recipe.rating) : 0,
     }));
   };
 
-  // ✅ แปลง recipeId เป็นตัวเลขและกำหนดค่าเริ่มต้นเป็น 0 ถ้า undefined
+  // Convert recipeId to number and set default to 0 if undefined
   const parsedRecipeId = Number(recipeId ?? 0);
 
-  // ✅ ใช้ฟังก์ชันเพื่อสุ่ม 5 รายการ
+  // Get 5 random related recipes
   const relatedRecipes: {
     id: number;
     title: string;
@@ -131,14 +126,14 @@ const RecipePage: React.FC = () => {
     rating?: number;
   }[] = getRandomRecipes(allRecipes, parsedRecipeId, 5);
 
-  // ✅ ตั้งค่า checkedIngredients เมื่อโหลดข้อมูล
+  // Set checkedIngredients when data is loaded
   useEffect(() => {
     if (Array.isArray(recipe?.ingredients) && recipe.ingredients.length > 0) {
       setCheckedIngredients(Array(recipe.ingredients.length).fill(false));
     }
   }, [recipe?.ingredients]);
 
-  // ✅ ฟังก์ชันสลับค่า Checkbox
+  // Function to toggle checkbox
   const handleIngredientClick = (index: number): void => {
     setCheckedIngredients((prev = []) => {
       const updated = [...prev];
@@ -150,10 +145,7 @@ const RecipePage: React.FC = () => {
   };
 
   const nextStep = () => {
-    if (
-      recipe?.instructions?.length &&
-      currentStep < recipe.instructions.length - 1
-    ) {
+    if (recipe?.instructions?.length && currentStep < recipe.instructions.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -186,10 +178,10 @@ const RecipePage: React.FC = () => {
               ) {
                 return `${ingredient.name} - ${ingredient.quantity} ${ingredient.unit}`;
               }
-              return "ข้อมูลส่วนผสมไม่ถูกต้อง";
+              return "Ingredient data is incorrect";
             }}
             timer={timer}
-            setTimer={setTimer} // ✅ ส่ง setTimer ไปให้ CookingModeView
+            setTimer={setTimer}
             timerActive={timerActive}
             toggleTimer={toggleTimer}
             resetTimer={resetTimer}
@@ -199,30 +191,28 @@ const RecipePage: React.FC = () => {
           <>
             {/* Hero Section */}
             <RecipeHeader
-              title={recipe?.title || "ไม่มีชื่อสูตร"}
-              author={recipe?.author?.username || "ไม่ทราบผู้เขียน"}
+              title={recipe?.title || "No Recipe Name"}
+              author={recipe?.author?.username || "Unknown Author"}
               date={
                 recipe?.created_at
                   ? new Date(recipe.created_at).toLocaleDateString()
-                  : "ไม่ระบุวันที่"
+                  : "No Date"
               }
               rating={recipe?.rating || 0}
               comments={commentsList.length}
               image_url={recipe?.image_url || "/default-recipe.jpg"}
-              recipeId={recipe?.id || 0} // ✅ แก้ไขให้เป็นตัวเลข
-              userId={user?.id || 0} // ✅ ตรวจสอบว่ามี `user` หรือไม่
+              recipeId={recipe?.id || 0}
+              userId={user?.id || 0}
               saved={saved}
               setSaved={setSaved}
-              liked={liked} // ✅ เพิ่ม liked
-              setLiked={setLiked} // ✅ เพิ่ม setLiked
+              liked={liked}
+              setLiked={setLiked}
             />
 
             {/* Control Bar */}
             <ControlBar
               toggleUnit={() =>
-                setSelectedUnit(
-                  selectedUnit === "metric" ? "imperial" : "metric"
-                )
+                setSelectedUnit(selectedUnit === "metric" ? "imperial" : "metric")
               }
               selectedUnit={selectedUnit}
               setShowAllergies={setShowAllergies}
@@ -253,7 +243,7 @@ const RecipePage: React.FC = () => {
                     />
                   ) : activeTab === "instructions" ? (
                     <InstructionsTab
-                      instructions={recipe.instructions || []}
+                      instructions={recipe?.instructions || []}
                       toggleCookingMode={() => setCookingMode(!cookingMode)}
                       setTimerMinutes={(minutes) => setTimer(minutes * 60)}
                     />
@@ -269,8 +259,9 @@ const RecipePage: React.FC = () => {
               </div>
               <div className="w-full lg:w-96 flex-shrink-0 order-1 lg:order-2">
                 <div className="lg:sticky lg:top-20 space-y-6">
+                  {/* Fixed the nutrition_facts error here */}
                   <NutritionFacts
-                    nutrition={recipe.nutrition_facts || {}}
+                    nutrition={recipe?.nutrition_facts || {}}
                     showNutritionDetails={showNutritionDetails}
                     setShowNutritionDetails={setShowNutritionDetails}
                   />
