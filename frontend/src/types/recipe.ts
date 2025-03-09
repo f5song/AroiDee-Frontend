@@ -117,13 +117,14 @@ export interface Nutrition {
     nextStep: () => void;
     checkedIngredients: boolean[];
     handleIngredientClick: (index: number) => void;
-    getConvertedIngredient: (ingredient: string) => string;
+    getConvertedIngredient: (ingredient: { name: string; quantity: number; unit: string }) => string;
     timer: number;
     timerActive: boolean;
     toggleTimer: () => void;
     resetTimer: () => void;
     setTimerMinutes: (minutes: number) => void;
-  }
+}
+
   
   export interface TabContainerProps {
     activeTab: string;

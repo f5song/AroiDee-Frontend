@@ -47,7 +47,8 @@ const RecipePage: React.FC = () => {
   const [cookingMode, setCookingMode] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(false);
-  const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
+  const [showNutritionDetails, setShowNutritionDetails] =
+    useState<boolean>(false);
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
   const [selectedUnit, setSelectedUnit] = useState<string>("metric");
 
@@ -72,19 +73,35 @@ const RecipePage: React.FC = () => {
   if (error) return <p>เกิดข้อผิดพลาด: {error.message}</p>;
   if (!recipe) return <p>ไม่พบสูตรอาหาร</p>;
 
+  const [currentStep, setCurrentStep] = useState<number>(0);
+
+  const nextStep = () => {
+    if (recipe?.instructions && currentStep < recipe.instructions.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-6">
         {cookingMode ? (
           <CookingModeView
             recipe={recipe}
-            toggleCookingMode={() => setCookingMode(!cookingMode)}
-            currentStep={0}
-            prevStep={() => {}}
-            nextStep={() => {}}
+            toggleCookingMode={() => setCookingMode(false)}
+            currentStep={currentStep}
+            prevStep={prevStep}
+            nextStep={nextStep}
             checkedIngredients={checkedIngredients}
             handleIngredientClick={handleIngredientClick}
-            getConvertedIngredient={() => ""}
+            getConvertedIngredient={(ingredient) => {
+              return `${ingredient.name} - ${ingredient.quantity} ${ingredient.unit}`;
+            }}
             timer={timer}
             timerActive={timerActive}
             toggleTimer={() => setTimerActive(!timerActive)}
@@ -114,7 +131,9 @@ const RecipePage: React.FC = () => {
             {/* Control Bar */}
             <ControlBar
               toggleUnit={() =>
-                setSelectedUnit(selectedUnit === "metric" ? "imperial" : "metric")
+                setSelectedUnit(
+                  selectedUnit === "metric" ? "imperial" : "metric"
+                )
               }
               selectedUnit={selectedUnit}
               setShowAllergies={setShowAllergies}
@@ -123,12 +142,19 @@ const RecipePage: React.FC = () => {
             />
 
             {/* Allergy Information */}
-            <AllergyInfo showAllergies={showAllergies} setShowAllergies={setShowAllergies} />
+            <AllergyInfo
+              showAllergies={showAllergies}
+              setShowAllergies={setShowAllergies}
+            />
 
             {/* Main Content */}
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="flex-grow order-2 lg:order-1">
-                <TabContainer activeTab={activeTab} setActiveTab={setActiveTab} commentCount={commentsList.length}>
+                <TabContainer
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  commentCount={commentsList.length}
+                >
                   {activeTab === "ingredients" ? (
                     <IngredientsTab
                       ingredients={recipe?.ingredients || []}
@@ -143,13 +169,22 @@ const RecipePage: React.FC = () => {
                       setTimerMinutes={(minutes) => setTimer(minutes * 60)}
                     />
                   ) : (
-                    <CommentsTab commentsList={commentsList} newComment={newComment} setNewComment={setNewComment} handleCommentSubmit={() => {}} />
+                    <CommentsTab
+                      commentsList={commentsList}
+                      newComment={newComment}
+                      setNewComment={setNewComment}
+                      handleCommentSubmit={() => {}}
+                    />
                   )}
                 </TabContainer>
               </div>
               <div className="w-full lg:w-96 flex-shrink-0 order-1 lg:order-2">
                 <div className="lg:sticky lg:top-20 space-y-6">
-                  <NutritionFacts nutrition={recipe.nutrition_facts || {}} showNutritionDetails={showNutritionDetails} setShowNutritionDetails={setShowNutritionDetails} />
+                  <NutritionFacts
+                    nutrition={recipe.nutrition_facts || {}}
+                    showNutritionDetails={showNutritionDetails}
+                    setShowNutritionDetails={setShowNutritionDetails}
+                  />
                   <RelatedRecipes recipes={recipe.related_recipes || []} />
                 </div>
               </div>
