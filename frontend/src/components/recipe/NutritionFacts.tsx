@@ -24,7 +24,7 @@ const NutritionFacts: React.FC<NutritionFactsProps> = ({ nutrition }) => {
     sodium: "bg-yellow-500",
     potassium: "bg-green-500",
     total_carbohydrate: "bg-blue-500",
-    sugars: "bg-brown-500", // ถ้าไม่มี Tailwind ให้ใช้ bg-yellow-800 แทน
+    sugars: "bg-yellow-800", // ถ้าไม่มี Tailwind ให้ใช้ bg-yellow-800 แทน
     protein: "bg-indigo-500"
   };
 
