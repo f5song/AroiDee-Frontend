@@ -17,11 +17,6 @@ interface ProfileFormProps {
 
 const ProfileForm: React.FC<ProfileFormProps> = ({
   profile,
-  isEditing,
-  setIsEditing,
-  isSaving,
-  handleSave,
-  onProfileChange,
   onAvatarChange,
 }) => {
   return (
