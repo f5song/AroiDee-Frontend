@@ -12,40 +12,18 @@ interface ProfileFormProps {
   isSaving: boolean;
   handleSave: () => Promise<void>;
   onProfileChange: (updatedProfile: Profile) => void;
+  onAvatarChange: (file: File) => Promise<void>; // เพิ่ม prop สำหรับการอัพโหลดรูปโปรไฟล์
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({
   profile,
+  isEditing,
+  setIsEditing,
+  isSaving,
+  handleSave,
   onProfileChange,
+  onAvatarChange,
 }) => {
-  const handleAvatarChange = async (file: File) => {
-    console.log("Avatar file:", file);
-
-    // ✅ Upload image to backend (you need to implement this API)
-    const formData = new FormData();
-    formData.append("avatar", file);
-
-    try {
-      const response = await fetch(
-        "https://aroi-dee-backend.vercel.app/api/users/upload-avatar",
-        {
-          method: "POST",
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`, // ✅ ดึง Token จาก LocalStorage
-          },
-        }
-      );
-
-      const data = await response.json();
-      if (data.success) {
-        onProfileChange({ ...profile, image_url: data.imageUrl }); // ✅ อัปเดตค่า `image_url`
-      }
-    } catch (error) {
-      console.error("Failed to upload avatar", error);
-    }
-  };
-
   return (
     <motion.div
       className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-0"
@@ -63,14 +41,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <div className="z-10">
               <AvatarUpload
                 username={profile.username}
-                currentAvatar={profile.image_url || "/default-avatar.png"} // ✅ ใช้ image_url จาก Profile type ที่แก้ไขแล้ว
-                onAvatarChange={handleAvatarChange}
+                currentAvatar={profile.image_url || "/default-avatar.png"}
+                onAvatarChange={onAvatarChange}
               />
             </div>
             <div className="mt-4 space-y-1 text-center">
               <p className="text-gray-500 flex items-center justify-center">
-                <MapPin className="h-3 w-3 mr-1" />{" "}
-                {/* สามารถเพิ่ม location ได้ถ้ามีข้อมูล */}
+                <MapPin className="h-3 w-3 mr-1" />
+                {profile.location || "No location set"}
               </p>
             </div>
           </div>
