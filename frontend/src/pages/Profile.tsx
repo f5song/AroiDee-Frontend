@@ -28,17 +28,15 @@ const ProfilePage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [isLoading, setIsLoading] = useState(true);
-  const [newImage, setNewImage] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-  // ✅ ถ้าไม่ได้ล็อกอิน ให้ redirect ไปหน้า login
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
 
-  // ✅ ดึงข้อมูลโปรไฟล์จาก Backend
+  // Fetch profile data from backend
   useEffect(() => {
     const fetchProfile = async () => {
       if (!token) return;
@@ -51,7 +49,6 @@ const ProfilePage: React.FC = () => {
           }
         );
         setProfile(response.data.user);
-        setPreviewImage(response.data.user.image_url || null);
       } catch (error) {
         console.error("Failed to load profile data", error);
         toast.error("Failed to load profile", {
@@ -65,33 +62,61 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [token]);
 
+  // Handle direct profile data changes
   const handleProfileChange = (updatedProfile: Profile) => {
     setProfile(updatedProfile);
   };
 
-  // ✅ ฟังก์ชันอัปโหลดรูปภาพไปยัง Cloudinary
-  const handleImageUpload = async () => {
-    if (!newImage) return;
-
-    const formData = new FormData();
-    formData.append("file", newImage);
-    formData.append("upload_preset", "your_upload_preset");
-
+  // Handle avatar upload
+  const handleAvatarChange = async (file: File) => {
+    if (!file || !profile) return;
+    
+    setIsSaving(true);
+    
     try {
+      // Create FormData object for the file upload
+      const formData = new FormData();
+      formData.append("avatar", file);
+      
+      // Upload to your backend API
       const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
-        formData
+        "https://aroi-dee-backend.vercel.app/api/users/upload-avatar",
+        formData,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data"
+          } 
+        }
       );
-
-      const imageUrl = response.data.secure_url;
-      setPreviewImage(imageUrl); // ✅ อัปเดตรูปที่แสดงใน UI
-      setProfile((prevProfile) => prevProfile ? { ...prevProfile, image_url: imageUrl } : null);
+      
+      if (response.data.success) {
+        // Update the profile with the new image URL
+        const imageUrl = response.data.imageUrl;
+        
+        // Update local state
+        setProfile({
+          ...profile,
+          image_url: imageUrl
+        });
+        
+        toast.success("Profile picture updated", {
+          description: "Your avatar has been updated successfully."
+        });
+      } else {
+        throw new Error("Failed to upload avatar");
+      }
     } catch (error) {
-      console.error("Error uploading image:", error);
+      console.error("Error uploading avatar:", error);
+      toast.error("Upload failed", {
+        description: "There was an error uploading your profile picture. Please try again."
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
-  // ✅ ฟังก์ชันอัปเดตข้อมูลโปรไฟล์
+  // Save profile changes to backend
   const handleSave = async () => {
     if (!profile) return;
 
@@ -110,7 +135,8 @@ const ProfilePage: React.FC = () => {
         {
           username: profile.username,
           email: profile.email,
-          image_url: previewImage, // ✅ อัปเดตรูปภาพโปรไฟล์
+          image_url: profile.image_url,
+          // Add any other profile fields you want to update
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -146,41 +172,15 @@ const ProfilePage: React.FC = () => {
             <p className="mt-4 text-gray-500">Loading profile...</p>
           </div>
         ) : profile ? (
-          <>
-
-            {/* ✅ ฟอร์มแก้ไขข้อมูล */}
-            <ProfileForm
-              profile={profile}
-              isEditing={isEditing}
-              setIsEditing={setIsEditing}
-              isSaving={isSaving}
-              handleSave={handleSave}
-              onProfileChange={handleProfileChange}
-            />
-
-            {/* ✅ อัปโหลดรูปภาพ */}
-            {isEditing && (
-              <div className="flex flex-col items-center mt-4">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files?.[0]) {
-                      setNewImage(e.target.files[0]);
-                      setPreviewImage(URL.createObjectURL(e.target.files[0]));
-                    }
-                  }}
-                  className="mt-3"
-                />
-                <button
-                  onClick={handleImageUpload}
-                  className="bg-blue-500 text-white px-4 py-2 rounded mt-3"
-                >
-                  Upload Image
-                </button>
-              </div>
-            )}
-          </>
+          <ProfileForm
+            profile={profile}
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            isSaving={isSaving}
+            handleSave={handleSave}
+            onProfileChange={handleProfileChange}
+            onAvatarChange={handleAvatarChange}
+          />
         ) : (
           <p className="text-center text-red-500">Failed to load profile.</p>
         )}

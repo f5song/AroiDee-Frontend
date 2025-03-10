@@ -6,7 +6,10 @@ export interface Profile {
   gender: "Male" | "Female" | "Other";
   notifications?: boolean;
   avatar?: string;
-  // เพิ่ม preferences สำหรับการตั้งค่า
+  location?: string; // Added location field for display purposes
+  // Change from avatar to image_url to match API response
+  image_url?: string;
+  // User preferences
   preferences?: {
     language: "th" | "en";
     darkMode?: boolean;
@@ -15,5 +18,4 @@ export interface Profile {
     pushNotifications?: boolean;
     newsletterSubscribed?: boolean;
   };
-  image_url?: string;
 }

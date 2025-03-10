@@ -22,34 +22,44 @@ interface Recipe {
   rating?: number | null;
   ingredients: string[];
   isFavorite: boolean;
+  created_at?: string;
 }
 
 const Homepage: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [latestRecipes, setLatestRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
 
-  // 📌 ดึงข้อมูลจาก Backend
   useEffect(() => {
     axios.get(`${API_URL}/api/recipes`)
       .then((response) => {
-        console.log("Fetched Recipes:", response.data); // ✅ ตรวจสอบค่าที่ frontend ได้รับ
-  
         if (response.data.success) {
           const fetchedRecipes = response.data.data.map((recipe: any) => ({
             id: recipe.id,
             title: recipe.title,
-            author: recipe.author || "Unknown", // ✅ ใช้ `author` แทน users.username
+            author: recipe.author || "Unknown",
             image_url: recipe.image_url || "/default-recipe.jpg",
-            cook_time: recipe.cook_time ?? 0, // ✅ ถ้าไม่มีค่าให้ใช้ 0
-            calories: recipe.calories ?? 0, // ✅ calories มาจาก API ตรงๆ
-            rating: recipe.rating ?? null, // ✅ ตรวจสอบค่า rating
+            cook_time: recipe.cook_time ?? 0,
+            calories: recipe.calories ?? 0,
+            rating: recipe.rating ?? null,
             ingredients: recipe.ingredients || [],
             isFavorite: false,
+            created_at: recipe.created_at,
           }));
   
           setRecipes(fetchedRecipes);
+          
+          // จัดเรียงตามเวลาที่สร้าง (ล่าสุดก่อน)
+          const sortedLatestRecipes = [...fetchedRecipes]
+            .sort((a, b) => {
+              const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+              const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+              return dateB - dateA;
+            });
+            
+          setLatestRecipes(sortedLatestRecipes);
         } else {
           setError("Failed to load recipes.");
         }
@@ -62,11 +72,22 @@ const Homepage: React.FC = () => {
       });
   }, []);
   
-
-  // 📌 ฟังก์ชัน Toggle Favorite
+  // Toggle Favorite สำหรับ Content component
   const toggleFavorite = (index: number) => {
     setRecipes((prev) => prev.map((recipe, i) => 
       i === index ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
+    ));
+  };
+
+  // Toggle Favorite สำหรับ Latest Recipes (โดยใช้ id)
+  const toggleLatestFavorite = (id: number) => {
+    // อัพเดตสถานะ favorite ในทั้ง latestRecipes และ recipes
+    setLatestRecipes((prev) => prev.map((recipe) => 
+      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
+    ));
+    
+    setRecipes((prev) => prev.map((recipe) => 
+      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
     ));
   };
 
@@ -77,12 +98,12 @@ const Homepage: React.FC = () => {
         <Categories />
         <FeaturedRecipes />
 
-        {/* ✅ เพิ่ม loading & error handling */}
         {loading && <p className="text-center text-gray-500">Loading...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
 
         <Content topic="Recommended" recipes={recipes} toggleFavorite={toggleFavorite} />
-        <LatestRecipes />
+        
+        {!loading && <LatestRecipes recipes={latestRecipes} toggleFavorite={toggleLatestFavorite} />}
         
         {isAuthenticated && <ShareRecipe />}
       </main>
