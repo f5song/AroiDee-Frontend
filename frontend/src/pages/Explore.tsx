@@ -26,8 +26,6 @@ export default function ExplorePage() {
   });
 
   useEffect(() => {
-    if (!user) return;
-
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -43,11 +41,11 @@ export default function ExplorePage() {
     };
 
     fetchData();
-  }, [user, filterOptions]);
+  }, [filterOptions]);
 
   // กำหนดว่ามีการใช้ filters หรือไม่
   const hasFilters = !!filterOptions.search || !!filterOptions.category;
-  
+
   // ฟังก์ชันล้าง filters
   const clearFilters = () => {
     setFilterOptions({
@@ -55,6 +53,16 @@ export default function ExplorePage() {
       sort: "rating",
       page: 1,
     });
+  };
+
+  // ✅ เช็คก่อนให้ Favorite ถ้ายังไม่ล็อกอินให้แจ้งเตือน
+  // ✅ แก้ไขให้รองรับ async/await
+  const handleFavoriteToggle = async (recipeId: number): Promise<void> => {
+    if (!user) {
+      alert("❌ กรุณาเข้าสู่ระบบเพื่อบันทึกสูตรอาหาร");
+      return;
+    }
+    await toggleFavorite(recipeId); // ✅ ใช้ await เพื่อให้มันเป็น Promise<void>
   };
 
   return (
@@ -83,7 +91,7 @@ export default function ExplorePage() {
               recipes={recipes}
               loading={loading}
               favorites={favorites}
-              onFavoriteToggle={toggleFavorite} // ✅ ใช้ฟังก์ชันจาก Context
+              onFavoriteToggle={handleFavoriteToggle} // ✅ ใช้ฟังก์ชันเช็ค login
               isProcessing={isProcessing}
               isLoggedIn={!!user}
               hasFilters={hasFilters}
