@@ -46,14 +46,8 @@ const LatestRecipes: React.FC<LatestRecipesProps> = ({ recipes, toggleFavorite }
     setVisibleCount(prev => prev + 8);
   };
 
-  // เรียงลำดับตาม created_at ใหม่สุดก่อน (กรณีที่รับมาแล้วต้องการเรียงใหม่)
-  const sortedRecipes = [...recipes].sort((a, b) => {
-    const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-    const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-    return dateB - dateA;
-  });
-
-  const displayedRecipes = sortedRecipes.slice(0, visibleCount);
+  // Display recipes up to the visible count
+  const displayedRecipes = recipes.slice(0, visibleCount);
 
   return (
     <section className="container mx-auto py-10 px-4">
@@ -77,44 +71,47 @@ const LatestRecipes: React.FC<LatestRecipesProps> = ({ recipes, toggleFavorite }
             animate="visible"
             whileHover="hover"
           >
-            {/* Image Container */}
-            <div className="relative overflow-hidden bg-gray-100 mb-2 rounded-lg">
-              <img 
-                src={recipe.image_url || "/default-recipe.jpg"} 
-                alt={recipe.title} 
-                className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-              
-              {/* Favorite Button */}
-              <button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleFavorite(recipe.id);
-                }}
-                className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md transition-colors duration-200 hover:bg-gray-100"
-              >
-                <Heart 
-                  className={`h-5 w-5 ${recipe.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} 
+            {/* Wrap entire card in Link component for navigation */}
+            <Link to={`/recipe/${recipe.id}`} className="block">
+              {/* Image Container */}
+              <div className="relative overflow-hidden bg-gray-100 mb-2 rounded-lg">
+                <img 
+                  src={recipe.image_url || "/default-recipe.jpg"} 
+                  alt={recipe.title} 
+                  className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-              </button>
               
-              {/* Cook Time Badge */}
-              {recipe.cook_time > 0 && (
-                <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded-full text-xs font-medium flex items-center shadow-sm">
-                  <Clock className="mr-1 h-3 w-3 text-orange-500" />
-                  {recipe.cook_time} mins
-                </div>
-              )}
-            </div>
+                {/* Favorite Button */}
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleFavorite(recipe.id);
+                  }}
+                  className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md transition-colors duration-200 hover:bg-gray-100"
+                >
+                  <Heart 
+                    className={`h-5 w-5 ${recipe.isFavorite ? "fill-red-500 text-red-500" : "text-gray-600"}`} 
+                  />
+                </button>
+              
+                {/* Cook Time Badge */}
+                {recipe.cook_time > 0 && (
+                  <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded-full text-xs font-medium flex items-center shadow-sm">
+                    <Clock className="mr-1 h-3 w-3 text-orange-500" />
+                    {recipe.cook_time} mins
+                  </div>
+                )}
+              </div>
             
-            {/* Recipe Info */}
-            <div>
-              {/* Recipe Title */}
-              <h3 className="text-sm font-medium line-clamp-2">{recipe.title}</h3>
-              
-              {/* Author */}
-              <p className="text-xs text-gray-500 mt-1">by {recipe.author || "Anonymous"}</p>
-            </div>
+              {/* Recipe Info */}
+              <div>
+                {/* Recipe Title */}
+                <h3 className="text-sm font-medium line-clamp-2">{recipe.title}</h3>
+                
+                {/* Author */}
+                <p className="text-xs text-gray-500 mt-1">by {recipe.author || "Anonymous"}</p>
+              </div>
+            </Link>
           </motion.div>
         ))}
       </div>
