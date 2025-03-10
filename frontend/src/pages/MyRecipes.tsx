@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router"; // ✅ ใช้ useRouter เพื่อเปลี่ยนหน้า
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/auth/AuthContext";
 import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ FavoritesContext
 import { Recipe } from "@/lib/recipes/types";
@@ -13,20 +13,21 @@ const API_URL = "https://aroi-dee-backend.vercel.app/api";
  * My Recipes page component
  */
 export default function MyRecipesPage() {
-  const router = useRouter(); // ✅ ใช้ router สำหรับ redirect
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { favorites, isProcessing, toggleFavorite } = useFavorites(); // ✅ ใช้ Context
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ เช็ค authToken ถ้าไม่มีให้ redirect ไปหน้า login
+  // ✅ ตรวจสอบ authToken และ redirect ถ้าไม่มี
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (!token) {
-      router.push("/login"); // ✅ เปลี่ยนเส้นทางไปหน้า Login ถ้าไม่มี token
+      navigate("/login"); // ✅ เปลี่ยนเส้นทางไปหน้า Login ถ้าไม่มี token
       return;
     }
-    
+
+    // ✅ ตรวจสอบว่ามี user ก่อนโหลดข้อมูล
     if (!user) return;
 
     const fetchUserRecipes = async () => {
@@ -50,7 +51,7 @@ export default function MyRecipesPage() {
     };
 
     fetchUserRecipes();
-  }, [user, router]);
+  }, [user, navigate]); // ✅ ใช้ navigate แทน router
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-8 lg:p-10">
