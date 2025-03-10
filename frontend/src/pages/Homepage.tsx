@@ -22,10 +22,12 @@ interface Recipe {
   rating?: number | null;
   ingredients: string[];
   isFavorite: boolean;
+  created_at?: string; // เพิ่ม timestamp เพื่อจัดเรียงตามเวลา
 }
 
 const Homepage: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [latestRecipes, setLatestRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
@@ -47,9 +49,21 @@ const Homepage: React.FC = () => {
             rating: recipe.rating ?? null, // ✅ ตรวจสอบค่า rating
             ingredients: recipe.ingredients || [],
             isFavorite: false,
+            created_at: recipe.created_at, // เพิ่ม timestamp สำหรับการจัดเรียง
           }));
   
           setRecipes(fetchedRecipes);
+          
+          // จัดเรียงและตั้งค่า latest recipes โดยใช้เวลาที่สร้าง
+          const sortedLatestRecipes = [...fetchedRecipes]
+            .sort((a, b) => {
+              // จัดเรียงตามเวลาที่สร้าง โดยล่าสุดจะอยู่ก่อน
+              const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+              const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+              return dateB - dateA;
+            });
+            
+          setLatestRecipes(sortedLatestRecipes);
         } else {
           setError("Failed to load recipes.");
         }
@@ -70,6 +84,18 @@ const Homepage: React.FC = () => {
     ));
   };
 
+  // ฟังก์ชัน Toggle Favorite สำหรับ latest recipes (โดยใช้ id)
+  const toggleLatestFavorite = (id: number) => {
+    setLatestRecipes((prev) => prev.map((recipe) => 
+      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
+    ));
+    
+    // อัพเดต favorite ในรายการหลักด้วย
+    setRecipes((prev) => prev.map((recipe) => 
+      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
+    ));
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Hero />
@@ -82,7 +108,9 @@ const Homepage: React.FC = () => {
         {error && <p className="text-center text-red-500">{error}</p>}
 
         <Content topic="Recommended" recipes={recipes} toggleFavorite={toggleFavorite} />
-        <LatestRecipes />
+        
+        {/* ส่ง props ไปยัง LatestRecipes component */}
+        {!loading && <LatestRecipes recipes={latestRecipes} toggleFavorite={toggleLatestFavorite} />}
         
         {isAuthenticated && <ShareRecipe />}
       </main>
