@@ -5,6 +5,7 @@ import {
   TermsPrivacyProvider,
 } from "@/components/auth/TermsPrivacyManager";
 import { Eye, EyeOff } from "lucide-react";
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
 const SignupPageContent: React.FC = () => {
   const [name, setName] = useState("");
@@ -28,22 +29,22 @@ const SignupPageContent: React.FC = () => {
     e.preventDefault();
 
     if (!name || !email || !password) {
-      setError("Please fill in all fields");
+      setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
 
     if (!validateUsername(name)) {
-      setError("Username must be all lowercase with no spaces (only letters, numbers, underscores, and hyphens are allowed)");
+      setError("ชื่อผู้ใช้ต้องเป็นตัวพิมพ์เล็กและไม่มีช่องว่าง (อนุญาตเฉพาะตัวอักษร, ตัวเลข, เครื่องหมายขีดล่าง และขีดกลางเท่านั้น)");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("รหัสผ่านไม่ตรงกัน");
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setError("รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร");
       return;
     }
 
@@ -63,22 +64,30 @@ const SignupPageContent: React.FC = () => {
       // Check if the response has content
       if (!response.ok) {
         const errorText = await response.text(); // Read message from response
-        throw new Error(errorText || "Registration failed");
+        throw new Error(errorText || "การลงทะเบียนล้มเหลว");
       }
 
       const data = await response.json(); // Convert response to JSON
 
       if (!data.success) {
-        throw new Error(data.message || "Registration failed");
+        throw new Error(data.message || "การลงทะเบียนล้มเหลว");
       }
 
-      alert("Registration successful! 🎉 Please log in");
+      alert("ลงทะเบียนสำเร็จ! 🎉 กรุณาเข้าสู่ระบบ");
       navigate("/login"); // Navigate user to Login page
     } catch (err: any) {
-      setError(err.message || "An error occurred");
+      setError(err.message || "เกิดข้อผิดพลาด");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = () => {
+    // จัดการเมื่อล็อกอินด้วย Google สำเร็จ (การนำทางจะจัดการโดย GoogleAuthButton)
+  };
+
+  const handleGoogleError = (errorMessage: string) => {
+    setError(errorMessage);
   };
 
   return (
@@ -86,17 +95,17 @@ const SignupPageContent: React.FC = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Sign Up
+            สมัครสมาชิก
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Or{" "}
+            หรือ{" "}
             <Link
               to="/login"
               className="font-medium text-orange-500 hover:text-orange-600"
             >
-              log in
+              เข้าสู่ระบบ
             </Link>{" "}
-            if you already have an account
+            หากคุณมีบัญชีอยู่แล้ว
           </p>
         </div>
 
@@ -106,14 +115,30 @@ const SignupPageContent: React.FC = () => {
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <div className="mt-8">
+          <GoogleAuthButton 
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+          />
+
+          <div className="relative mt-6 mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">หรือสมัครด้วยอีเมล</span>
+            </div>
+          </div>
+        </div>
+
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label
                 htmlFor="name"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Username
+                ชื่อผู้ใช้
               </label>
               <input
                 id="name"
@@ -124,10 +149,10 @@ const SignupPageContent: React.FC = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                placeholder="username (lowercase, no spaces)"
+                placeholder="ชื่อผู้ใช้ (ตัวพิมพ์เล็ก ไม่มีช่องว่าง)"
               />
               <p className="mt-1 text-xs text-gray-500">
-                Username must be all lowercase with no spaces. Only letters, numbers, underscores, and hyphens allowed.
+                ชื่อผู้ใช้ต้องเป็นตัวพิมพ์เล็กและไม่มีช่องว่าง อนุญาตเฉพาะตัวอักษร ตัวเลข เครื่องหมายขีดล่าง และขีดกลางเท่านั้น
               </p>
             </div>
 
@@ -136,7 +161,7 @@ const SignupPageContent: React.FC = () => {
                 htmlFor="email-address"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Email
+                อีเมล
               </label>
               <input
                 id="email-address"
@@ -156,7 +181,7 @@ const SignupPageContent: React.FC = () => {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Password
+                รหัสผ่าน
               </label>
               <div className="relative">
                 <input
@@ -189,7 +214,7 @@ const SignupPageContent: React.FC = () => {
                 htmlFor="confirm-password"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Confirm Password
+                ยืนยันรหัสผ่าน
               </label>
               <div className="relative">
                 <input
@@ -227,21 +252,21 @@ const SignupPageContent: React.FC = () => {
               className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
             />
             <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-              I accept the{" "}
+              ฉันยอมรับ{" "}
               <button
                 type="button"
                 onClick={openTerms}
                 className="text-orange-500 hover:text-orange-600 hover:underline focus:outline-none"
               >
-                Terms of Service
+                เงื่อนไขการใช้บริการ
               </button>{" "}
-              and{" "}
+              และ{" "}
               <button
                 type="button"
                 onClick={openPrivacy}
                 className="text-orange-500 hover:text-orange-600 hover:underline focus:outline-none"
               >
-                Privacy Policy
+                นโยบายความเป็นส่วนตัว
               </button>
             </label>
           </div>
@@ -254,7 +279,7 @@ const SignupPageContent: React.FC = () => {
                 isLoading ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
-              {isLoading ? "Processing..." : "Sign Up"}
+              {isLoading ? "กำลังดำเนินการ..." : "สมัครสมาชิก"}
             </button>
           </div>
         </form>
