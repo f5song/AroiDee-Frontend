@@ -72,6 +72,7 @@ const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   const handleGoogleResponse = async (response: any) => {
     try {
       // การตอบกลับจาก Google จะมี credential (ID token)
+      console.log("Google Response:", response);
       const { credential } = response;
 
       // ส่ง Google token ไปยัง backend ผ่านฟังก์ชั่น loginWithGoogle ใน AuthContext
