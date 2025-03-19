@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
 import axios from "axios";
 
 type User = {
@@ -49,10 +55,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (identifier: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await axios.post("https://aroi-dee-backend.vercel.app/api/users/login", {
-        identifier, // ใช้ identifier (username หรือ email)
-        password,
-      });
+      const response = await axios.post(
+        "https://aroi-dee-backend.vercel.app/api/users/login",
+        {
+          identifier, // ใช้ identifier (username หรือ email)
+          password,
+        }
+      );
 
       const { token, user } = response.data;
 
@@ -66,7 +75,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // ตั้งค่า axios ให้ใช้ token อัตโนมัติ
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
     } catch (error: any) {
-      console.error("Login failed:", error.response?.data?.message || error.message);
+      console.error(
+        "Login failed:",
+        error.response?.data?.message || error.message
+      );
       throw new Error(error.response?.data?.message || "เข้าสู่ระบบล้มเหลว");
     } finally {
       setIsLoading(false);
@@ -78,9 +90,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       // ส่ง Google ID token ไปที่ backend เพื่อตรวจสอบและรับ JWT token กลับมา
-      const response = await axios.post("https://aroi-dee-backend.vercel.app/api/users/google-login", {
-        token: googleToken,
-      });
+      const response = await axios.post(
+        "https://aroi-dee-backend.vercel.app/api/users/google-login",
+        { token: googleToken }
+      );
 
       const { token, user } = response.data;
 
@@ -94,8 +107,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // ตั้งค่า axios ให้ใช้ token อัตโนมัติ
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
     } catch (error: any) {
-      console.error("Google login failed:", error.response?.data?.message || error.message);
-      throw new Error(error.response?.data?.message || "การเข้าสู่ระบบด้วย Google ล้มเหลว");
+      console.error(
+        "Google login failed:",
+        error.response?.data?.message || error.message
+      );
+      throw new Error(
+        error.response?.data?.message || "การเข้าสู่ระบบด้วย Google ล้มเหลว"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -113,15 +131,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        token, 
-        isAuthenticated: !!user, 
-        isLoading, 
-        login, 
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
         loginWithGoogle, // เพิ่ม loginWithGoogle เข้าไปใน context
-        logout 
+        logout,
       }}
     >
       {children}
