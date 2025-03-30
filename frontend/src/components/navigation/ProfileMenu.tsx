@@ -102,13 +102,17 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
+        const authToken = localStorage.getItem("authToken");
         const response = await fetch(
-          "https://aroi-dee-backend.vercel.app/api/users/profile"
+          "https://aroi-dee-backend.vercel.app/api/users/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`, // เพิ่ม token ใน header
+            },
+          }
         );
         if (response.ok) {
           const data = await response.json();
-          console.log("Fetched profile data:", data); // Log the fetched data
-
           if (data && data.image_url) {
             setImageUrl(data.image_url); // Update image URL from the API
           }
@@ -135,7 +139,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
         >
           Profile
           <ChevronDown
-            className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+            className={`w-5 h-5 transition-transform duration-300 ${
+              isOpen ? "rotate-180" : ""
+            }`}
           />
         </button>
 
@@ -155,7 +161,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
                     }}
                   >
                     {item.icon && (
-                      <span className="text-orange-500 flex-shrink-0">{item.icon}</span>
+                      <span className="text-orange-500 flex-shrink-0">
+                        {item.icon}
+                      </span>
                     )}
                     <span className="text-base">{item.name}</span>
                   </Link>
@@ -171,7 +179,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
                     }}
                   >
                     {item.icon && (
-                      <span className="text-orange-500 flex-shrink-0">{item.icon}</span>
+                      <span className="text-orange-500 flex-shrink-0">
+                        {item.icon}
+                      </span>
                     )}
                     <span className="text-base">{item.name}</span>
                   </button>
@@ -203,7 +213,9 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
           />
         </div>
         <ChevronDown
-          className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${
+            isOpen ? "rotate-180" : ""
+          }`}
         />
       </button>
 
