@@ -103,21 +103,31 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
     const fetchProfileData = async () => {
       try {
         const authToken = localStorage.getItem("authToken");
+        console.log("Auth Token:", authToken); // Log the token to verify it's correct
+
         const response = await fetch(
           "https://aroi-dee-backend.vercel.app/api/users/profile",
           {
             headers: {
-              Authorization: `Bearer ${authToken}`, // เพิ่ม token ใน header
+              Authorization: `Bearer ${authToken}`,
             },
           }
         );
+
         if (response.ok) {
           const data = await response.json();
+          console.log("API Response:", data); // Log the API response to check what comes back
+
           if (data && data.image_url) {
-            setImageUrl(data.image_url); // Update image URL from the API
+            setImageUrl(data.image_url);
+          } else {
+            console.error("Image URL not found in the response");
           }
         } else {
-          console.error("Error fetching profile data");
+          console.error(
+            "Error fetching profile data, status:",
+            response.status
+          );
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
