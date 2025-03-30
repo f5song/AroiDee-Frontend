@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/components/auth/AuthContext';
 import { Eye, EyeOff } from "lucide-react";
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
 const LoginPage: React.FC = () => {
   const [identifier, setIdentifier] = useState('');
@@ -17,7 +18,7 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     
     if (!identifier || !password) {
-      setError('Please enter username/email and password');
+      setError('กรุณากรอกชื่อผู้ใช้/อีเมลและรหัสผ่าน');
       return;
     }
     
@@ -25,15 +26,24 @@ const LoginPage: React.FC = () => {
       setIsLoading(true);
       setError('');
       
-      // Assuming your login function needs to be updated to handle both username and email
+      // เรียกใช้ฟังก์ชัน login จาก AuthContext
       await login(identifier, password);
       navigate('/'); // Redirect to home page after login
-    } catch (err) {
-      setError('Login failed. Please try again');
+    } catch (err: any) {
+      setError(err.message || 'เข้าสู่ระบบล้มเหลว กรุณาลองใหม่อีกครั้ง');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleSuccess = () => {
+    // สามารถเพิ่มโค้ดเพิ่มเติมที่ต้องการทำเมื่อล็อกอินด้วย Google สำเร็จ
+    // ในที่นี้ไม่จำเป็นต้องมีเพราะการนำทางจะจัดการโดย GoogleAuthButton
+  };
+
+  const handleGoogleError = (errorMessage: string) => {
+    setError(errorMessage);
   };
   
   return (
@@ -41,12 +51,12 @@ const LoginPage: React.FC = () => {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md">
         <div className="text-center">
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Log In
+            เข้าสู่ระบบ
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            Or{' '}
+            หรือ{' '}
             <Link to="/signup" className="font-medium text-orange-500 hover:text-orange-600">
-              sign up
+              สมัครสมาชิก
             </Link>
           </p>
         </div>
@@ -57,11 +67,27 @@ const LoginPage: React.FC = () => {
           </div>
         )}
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <div className="mt-8">
+          <GoogleAuthButton 
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+          />
+          
+          <div className="relative mt-6 mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">หรือเข้าสู่ระบบด้วยอีเมล</span>
+            </div>
+          </div>
+        </div>
+        
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-1">
-                Username or Email
+                ชื่อผู้ใช้หรืออีเมล
               </label>
               <input
                 id="identifier"
@@ -72,16 +98,16 @@ const LoginPage: React.FC = () => {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your username or email"
+                placeholder="กรอกชื่อผู้ใช้หรืออีเมลของคุณ"
               />
             </div>
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                  Password
+                  รหัสผ่าน
                 </label>
                 <Link to="/forgot-password" className="text-sm text-orange-500 hover:text-orange-600">
-                  Forgot password?
+                  ลืมรหัสผ่าน?
                 </Link>
               </div>
               <div className="relative">
@@ -119,7 +145,7 @@ const LoginPage: React.FC = () => {
                 isLoading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
             >
-              {isLoading ? 'Processing...' : 'Log In'}
+              {isLoading ? 'กำลังดำเนินการ...' : 'เข้าสู่ระบบ'}
             </button>
           </div>
         </form>
