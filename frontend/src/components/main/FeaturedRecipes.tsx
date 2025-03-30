@@ -50,7 +50,16 @@ const FeaturedRecipes = () => {
               className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               whileHover={{ scale: 1.02 }}
             >
+              <div className="relative">
+                <img
+                  src={recipe.image_url || "/default-recipe.jpg"}
+                  alt={recipe.title}
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+
               <div className="p-4">
+
 
                 {/* Recipe title */}
                 <h3 className="font-medium text-lg mb-1 line-clamp-2">{recipe.title}</h3>
@@ -58,7 +67,6 @@ const FeaturedRecipes = () => {
                 {/* Author with avatar */}
                 <div className="flex items-center mt-2 mb-2">
                   <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden mr-2">
-                    <img src="/default-avatar.png" alt={recipe.author} className="w-full h-full object-cover" />
                   </div>
                   <span className="text-sm text-gray-600">{recipe.author || "Unknown"}</span>
                 </div>

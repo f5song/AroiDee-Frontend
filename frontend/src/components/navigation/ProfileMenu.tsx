@@ -107,6 +107,8 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
         );
         if (response.ok) {
           const data = await response.json();
+          console.log("Fetched profile data:", data); // Log the fetched data
+
           if (data && data.image_url) {
             setImageUrl(data.image_url); // Update image URL from the API
           }
@@ -133,9 +135,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
         >
           Profile
           <ChevronDown
-            className={`w-5 h-5 transition-transform duration-300 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={`w-5 h-5 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
           />
         </button>
 
@@ -155,9 +155,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
                     }}
                   >
                     {item.icon && (
-                      <span className="text-orange-500 flex-shrink-0">
-                        {item.icon}
-                      </span>
+                      <span className="text-orange-500 flex-shrink-0">{item.icon}</span>
                     )}
                     <span className="text-base">{item.name}</span>
                   </Link>
@@ -173,9 +171,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
                     }}
                   >
                     {item.icon && (
-                      <span className="text-orange-500 flex-shrink-0">
-                        {item.icon}
-                      </span>
+                      <span className="text-orange-500 flex-shrink-0">{item.icon}</span>
                     )}
                     <span className="text-base">{item.name}</span>
                   </button>
@@ -207,9 +203,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
           />
         </div>
         <ChevronDown
-          className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
