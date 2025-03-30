@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://aroi-dee-backend.vercel.app";
@@ -51,21 +50,7 @@ const FeaturedRecipes = () => {
               className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               whileHover={{ scale: 1.02 }}
             >
-              <div className="relative">
-                <img
-                  src={recipe.image_url || "/default-recipe.jpg"}
-                  alt={recipe.title}
-                  className="w-full h-48 object-cover"
-                />
-              </div>
-
               <div className="p-4">
-                {/* Rating stars */}
-                <div className="flex text-orange-500 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-orange-500" />
-                  ))}
-                </div>
 
                 {/* Recipe title */}
                 <h3 className="font-medium text-lg mb-1 line-clamp-2">{recipe.title}</h3>

@@ -41,7 +41,7 @@ export default function ExplorePage() {
     };
 
     fetchData();
-  }, [filterOptions]);
+  }, [filterOptions]); // ✅ ไม่ต้องเช็ค user เพื่อให้ทำงานแม้ไม่ได้ล็อกอิน
 
   // กำหนดว่ามีการใช้ filters หรือไม่
   const hasFilters = !!filterOptions.search || !!filterOptions.category;
