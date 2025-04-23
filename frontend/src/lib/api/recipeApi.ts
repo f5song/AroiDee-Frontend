@@ -1,8 +1,13 @@
 import { apiClient } from "../apiClient";
 import axios from "axios";
 
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
+
 export const getRecipeById = async (recipeId: string) => {
-  const response = await apiClient.get(`/recipes/${recipeId}`);
+  const response = await apiClient.get(`${API_URL}/api/recipes/${recipeId}`);
 
   // 🔍 Debug: ตรวจสอบค่าที่ API ส่งกลับมา
   console.log("API Full Response:", response.data);
@@ -15,7 +20,7 @@ export const getRecipeById = async (recipeId: string) => {
 export const createRecipe = async (recipeData: any, token: string) => {
   try {
     const response = await axios.post(
-      "https://aroi-dee-backend.vercel.app/api/recipes/create",
+      `${API_URL}/api/recipes/create`,
       recipeData,
       {
         headers: {

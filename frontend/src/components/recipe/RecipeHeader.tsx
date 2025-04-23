@@ -1,10 +1,15 @@
 import React from "react";
 import { Heart, User, Clock, Share2, Star } from "lucide-react";
 import { RecipeHeaderProps } from "../../types/recipe";
-import { useFavorites } from "../auth/FavoritesContext"; // ✅ ใช้ FavoritesContext
+import { useFavorites } from "../auth/FavoritesContext";
 import { useNavigate } from "react-router-dom";
 
-const RecipeHeader: React.FC<RecipeHeaderProps> = ({
+// เพิ่ม prop สำหรับ Skeleton
+interface RecipeHeaderSkeletonProps extends Partial<RecipeHeaderProps> {
+  isLoading?: boolean;
+}
+
+const RecipeHeader: React.FC<RecipeHeaderSkeletonProps> = ({
   title,
   author,
   date,
@@ -12,48 +17,56 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
   comments,
   image_url,
   recipeId,
-  userId, // ✅ รับ userId เพื่อเช็คว่าเข้าสู่ระบบหรือยัง
+  userId,
+  isLoading = false,
 }) => {
-  const { favorites, isProcessing, toggleFavorite } = useFavorites(); // ✅ ใช้ Context
+  const { favorites, isProcessing, toggleFavorite } = useFavorites();
   const navigate = useNavigate();
 
-  // ✅ ดึง token จาก localStorage โดยอัตโนมัติ
   const token = localStorage.getItem("authToken");
+  const isFavorite = favorites.includes(recipeId || -1);
+  const isDisabled = isProcessing[recipeId || -1] ?? false;
 
-  // ✅ ตรวจสอบว่าสูตรอาหารนี้ถูก save หรือยัง
-  const isFavorite = favorites.includes(recipeId);
-  const isDisabled = isProcessing[recipeId] ?? false;
-
-  console.log(
-    `📌 Recipe ID: ${recipeId}, isFavorite: ${isFavorite}, isProcessing: ${isDisabled}, token: ${token}`
-  );
-
-  // ✅ ฟังก์ชัน Toggle Save/Unsave โดยใช้ FavoritesContext
   const handleFavoriteToggle = async (event: React.MouseEvent) => {
     event.preventDefault();
 
     if (!userId || !token) {
-      console.warn("❌ ผู้ใช้ไม่ได้ล็อกอินหรือไม่มี token", { userId, token });
-      navigate("/login"); // นำไปสู่หน้า Login ถ้าไม่ได้ล็อกอิน
+      navigate("/login");
       return;
     }
 
-    if (isDisabled) return; // ป้องกันกดซ้ำ
+    if (isDisabled) return;
 
-    console.log(`📌 Toggling favorite for recipe ID: ${recipeId}`);
-    await toggleFavorite(recipeId);
+    await toggleFavorite(recipeId!);
   };
+
+  // 🔧 Skeleton UI
+  if (isLoading) {
+    return (
+      <div className="relative h-[500px] bg-gray-300 dark:bg-gray-700 animate-pulse rounded-xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 p-8 w-full">
+          <div className="h-12 w-2/3 bg-gray-400 dark:bg-gray-600 rounded mb-4" />
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="h-8 w-32 bg-gray-400 dark:bg-gray-600 rounded-full" />
+            <div className="h-8 w-32 bg-gray-400 dark:bg-gray-600 rounded-full" />
+            <div className="h-8 w-40 bg-gray-400 dark:bg-gray-600 rounded-full" />
+          </div>
+          <div className="absolute top-6 right-6 flex space-x-3">
+            <div className="h-10 w-24 bg-gray-400 dark:bg-gray-600 rounded-full" />
+            <div className="h-10 w-10 bg-gray-400 dark:bg-gray-600 rounded-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
 
   return (
     <div className="relative rounded-xl overflow-hidden">
       <div className="relative h-[500px]">
-        <img
-          src={image_url}
-          alt={title}
-          className="w-full h-full object-cover"
-        />
+        <img src={image_url} alt={title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
         <div className="absolute bottom-0 left-0 p-8 w-full">
           <h1 className="text-5xl font-bold mb-3 text-white">{title}</h1>
           <div className="flex flex-wrap items-center gap-4 mb-6">
@@ -72,12 +85,10 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
               </span>
             </div>
           </div>
-
           <div className="absolute top-6 right-6 flex space-x-3">
-            {/* ✅ ปุ่ม Save/Unsave ใช้ FavoritesContext */}
             <button
               onClick={handleFavoriteToggle}
-              disabled={isDisabled || !token} // ❌ ปิดปุ่มถ้าไม่มี token
+              disabled={isDisabled || !token}
               className={`p-3 rounded-full backdrop-blur-md transition-all ${
                 isFavorite
                   ? "bg-red-500 text-white"
@@ -85,7 +96,6 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({
               }`}
             >
               <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
-              <span className="ml-2">{isFavorite ? "Saved" : "Save"}</span>
             </button>
             <button className="p-3 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md text-white transition-all">
               <Share2 size={20} />

@@ -7,6 +7,12 @@ import React, {
 } from "react";
 import axios from "axios";
 
+// ใช้ API_URL จาก environment variable หรือค่า default
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app"; // Default URL ถ้าไม่มีค่าใน .env
+
 type User = {
   id: number;
   username: string;
@@ -56,9 +62,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "https://aroi-dee-backend.vercel.app/api/users/login",
+        `${API_URL}/api/users/login`, 
         {
-          identifier, // ใช้ identifier (username หรือ email)
+          identifier,
           password,
         }
       );
@@ -89,9 +95,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loginWithGoogle = async (googleToken: string) => {
     setIsLoading(true);
     try {
-      // ส่ง Google ID token ไปที่ backend เพื่อตรวจสอบและรับ JWT token กลับมา
       const response = await axios.post(
-        "https://aroi-dee-backend.vercel.app/api/users/google-login",
+        `${API_URL}/api/users/google-login`, // ใช้ API_URL ที่ตั้งค่าไว้
         { token: googleToken }
       );
 

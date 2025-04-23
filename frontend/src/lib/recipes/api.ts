@@ -3,7 +3,10 @@ import { Recipe, FilterOptions, PaginationInfo, CategoryOption } from "./types";
 import { CATEGORIES } from "./constants";
 // import { sortRecipes, filterRecipes, paginateData } from "./utils";
 
-const API_URL = "https://aroi-dee-backend.vercel.app/api";
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
 
 export type { FilterOptions, Recipe };
 
@@ -14,7 +17,7 @@ export const fetchRecipes = async (
   const { search, sort, page, category, cookingTime, calorieRange } = options; // ✅ เพิ่ม cookingTime และ calorieRange
 
   try {
-    const response = await axios.get(`${API_URL}/recipes`, {
+    const response = await axios.get(`${API_URL}/api/recipes`, {
       params: {
         search: search ?? "",
         sort: sort ?? "rating",

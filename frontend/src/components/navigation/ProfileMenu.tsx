@@ -1,11 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, UserCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import useOutsideClick from "@/lib/hooks/useOutsideClick";
 import {
   PROFILE_MENU_ITEMS,
   DropdownItem,
 } from "@/components/navigation/constants";
+
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app"; // Default URL ถ้าไม่มีค่าใน .env
+
 
 interface ProfileMenuProps {
   isMobile?: boolean;
@@ -103,7 +109,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
     const fetchProfileData = async () => {
       try {
         const response = await fetch(
-          "https://aroi-dee-backend.vercel.app/api/users/profile",
+          `${API_URL}/api/users/profile`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("authToken")}`, // ส่ง token
@@ -112,7 +118,7 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log("API Response:", data); // Log ดูข้อมูลทั้งหมดที่ได้จาก API
+          
           if (data && data.user && data.user.image_url) {
             setImageUrl(data.user.image_url); // Update image URL from the API
           } else {
@@ -207,12 +213,16 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({ isMobile = false }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 p-2 rounded-md hover:bg-orange-50 transition-colors duration-200"
       >
-        <div className="w-10 h-10 rounded-full overflow-hidden">
-          <img
-            src={imageUrl || "/api/placeholder/40/40"} // Fallback to placeholder if no image URL
-            alt="Profile"
-            className="w-full h-full object-cover"
-          />
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt="Profile"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <UserCircle className="h-8 w-8 text-gray-400" />
+          )}
         </div>
         <ChevronDown
           className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${

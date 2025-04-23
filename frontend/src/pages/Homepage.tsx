@@ -8,9 +8,10 @@ import ShareRecipe from "@/components/main/ShareRecipe";
 import FeaturedRecipes from "@/components/main/FeaturedRecipes";
 import LatestRecipes from "@/components/main/LatestRecipesGrid";
 
-const API_URL = import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== "" 
-  ? import.meta.env.VITE_API_URL 
-  : "https://aroi-dee-backend.vercel.app";
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
 
 interface Recipe {
   id: number;
@@ -33,7 +34,10 @@ const Homepage: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/recipes`)
+    axios
+      .get(`${API_URL}/api/recipes`, {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.success) {
           const fetchedRecipes = response.data.data.map((recipe: any) => ({
@@ -48,17 +52,16 @@ const Homepage: React.FC = () => {
             isFavorite: false,
             created_at: recipe.created_at,
           }));
-  
+
           setRecipes(fetchedRecipes);
-          
+
           // จัดเรียงตามเวลาที่สร้าง (ล่าสุดก่อน)
-          const sortedLatestRecipes = [...fetchedRecipes]
-            .sort((a, b) => {
-              const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
-              const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
-              return dateB - dateA;
-            });
-            
+          const sortedLatestRecipes = [...fetchedRecipes].sort((a, b) => {
+            const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return dateB - dateA;
+          });
+
           setLatestRecipes(sortedLatestRecipes);
         } else {
           setError("Failed to load recipes.");
@@ -71,24 +74,34 @@ const Homepage: React.FC = () => {
         setLoading(false);
       });
   }, []);
-  
+
   // Toggle Favorite สำหรับ Content component
   const toggleFavorite = (index: number) => {
-    setRecipes((prev) => prev.map((recipe, i) => 
-      i === index ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
-    ));
+    setRecipes((prev) =>
+      prev.map((recipe, i) =>
+        i === index ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
+      )
+    );
   };
 
   // Toggle Favorite สำหรับ Latest Recipes (โดยใช้ id)
   const toggleLatestFavorite = (id: number) => {
     // อัพเดตสถานะ favorite ในทั้ง latestRecipes และ recipes
-    setLatestRecipes((prev) => prev.map((recipe) => 
-      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
-    ));
-    
-    setRecipes((prev) => prev.map((recipe) => 
-      recipe.id === id ? { ...recipe, isFavorite: !recipe.isFavorite } : recipe
-    ));
+    setLatestRecipes((prev) =>
+      prev.map((recipe) =>
+        recipe.id === id
+          ? { ...recipe, isFavorite: !recipe.isFavorite }
+          : recipe
+      )
+    );
+
+    setRecipes((prev) =>
+      prev.map((recipe) =>
+        recipe.id === id
+          ? { ...recipe, isFavorite: !recipe.isFavorite }
+          : recipe
+      )
+    );
   };
 
   return (
@@ -97,14 +110,19 @@ const Homepage: React.FC = () => {
       <main className="container mx-auto py-6 px-4">
         <Categories />
         <FeaturedRecipes />
+        <Content
+          topic="Recommended Recipes"
+          recipes={recipes}
+          toggleFavorite={toggleFavorite}
+          loading={loading}
+        />
+        {!loading && (
+          <LatestRecipes
+            recipes={latestRecipes}
+            toggleFavorite={toggleLatestFavorite}
+          />
+        )}
 
-        {loading && <p className="text-center text-gray-500">Loading...</p>}
-        {error && <p className="text-center text-red-500">{error}</p>}
-
-        <Content topic="Recommended" recipes={recipes} toggleFavorite={toggleFavorite} />
-        
-        {!loading && <LatestRecipes recipes={latestRecipes} toggleFavorite={toggleLatestFavorite} />}
-        
         {isAuthenticated && <ShareRecipe />}
       </main>
     </div>

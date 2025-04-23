@@ -7,6 +7,13 @@ import {
 import { Eye, EyeOff } from "lucide-react";
 import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
+
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app"; // Default URL ถ้าไม่มีค่าใน .env
+
+
 const SignupPageContent: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -53,7 +60,7 @@ const SignupPageContent: React.FC = () => {
       setError("");
 
       const response = await fetch(
-        "https://aroi-dee-backend.vercel.app/api/users/register",
+        `${API_URL}/api/users/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

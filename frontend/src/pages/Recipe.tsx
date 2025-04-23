@@ -18,11 +18,19 @@ import CookingModeView from "../components/recipe/CookingModeView";
 // Types
 import { Comment } from "../types/recipe";
 
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app"; // Default URL ถ้าไม่มีค่าใน .env
+
 const RecipePage: React.FC = () => {
   const { recipeId } = useParams();
 
   // Fetch the current recipe
-  const { data: recipe = {} } = useQuery({
+  const {
+    data: recipe = {},
+    isLoading, // ✅ เอา isLoading จาก react-query มาใช้
+  } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: () => getRecipeById(recipeId as string),
     enabled: !!recipeId,
@@ -46,7 +54,6 @@ const RecipePage: React.FC = () => {
   const [showAllergies, setShowAllergies] = useState<boolean>(false);
   const [selectedUnit, setSelectedUnit] = useState<string>("metric");
   const [currentStep, setCurrentStep] = useState<number>(0);
-
   const [timer, setTimer] = useState<number>(0);
   const [timerActive, setTimerActive] = useState<boolean>(false);
   const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -77,9 +84,7 @@ const RecipePage: React.FC = () => {
   >({
     queryKey: ["allRecipes"],
     queryFn: async () => {
-      const res = await fetch(
-        "https://aroi-dee-backend.vercel.app/api/recipes"
-      );
+      const res = await fetch(`${API_URL}/api/recipes`);
       const data = await res.json();
       return data.data || [];
     },
@@ -197,6 +202,7 @@ const RecipePage: React.FC = () => {
           <>
             {/* Hero Section */}
             <RecipeHeader
+              isLoading={isLoading}
               title={recipe?.title || "No Recipe Name"}
               author={recipe?.author?.username || "Unknown Author"}
               date={
@@ -249,12 +255,14 @@ const RecipePage: React.FC = () => {
                       checkedIngredients={checkedIngredients}
                       handleIngredientClick={handleIngredientClick}
                       getConvertedIngredient={(ingredient) => ingredient.name}
+                      isLoading={isLoading}
                     />
                   ) : activeTab === "instructions" ? (
                     <InstructionsTab
                       instructions={recipe?.instructions || []}
                       toggleCookingMode={() => setCookingMode(!cookingMode)}
                       setTimerMinutes={(minutes) => setTimer(minutes * 60)}
+                      isLoading={isLoading}
                     />
                   ) : (
                     <CommentsTab
@@ -273,8 +281,11 @@ const RecipePage: React.FC = () => {
                     nutrition={recipe?.nutrition_facts || {}}
                     showNutritionDetails={showNutritionDetails}
                     setShowNutritionDetails={setShowNutritionDetails}
+                    isLoading={isLoading}
                   />
-                  <RelatedRecipes recipes={relatedRecipes} />
+                  <RelatedRecipes 
+                  recipes={relatedRecipes}
+                  isLoading={isLoading} />
                 </div>
               </div>
             </div>

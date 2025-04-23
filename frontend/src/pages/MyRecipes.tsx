@@ -7,8 +7,10 @@ import RecipeCollection from "@/components/myRecipe/RecipeCollection";
 import PageHeader from "@/components/myRecipe/PageHeader";
 import axios from "axios";
 
-const API_URL = "https://aroi-dee-backend.vercel.app/api";
-
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
 /**
  * My Recipes page component
  */

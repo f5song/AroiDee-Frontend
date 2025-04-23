@@ -26,13 +26,17 @@ const categoryVariants = {
 };
 
 const Categories = () => {
-  const [categories, setCategories] = useState<{ id: number; name: string; image_url?: string }[]>([]);
+  const [categories, setCategories] = useState<
+    { id: number; name: string; image_url?: string }[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     axios
-      .get(`${API_URL}/api/categories`)
+      .get(`${API_URL}/api/categories`, {
+        withCredentials: true,
+      })
       .then((response) => {
         if (response.data.success) {
           setCategories(response.data.data); // ✅ ตรวจสอบว่า API คืนค่า success=true
@@ -48,7 +52,37 @@ const Categories = () => {
       });
   }, []);
 
-  if (loading) return <p className="text-center text-gray-500">Loading categories...</p>;
+  if (loading) {
+    return (
+      <section className="container mx-auto py-8 px-4">
+        <motion.h3
+          className="text-3xl font-bold text-gray-800 mb-6"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          Categories
+        </motion.h3>
+
+        <div className="grid grid-cols-3 md:grid-cols-6 gap-4 justify-items-center">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="flex flex-col items-center animate-pulse"
+              variants={categoryVariants}
+              custom={i}
+              initial="hidden"
+              animate="visible"
+            >
+              <div className="w-24 h-24 rounded-full bg-gray-300 mb-2 shadow-md" />
+              <div className="w-16 h-4 bg-gray-300 rounded" />
+            </motion.div>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
@@ -85,7 +119,9 @@ const Categories = () => {
             </div>
 
             {/* Category Name */}
-            <span className="text-sm font-medium text-center">{category.name}</span>
+            <span className="text-sm font-medium text-center">
+              {category.name}
+            </span>
           </motion.div>
         ))}
       </div>

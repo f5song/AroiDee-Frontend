@@ -1,7 +1,11 @@
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
 
 export async function fetchCategories() {
     try {
-      const response = await fetch("https://aroi-dee-backend.vercel.app/api/categories");
+      const response = await fetch(`${API_URL}/api/categories`);
       if (!response.ok) throw new Error("Failed to fetch categories");
   
       const data = await response.json();

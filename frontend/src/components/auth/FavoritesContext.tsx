@@ -2,7 +2,10 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "./AuthContext";
 
-const API_URL = "https://aroi-dee-backend.vercel.app/api";
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
 
 interface FavoritesContextProps {
   favorites: number[];
@@ -35,12 +38,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-      console.log("📌 Fetching favorites with token:", token);
-
-      console.log("📌 Fetching favorites...");
-
       const response = await axios.get(
-        `${API_URL}/saved-recipes/${user.id}/saved-recipes`,
+        `${API_URL}/api/saved-recipes/${user.id}/saved-recipes`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -86,8 +85,8 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const isCurrentlyFavorite = favorites.includes(recipeId);
       const url = isCurrentlyFavorite
-        ? `${API_URL}/saved-recipes/unsave-recipe`
-        : `${API_URL}/saved-recipes/save-recipe`;
+        ? `${API_URL}/api/saved-recipes/unsave-recipe`
+        : `${API_URL}/api/saved-recipes/save-recipe`;
 
       console.log(`📌 Sending request to ${url} for recipe ID: ${recipeId}`);
 

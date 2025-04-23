@@ -36,7 +36,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             <div className="z-10">
               <AvatarUpload
                 username={profile.username}
-                currentAvatar={profile.image_url || "/default-avatar.png"}
+                currentAvatar={profile.image_url || undefined}
                 onAvatarChange={onAvatarChange}
               />
             </div>

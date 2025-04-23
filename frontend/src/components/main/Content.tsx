@@ -19,12 +19,28 @@ interface ContentProps {
   topic?: string;
   recipes: Recipe[];
   toggleFavorite: (index: number) => void;
+  loading?: boolean;
 }
+
+const SkeletonCard = () => (
+  <motion.div className="snap-center flex-shrink-0 w-[320px] bg-white rounded-lg shadow animate-pulse">
+    <div className="w-full h-40 bg-gray-300 rounded-t-lg" />
+    <div className="p-4 space-y-2">
+      <div className="h-5 bg-gray-300 rounded w-3/4" />
+      <div className="h-4 bg-gray-300 rounded w-1/2" />
+      <div className="flex gap-2 mt-4">
+        <div className="h-4 bg-gray-300 rounded w-1/4" />
+        <div className="h-4 bg-gray-300 rounded w-1/4" />
+      </div>
+    </div>
+  </motion.div>
+);
 
 const Content: React.FC<ContentProps> = ({
   topic,
   recipes,
   toggleFavorite,
+  loading = false,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -49,24 +65,26 @@ const Content: React.FC<ContentProps> = ({
           ref={scrollRef}
           className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar"
         >
-          {recipes.map((recipe, index) => (
-            <motion.div
-              key={recipe.id}
-              className="snap-center flex-shrink-0 w-[320px]"
-            >
-              <RecipeCard
-                recipe={{
-                  ...recipe,
-                  cook_time: recipe.cook_time ?? 0,
-                  calories: recipe.calories ?? 0,
-                }}
-                onToggleFavorite={() => toggleFavorite(index)}
-              />
-            </motion.div>
-          ))}
+          {loading
+            ? [...Array(4)].map((_, idx) => <SkeletonCard key={idx} />)
+            : recipes.map((recipe, index) => (
+                <motion.div
+                  key={recipe.id}
+                  className="snap-center flex-shrink-0 w-[320px]"
+                >
+                  <RecipeCard
+                    recipe={{
+                      ...recipe,
+                      cook_time: recipe.cook_time ?? 0,
+                      calories: recipe.calories ?? 0,
+                    }}
+                    onToggleFavorite={() => toggleFavorite(index)}
+                  />
+                </motion.div>
+              ))}
         </div>
 
-        {recipes.length > 3 && (
+        {!loading && recipes.length > 3 && (
           <>
             <button
               onClick={handlePrev}

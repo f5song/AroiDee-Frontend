@@ -9,10 +9,14 @@ import ProfileCalorieGoals from "@/components/profile/ProfileCalorieGoals";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/AuthContext";
 
+const API_URL =
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app"; // Default URL ถ้าไม่มีค่าใน .en
+
 // Import all tab content components
 import {
   SavedRecipesContent,
-  ShoppingListContent,
   NutritionTrackerContent,
   MealPlansContent,
   MyRecipesContent,
@@ -43,7 +47,8 @@ const ProfilePage: React.FC = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          "https://aroi-dee-backend.vercel.app/api/users/profile",
+          `${API_URL}/api/users/profile`,
+          
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -80,7 +85,7 @@ const ProfilePage: React.FC = () => {
       
       // Upload to your backend API
       const response = await axios.post(
-        "https://aroi-dee-backend.vercel.app/api/users/upload-avatar",
+        `${API_URL}/api/users/upload-avatar`,
         formData,
         { 
           headers: { 
@@ -131,12 +136,11 @@ const ProfilePage: React.FC = () => {
 
     try {
       const response = await axios.put(
-        "https://aroi-dee-backend.vercel.app/api/users/profile",
+        `${API_URL}/api/users/profile`,
         {
           username: profile.username,
           email: profile.email,
           image_url: profile.image_url,
-          // Add any other profile fields you want to update
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -187,7 +191,6 @@ const ProfilePage: React.FC = () => {
       </motion.div>
     ),
     saved: <SavedRecipesContent />,
-    shopping: <ShoppingListContent />,
     nutrition: <NutritionTrackerContent />,
     "meal-plans": <MealPlansContent />,
     recipes: <MyRecipesContent />,
