@@ -26,6 +26,8 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 
+import { useUserProfile } from "@/contexts/UserProfileContext";
+
 // Define types for our data structures
 interface Recipe {
   id: number;
@@ -89,24 +91,26 @@ const getFirstDayOfMonth = (year: number, month: number): number => {
 };
 
 // Mock user profile data - in a real app, this would be fetched from the server
-const USER_PROFILE: UserProfile = {
-  fullName: "Thana Smith",
-  username: "thana_smith",
-  email: "thana@example.com",
-  gender: "Male",
-  weight: 70, // kg
-  height: 175, // cm
-  birthdate: "1990-05-15",
-  activityLevel: "moderate", // sedentary, light, moderate, active, very active
-  calorieGoal: 2200,
-  fitnessGoals: ["maintain", "build-muscle"] // lose-weight, maintain, build-muscle
-};
+// const USER_PROFILE: UserProfile = {
+//   fullName: "Thana Smith",
+//   username: "thana_smith",
+//   email: "thana@example.com",
+//   gender: "Male",
+//   weight: 70, // kg
+//   height: 175, // cm
+//   birthdate: "1990-05-15",
+//   activityLevel: "moderate", // sedentary, light, moderate, active, very active
+//   calorieGoal: 1000,
+//   fitnessGoals: ["maintain", "build-muscle"] // lose-weight, maintain, build-muscle
+// };
 
 const CalendarMealPlanner: React.FC = () => {
+  const { userData } = useUserProfile();
+  const calorieGoal = userData.calorieGoal;
+
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
   // Get calorie goal from user profile
-  const [calorieGoal] = useState<number>(USER_PROFILE.calorieGoal);
   const [view, setView] = useState<'calendar' | 'day'>('calendar'); // 'calendar' or 'day'
   const [meals, setMeals] = useState<MealsByDate>({});
   const [showRecipeDialog, setShowRecipeDialog] = useState<boolean>(false);

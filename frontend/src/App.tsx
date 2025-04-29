@@ -5,7 +5,7 @@ import SmartNavbar from "./components/navigation/SmartNavbar";
 import Footer from "@/components/footer";
 import { FavoritesProvider } from "@/components/auth/FavoritesContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import { UserProfileProvider } from "./contexts/UserProfileContext";
 // สร้าง QueryClient instance
 const queryClient = new QueryClient();
 
@@ -34,34 +34,39 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <FavoritesProvider>
-            <div className="flex flex-col min-h-screen">
-              <SmartNavbar />
+          <UserProfileProvider>
+            <FavoritesProvider>
+              <div className="flex flex-col min-h-screen">
+                <SmartNavbar />
 
-              <main className="flex-grow">
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/recipes/explore" element={<Explore />} />
-                    <Route path="/recipes/my-recipes" element={<MyRecipes />} />
-                    <Route path="/recipe/create" element={<CreateRecipe />} />
-                    <Route path="/signup" element={<SignupPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/about-us" element={<AboutUs />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/recipe/:recipeId" element={<Recipe />} />
-                    <Route
-                      path="/meal-planning/planner"
-                      element={<MealPlanner />}
-                    />
-                    <Route path="*" element={<NotFoundPage />} />
-                  </Routes>
-                </Suspense>
-              </main>
+                <main className="flex-grow">
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Routes>
+                      <Route path="/" element={<LandingPage />} />
+                      <Route path="/recipes/explore" element={<Explore />} />
+                      <Route
+                        path="/recipes/my-recipes"
+                        element={<MyRecipes />}
+                      />
+                      <Route path="/recipe/create" element={<CreateRecipe />} />
+                      <Route path="/signup" element={<SignupPage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/about-us" element={<AboutUs />} />
+                      <Route path="/profile" element={<ProfilePage />} />
+                      <Route path="/recipe/:recipeId" element={<Recipe />} />
+                      <Route
+                        path="/meal-planning/planner"
+                        element={<MealPlanner />}
+                      />
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                  </Suspense>
+                </main>
 
-              <Footer />
-            </div>
-          </FavoritesProvider>
+                <Footer />
+              </div>
+            </FavoritesProvider>
+          </UserProfileProvider>
         </AuthProvider>
       </Router>
     </QueryClientProvider>
