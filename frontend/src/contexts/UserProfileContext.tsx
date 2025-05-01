@@ -1,5 +1,6 @@
 // contexts/UserProfileContext.tsx
-import { createContext, useContext, useState } from "react";
+import axios from "axios";
+import { createContext, useContext, useEffect, useState } from "react";
 
 type Macros = {
   carbs: number;
@@ -8,6 +9,7 @@ type Macros = {
 };
 
 type UserProfile = {
+  id: any;
   gender: "male" | "female";
   birthdate: string;
   height: number;
@@ -19,13 +21,14 @@ type UserProfile = {
 };
 
 const defaultUserProfile: UserProfile = {
+  id: 0,
   gender: "male",
   birthdate: "2000-01-01",
   height: 170,
   weight: 65,
   activityLevel: "moderate",
   goal: "maintain",
-  calorieGoal: 2200,
+  calorieGoal: 1000,
   macros: {
     carbs: 50,
     protein: 25,
@@ -33,15 +36,55 @@ const defaultUserProfile: UserProfile = {
   },
 };
 
+const API_URL =
+import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+  ? import.meta.env.VITE_API_URL
+  : "https://aroi-dee-backend.vercel.app";
+
+
 type UserProfileContextType = {
   userData: UserProfile;
   setUserData: React.Dispatch<React.SetStateAction<UserProfile>>;
 };
 
-const UserProfileContext = createContext<UserProfileContextType | undefined>(undefined);
+const UserProfileContext = createContext<UserProfileContextType | undefined>(
+  undefined
+);
 
-export const UserProfileProvider = ({ children }: { children: React.ReactNode }) => {
+export const UserProfileProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [userData, setUserData] = useState<UserProfile>(defaultUserProfile);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const token = localStorage.getItem("authToken");
+      if (!token) return;
+
+      try {
+        const response = await axios.get(`${API_URL}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = response.data.user;
+
+        if (data) {
+          setUserData((prev) => ({
+            ...prev,
+            id: data.id,
+            calorieGoal: data.calories_goal ?? prev.calorieGoal,
+            // หากต้องการ fetch เพิ่ม เช่น weight, height ให้ map ใส่เพิ่มตรงนี้
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch user profile", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   return (
     <UserProfileContext.Provider value={{ userData, setUserData }}>
@@ -49,7 +92,6 @@ export const UserProfileProvider = ({ children }: { children: React.ReactNode })
     </UserProfileContext.Provider>
   );
 };
-
 export const useUserProfile = (): UserProfileContextType => {
   const context = useContext(UserProfileContext);
   if (!context) {

@@ -5,11 +5,11 @@ import RecipeGrid from "@/components/common/RecipeGrid";
 import PaginationControls from "@/components/explore/PaginationControls";
 import { FilterOptions, Recipe, fetchRecipes } from "@/lib/recipes/api";
 import { useAuth } from "@/components/auth/AuthContext";
-import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ Context
+import { useFavorites } from "@/components/auth/FavoritesContext";
 
 export default function ExplorePage() {
   const { user } = useAuth();
-  const { favorites, isProcessing, toggleFavorite } = useFavorites(); // ✅ ใช้ฟังก์ชันจาก Context
+  const { favorites, isProcessing, toggleFavorite } = useFavorites();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
 

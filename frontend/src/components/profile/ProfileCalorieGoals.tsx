@@ -36,31 +36,21 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
-
-// Sample user data
-// const initialUserData = {
-//   gender: "male",
-//   birthdate: "0000-00-00s",
-//   height: 0, // cm
-//   weight: 0, // kg
-//   activityLevel: "moderate", // sedentary, light, moderate, active, very_active
-//   goal: "maintain", // lose_weight, maintain, gain_weight
-//   calorieGoal: 0, // calories per day
-//   macros: {
-//     carbs: 0, // percentage
-//     protein: 0, // percentage
-//     fat: 0, // percentage
-//   }
-// };
+import axios from "axios";
 
 const ProfileCalorieGoals = () => {
-  // const [userData, setUserData] = useState(initialUserData);
   const { userData, setUserData } = useUserProfile();
+  const [calorieGoal, setCalorieGoal] = useState(userData.calorieGoal ?? 2200);
 
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [calculatedCalories, setCalculatedCalories] = useState(0);
   const [activeTab, setActiveTab] = useState("manual");
+
+  useEffect(() => {
+    setCalorieGoal(userData.calorieGoal);
+  }, [userData.calorieGoal]);
+  
 
   // Calculate BMR (Basal Metabolic Rate) using Harris-Benedict formula
   const calculateBMR = () => {
@@ -151,18 +141,58 @@ const ProfileCalorieGoals = () => {
   };
 
   // Save data
+  const API_URL =
+    import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+      ? import.meta.env.VITE_API_URL
+      : "https://aroi-dee-backend.vercel.app";
+
+  // Save data
   const handleSave = async () => {
-    setIsSaving(true);
-
-    try {
-      // In a real app, this would be an API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setIsEditing(false);
-      toast.success("Settings Saved", {
-        description: `Your calorie goal has been set to ${userData.calorieGoal} kcal per day`,
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = localStorage.getItem("authToken");
+  
+    if (!user || !user.id || !token) {
+      toast.error("User not found", {
+        description: "Unable to find user or token. Please log in again.",
       });
-    } catch (error) {
+      return;
+    }
+  
+    setIsSaving(true);
+  
+    try {
+      // PUT: อัปเดตเป้าหมายแคลอรี่
+      await axios.put(
+        `${API_URL}/api/users/${user.id}/update-goals`,
+        {
+          calories_goal: calorieGoal,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      // GET: ดึงข้อมูลล่าสุดมาอัปเดต context
+      const response = await axios.get(`${API_URL}/api/users/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // อัปเดต context (สมมุติว่า API คืนข้อมูลที่โครงสร้างตรงกับ UserProfile)
+      setUserData((prev) => ({
+        ...prev,
+        calorieGoal: response.data.user.calories_goal,
+      }));
+  
+      setIsEditing(false);
+  
+      toast.success("Settings Saved", {
+        description: `Your calorie goal has been set to ${calorieGoal.toLocaleString()} kcal per day.`,
+      });
+    } catch (error: any) {
       console.error("Error saving profile:", error);
       toast.error("Error", {
         description: "Unable to save data. Please try again.",
@@ -171,6 +201,7 @@ const ProfileCalorieGoals = () => {
       setIsSaving(false);
     }
   };
+  
 
   const updateMacro = (type: "carbs" | "protein" | "fat", value: number) => {
     if (!isEditing) return;
