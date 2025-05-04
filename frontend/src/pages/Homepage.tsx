@@ -30,7 +30,7 @@ const Homepage: React.FC = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [latestRecipes, setLatestRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {

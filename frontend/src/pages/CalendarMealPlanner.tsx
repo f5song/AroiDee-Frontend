@@ -27,18 +27,18 @@ interface MealsByDate {
   [date: string]: Meal[]
 }
 
-interface UserProfile {
-  fullName: string
-  username: string
-  email: string
-  gender: string
-  weight: number
-  height: number
-  birthdate: string
-  activityLevel: string
-  calorieGoal: number
-  fitnessGoals: string[]
-}
+// interface UserProfile {
+//   fullName: string
+//   username: string
+//   email: string
+//   gender: string
+//   weight: number
+//   height: number
+//   birthdate: string
+//   activityLevel: string
+//   calorieGoal: number
+//   fitnessGoals: string[]
+// }
 
 const API_URL =
   import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
@@ -158,8 +158,8 @@ const CalendarMealPlanner: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]) // ✅ เริ่มจาก array เปล่า
   // Add this after the other useState declarations
-  const [isLoadingMeals, setIsLoadingMeals] = useState<boolean>(false)
-  const [totalCalories, setTotalCalories] = useState<number>(0)
+  const [, setIsLoadingMeals] = useState<boolean>(false)
+  const [, setTotalCalories] = useState<number>(0)
 
   // Calculate total calories whenever meals change
   useEffect(() => {
