@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { RecipeHeader } from "@/components/createRecipe/RecipeHeader";
 import { createRecipe } from "@/lib/api/recipeApi";
-import { useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { fetchCategories } from "@/lib/api/utils";
 import axios from "axios";
 

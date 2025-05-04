@@ -1,7 +1,7 @@
 import React from "react";
 import { Heart, User, Clock, Share2, Star } from "lucide-react";
 import { RecipeHeaderProps } from "../../types/recipe";
-import { useFavorites } from "../auth/FavoritesContext";
+import { useFavorites } from "../../contexts/FavoritesContext";
 import { useNavigate } from "react-router-dom";
 
 // เพิ่ม prop สำหรับ Skeleton

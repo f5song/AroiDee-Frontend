@@ -6,6 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 import axios from "axios";
+import { useUserProfile } from "@/contexts/UserProfileContext";
 
 // ใช้ API_URL จาก environment variable หรือค่า default
 const API_URL =
@@ -37,6 +38,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const { setUserData } = useUserProfile();
   const [user, setUser] = useState<User>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,25 +63,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (identifier: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        `${API_URL}/api/users/login`, 
-        {
-          identifier,
-          password,
-        }
-      );
+      const response = await axios.post(`${API_URL}/api/users/login`, {
+        identifier,
+        password,
+      });
 
       const { token, user } = response.data;
 
-      // บันทึก Token & User ลงใน LocalStorage
       localStorage.setItem("authToken", token);
       localStorage.setItem("user", JSON.stringify(user));
 
       setToken(token);
       setUser(user);
 
-      // ตั้งค่า axios ให้ใช้ token อัตโนมัติ
       axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+
+      // 🔥 เพิ่มส่วนนี้: fetch profile เต็มจาก backend
+      const profileRes = await axios.get(`${API_URL}/api/users/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = profileRes.data.user;
+
+      // 🔥 อัปเดต context ของ UserProfile
+      setUserData({
+        id: data.id,
+        gender: data.gender,
+        birthdate: data.birthdate,
+        height: data.height,
+        weight: data.weight,
+        activityLevel: data.activity_level,
+        goal: data.goal,
+        calorieGoal: data.calories_goal,
+        macros: {
+          carbs: data.macros?.carbs || 50,
+          protein: data.macros?.protein || 25,
+          fat: data.macros?.fat || 25,
+        },
+      });
     } catch (error: any) {
       console.error(
         "Login failed:",
@@ -159,4 +180,8 @@ export const useAuth = () => {
   return context;
 };
 
+
+
+
 export default AuthContext;
+

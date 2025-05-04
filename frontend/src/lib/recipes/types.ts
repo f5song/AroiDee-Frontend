@@ -12,6 +12,8 @@ export interface Category {
 
 
 export interface Recipe {
+  nutrition_facts: any;
+  kcal: number;
   id: number;
   title: string;
   description?: string; 

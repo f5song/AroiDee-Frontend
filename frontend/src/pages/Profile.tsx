@@ -7,7 +7,7 @@ import ResponsiveSidebar from "@/components/profile/ResponsiveSidebar";
 import { Profile } from "@/components/profile/ProfileTypes";
 import ProfileCalorieGoals from "@/components/profile/ProfileCalorieGoals";
 import { toast } from "sonner";
-import { useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const API_URL =
   import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""

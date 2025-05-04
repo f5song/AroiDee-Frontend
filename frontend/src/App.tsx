@@ -1,9 +1,9 @@
 import { Suspense, lazy } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { AuthProvider } from "@/components/auth/AuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import SmartNavbar from "./components/navigation/SmartNavbar";
 import Footer from "@/components/footer";
-import { FavoritesProvider } from "@/components/auth/FavoritesContext";
+import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserProfileProvider } from "./contexts/UserProfileContext";
 // สร้าง QueryClient instance
@@ -33,8 +33,8 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <AuthProvider>
-          <UserProfileProvider>
+        <UserProfileProvider>
+          <AuthProvider>
             <FavoritesProvider>
               <div className="flex flex-col min-h-screen">
                 <SmartNavbar />
@@ -66,8 +66,8 @@ const App = () => {
                 <Footer />
               </div>
             </FavoritesProvider>
-          </UserProfileProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </UserProfileProvider>
       </Router>
     </QueryClientProvider>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "@/components/auth/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Hero from "@/components/main/Hero";
 import Categories from "@/components/main/Categories";
 import Content from "@/components/main/Content";

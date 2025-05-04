@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/components/auth/AuthContext";
-import { useFavorites } from "@/components/auth/FavoritesContext"; // ✅ ใช้ FavoritesContext
+import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext"; // ✅ ใช้ FavoritesContext
 import { Recipe } from "@/lib/recipes/types";
 import RecipeCollection from "@/components/myRecipe/RecipeCollection";
 import PageHeader from "@/components/myRecipe/PageHeader";

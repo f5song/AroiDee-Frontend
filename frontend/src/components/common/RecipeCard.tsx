@@ -15,8 +15,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/components/auth/AuthContext";
-import { useFavorites } from "../auth/FavoritesContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "../../contexts/FavoritesContext";
 
 interface Category {
   id: number;

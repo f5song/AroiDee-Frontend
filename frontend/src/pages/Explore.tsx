@@ -4,8 +4,8 @@ import PageHeader from "@/components/explore/PageHeader";
 import RecipeGrid from "@/components/common/RecipeGrid";
 import PaginationControls from "@/components/explore/PaginationControls";
 import { FilterOptions, Recipe, fetchRecipes } from "@/lib/recipes/api";
-import { useAuth } from "@/components/auth/AuthContext";
-import { useFavorites } from "@/components/auth/FavoritesContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 export default function ExplorePage() {
   const { user } = useAuth();

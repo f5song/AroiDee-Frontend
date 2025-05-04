@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff } from "lucide-react";
 import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 

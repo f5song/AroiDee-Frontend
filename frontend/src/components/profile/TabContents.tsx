@@ -4,8 +4,8 @@ import { Profile } from "./ProfileTypes";
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "@/components/auth/AuthContext";
-import { useFavorites } from "@/components/auth/FavoritesContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 import RecipeCard from "@/components/common/RecipeCard";
 
 const API_URL =

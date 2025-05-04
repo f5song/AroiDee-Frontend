@@ -2,7 +2,7 @@ import React from "react";
 import { Recipe, Category } from "@/lib/recipes/types";
 import RecipeCard from "@/components/common/RecipeCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useFavorites } from "@/components/auth/FavoritesContext";
+import { useFavorites } from "@/contexts/FavoritesContext";
 import { Search, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

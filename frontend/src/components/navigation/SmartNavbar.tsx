@@ -1,6 +1,6 @@
 import React from 'react';
 import Navbar from '@/components/navigation/index'; // Unified navbar component
-import { useAuth } from '@/components/auth/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SmartNavbar: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();

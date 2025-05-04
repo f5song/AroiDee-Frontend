@@ -37,10 +37,9 @@ const defaultUserProfile: UserProfile = {
 };
 
 const API_URL =
-import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
-  ? import.meta.env.VITE_API_URL
-  : "https://aroi-dee-backend.vercel.app";
-
+  import.meta.env.VITE_API_URL && import.meta.env.VITE_API_URL.trim() !== ""
+    ? import.meta.env.VITE_API_URL
+    : "https://aroi-dee-backend.vercel.app";
 
 type UserProfileContextType = {
   userData: UserProfile;
@@ -61,7 +60,10 @@ export const UserProfileProvider = ({
   useEffect(() => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem("authToken");
-      if (!token) return;
+      if (!token) {
+        setUserData(defaultUserProfile);
+        return;
+      }
 
       try {
         const response = await axios.get(`${API_URL}/api/users/profile`, {
@@ -75,7 +77,6 @@ export const UserProfileProvider = ({
             ...prev,
             id: data.id,
             calorieGoal: data.calories_goal ?? prev.calorieGoal,
-            // หากต้องการ fetch เพิ่ม เช่น weight, height ให้ map ใส่เพิ่มตรงนี้
           }));
         }
       } catch (error) {
@@ -84,7 +85,9 @@ export const UserProfileProvider = ({
     };
 
     fetchUserProfile();
-  }, []);
+  }, [
+    typeof window !== "undefined" ? localStorage.getItem("authToken") : null,
+  ]);
 
   return (
     <UserProfileContext.Provider value={{ userData, setUserData }}>
